@@ -15,13 +15,8 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 	if (!InitializeScene())
 		return false;
 
-	//Setup ImGui
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
-	ImGui::StyleColorsDark();
+	InitGui(hwnd);
+	materialMesh.push_back(GetMaterialMesh());
 
 	return true;
 }
@@ -47,29 +42,78 @@ void Graphics::RenderFrame()
 	deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
 
-	//sprite mask
-	deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-	deviceContext->IASetInputLayout(vertexshader_2d.GetInputLayout());
-	deviceContext->PSSetShader(pixelshader_2d_discard.GetShader(), NULL, 0);
-	deviceContext->VSSetShader(vertexshader_2d.GetShader(), NULL, 0);
-	sprite.Draw(camera2D.GetWorldMatrix() * camera2D.GetOrthoMatrix());
+	////sprite mask
+	//deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
+	//deviceContext->IASetInputLayout(vertexshader_2d.GetInputLayout());
+	//deviceContext->PSSetShader(pixelshader_2d_discard.GetShader(), NULL, 0);
+	//deviceContext->VSSetShader(vertexshader_2d.GetShader(), NULL, 0);
+	//sprite.Draw(camera2D.GetWorldMatrix() * camera2D.GetOrthoMatrix());
 
 
 	deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
 	deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
 	deviceContext->IASetInputLayout(vertexshader.GetInputLayout());
-	deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
-
+	//deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	
 	{ 
-		gameObject.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
+		//gameObject.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
 	}
 	{
-		deviceContext->PSSetShader(pixelshader_nolight.GetShader(), NULL, 0);
-		light.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
+		//deviceContext->PSSetShader(pixelshader_nolight.GetShader(), NULL, 0);
+		//light.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
 	}
+	//-------
 
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	deviceContext->VSSetShader(my_vs.GetShader(), NULL, 0);
+	deviceContext->PSSetShader(my_ps.GetShader(), NULL, 0);
+	///*deviceContext->IASetInputLayout(my_vs.GetInputLayout());
+	//deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+
+	//deviceContext->RSSetState(rasterizerState.Get());
+	//deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
+	//deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 	
+	cb_vs_vertexshader.data.worldMatrix = XMMatrixIdentity();
+	cb_vs_vertexshader.data.wvpMatrix = Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+	cb_vs_vertexshader.ApplyChanges();
 
+	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
+
+	materialMesh[0].Draw();
+
+
+
+	DrawGui();
+	DrawFPS();
+
+	this->swapchain->Present(0, NULL);
+}
+
+Mesh Graphics::GetMaterialMesh()
+{
+	std::vector<Vertex3D> vertices{
+		Vertex3D(0,0,10,0,1,-1,-1,-1),
+		Vertex3D(10,0,10,1,1,-1,-1,-1),
+		Vertex3D(0,0,0,0,0,-1,-1,-1),
+		Vertex3D(10,0,0,0,0,-1,-1,-1),
+	};
+
+	std::vector<DWORD> indices{
+		0,1,3,
+		0,3,2
+	};
+
+	std::vector<Texture> textures;
+	DirectX::XMMATRIX mtx = XMMatrixIdentity();
+
+	return Mesh(device.Get(),deviceContext.Get(), vertices, indices, textures, mtx);
+}
+
+void Graphics::DrawFPS() {
 	//Draw Text
 	static int fpsCounter = 0;
 	static std::string fpsString = "FPS: 0";
@@ -81,15 +125,18 @@ void Graphics::RenderFrame()
 		fpsTimer.Restart();
 	}
 	spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), StringHelper::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f,0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+	spriteFont->DrawString(spriteBatch.get(), StringHelper::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
+}
 
+void Graphics::DrawGui() {
 	static int counter = 0;
 	// Start the Dear ImGui frame
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	//Create ImGui Test Window
+	ImGui::SetNextWindowPos(ImVec2(50, 400), ImGuiCond_Once);
 	ImGui::Begin("Light Controls");
 	ImGui::DragFloat3("Ambient Light Color", &this->cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("Ambient Light Strength", &this->cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f);
@@ -105,7 +152,6 @@ void Graphics::RenderFrame()
 	//Render Draw Data
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-	this->swapchain->Present(0, NULL);
 }
 
 bool Graphics::InitializeDirectX(HWND hwnd)
@@ -328,6 +374,12 @@ bool Graphics::InitializeShaders()
 	if (!pixelshader_nolight.Initialize(this->device, shaderfolder + L"pixelshader_nolight.cso"))
 		return false;
 
+	//-------
+	if (!my_vs.Initialize(this->device, shaderfolder + L"my_vs.cso", layout3D, numElements3D))
+		return false;
+
+	if (!my_ps.Initialize(this->device, shaderfolder + L"my_ps.cso"))
+		return false;
 
 	return true;
 }
@@ -372,8 +424,45 @@ bool Graphics::InitializeScene()
 
 		camera2D.SetProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
-		Camera3D.SetPosition(0.0f, 0.0f, -2.0f);
+		Camera3D.SetPosition(0.0f, 1.0f, -2.0f);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
+
+
+		//---------------------------------------------
+		int N = 10;
+
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+		desc.Width = N;
+		desc.Height = N;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+		desc.MiscFlags = 0;
+
+		hr = device->CreateTexture2D(&desc, nullptr, material_texture.GetAddressOf());
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		deviceContext->Map(material_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		unsigned int* data = ((unsigned int*)mappedResource.pData);
+
+		for (int i = 0; i < N; i++)
+		{
+			for (int j = 0; j < N; j++)
+			{
+				int a = 255, r = 255, g = 255, b = 255;
+				data[(j + i * N)] = (a << 24) + (r << 16) + (g << 8) + b;
+			}
+		}
+
+		deviceContext->Unmap(material_texture.Get(), 0);
+
+		hr = device->CreateShaderResourceView(material_texture.Get(), nullptr, &material_srv);
 
 	}
 	catch (COMException & exception)
@@ -382,4 +471,13 @@ bool Graphics::InitializeScene()
 		return false;
 	}
 	return true;
+}
+
+void Graphics::InitGui(HWND hwnd) {
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
+	ImGui::StyleColorsDark();
 }

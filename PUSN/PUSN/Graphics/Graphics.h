@@ -28,6 +28,20 @@ private:
 	bool InitializeDirectX(HWND hwnd);
 	bool InitializeShaders();
 	bool InitializeScene();
+	void InitGui(HWND hwnd);
+
+	void DrawGui();
+	void DrawFPS();
+
+	Mesh GetMaterialMesh();
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> material_texture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> material_srv;
+	VertexShader my_vs;
+	PixelShader my_ps;
+
+	std::vector<Mesh> materialMesh;
+
 
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
@@ -50,8 +64,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_drawMask;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_applyMask;
-
-
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState_CullFront;
