@@ -1,5 +1,4 @@
 #pragma once
-#include "RenderWindow.h"
 #include "Keyboard/KeyboardClass.h"
 #include "Mouse/MouseClass.h"
 #include "Graphics/Graphics.h"
@@ -11,9 +10,9 @@ public:
 	WindowContainer();
 	LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	bool InitializeBASE(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height);
+	bool InitializeWindowAndMessageHandling(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height);
 	HWND GetHWND() const;
-	bool ProcessMessageseBASE();
+	bool ProcessMessage();
 	~WindowContainer();
 
 protected:

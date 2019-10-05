@@ -160,7 +160,7 @@ LRESULT WindowContainer::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 }
 
-bool WindowContainer::InitializeBASE(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
+bool WindowContainer::InitializeWindowAndMessageHandling(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
 {
 	this->hInstance = hInstance;
 	this->width = width;
@@ -209,7 +209,7 @@ bool WindowContainer::InitializeBASE(HINSTANCE hInstance, std::string window_tit
 	return true;
 }
 
-bool WindowContainer::ProcessMessageseBASE()
+bool WindowContainer::ProcessMessage()
 {
 	// Handle the windows messages.
 	MSG msg;

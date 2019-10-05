@@ -4,18 +4,13 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 {
 	timer.Start();
 
-	if (!this->InitializeBASE( hInstance, window_title, window_class, width, height))
+	if (!this->InitializeWindowAndMessageHandling( hInstance, window_title, window_class, width, height))
 		return false;
 
 	if (!gfx.Initialize(this->GetHWND(), width, height))
 		return false;
 
 	return true;
-}
-
-bool Engine::ProcessMessages()
-{
-	return this->ProcessMessageseBASE();
 }
 
 void Engine::Update()
