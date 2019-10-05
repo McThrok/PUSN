@@ -4,10 +4,10 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 {
 	timer.Start();
 
-	if (!this->render_window.Initialize(this, hInstance, window_title, window_class, width, height))
+	if (!this->InitializeBASE( hInstance, window_title, window_class, width, height))
 		return false;
 
-	if (!gfx.Initialize(this->render_window.GetHWND(), width, height))
+	if (!gfx.Initialize(this->GetHWND(), width, height))
 		return false;
 
 	return true;
@@ -15,7 +15,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 
 bool Engine::ProcessMessages()
 {
-	return this->render_window.ProcessMessages();
+	return this->ProcessMessageseBASE();
 }
 
 void Engine::Update()
