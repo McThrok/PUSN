@@ -17,9 +17,12 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 
 	InitGui(hwnd);
 
+	std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\t1.k16";
+
 	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize({ 10,5,15 }, 100, 100);
-	//InitMillingCutterMesh(2, false);
+	millingMaterial->Initialize({ 100, 50, 150 }, 100, 100);
+	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
+	millingMachine->LoadDataFromFile(path);
 
 	return true;
 }
@@ -91,7 +94,12 @@ void Graphics::RenderFrame()
 	//millingMaterial->UpdateVertexBuffer();
 	millingMaterial->Draw();
 
-	DrawGui();
+	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
+	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix* Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+	cb_vs_vertexshader.ApplyChanges();
+	millingMachine->millingCutterMesh->Draw();
+
+	//DrawGui();
 	DrawFPS();
 
 	this->swapchain->Present(0, NULL);
@@ -389,12 +397,13 @@ bool Graphics::InitializeScene()
 
 		camera2D.SetProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
-		Camera3D.SetPosition(0.0f, 1.0f, -2.0f);
+		Camera3D.SetPosition(0.0f, 200.0f, -100.0f);
+		Camera3D.SetRotation(1.2, 0, 0);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
 
 
 		//---------------------------------------------
-		int N = 10;
+		/*int N = 10;
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -427,7 +436,7 @@ bool Graphics::InitializeScene()
 
 		deviceContext->Unmap(material_texture.Get(), 0);
 
-		hr = device->CreateShaderResourceView(material_texture.Get(), nullptr, &material_srv);
+		hr = device->CreateShaderResourceView(material_texture.Get(), nullptr, &material_srv);*/
 
 	}
 	catch (COMException & exception)

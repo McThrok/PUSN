@@ -1,16 +1,24 @@
 #include "MillingMachine.h"
 
+MillingMachine::MillingMachine(ID3D11Device * _device, ID3D11DeviceContext * _deviceContext)
+{
+	device = _device;
+	deviceContext = _deviceContext;
+
+	safePosition = XMFLOAT3(0, 120, 0);
+	speed = 0.5;
+}
+
 void MillingMachine::LoadDataFromFile(string filePath)
 {
 	string extension = filePath.substr(filePath.rfind("."));
-	flatCut = extension[0] == 'f';
-	cutRange = stoi(filePath.substr(1));
+	flatCut = extension[1] == 'f';
+	cutRange = stoi(extension.substr(2));
 
 	SetMillingCutterMesh(cutRange, flatCut);
 
 	moves.clear();
 	currentMove = 0;
-	safePosition = { 0, 10, 0 };
 	currentPosition = safePosition;
 	finished = false;
 
@@ -20,7 +28,7 @@ void MillingMachine::LoadDataFromFile(string filePath)
 		if (str[0] != 'N')
 			continue;
 
-		int pos = filePath.find("G");
+		int pos = str.find("G");
 		if (pos == -1)
 			continue;
 
@@ -39,7 +47,16 @@ void MillingMachine::LoadDataFromFile(string filePath)
 			position.x = moves.back().x;
 		}
 
-		if (str[0] == 'Y') {
+		if (str[0] == 'Y') {//Z
+			pos = str.find(".");
+			position.z = stof(str.substr(1, pos + 4));
+			str = str.substr(pos + 4);
+		}
+		else {
+			position.z = moves.back().z;
+		}
+
+		if (str[0] == 'Z') {//Y
 			pos = str.find(".");
 			position.y = stof(str.substr(1, pos + 4));
 			str = str.substr(pos + 4);
@@ -48,17 +65,8 @@ void MillingMachine::LoadDataFromFile(string filePath)
 			position.y = moves.back().y;
 		}
 
-		if (str[0] == 'Z') {
-			pos = str.find(".");
-			position.z = stof(str.substr(1, pos + 4));
-			str = str.substr(pos + 4);
-		}
-		else {
-			position.z = moves.back().z;
-		}
+		moves.push_back(position);
 	}
-
-	moves.insert(moves.begin(), safePosition);
 	moves.push_back(safePosition);
 }
 
@@ -67,7 +75,7 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 	float r = radius;
 	int horizontalLvls = 10;
 	int roundLvls = 10;
-	float height = 10;
+	float height = 300;
 	float startHeight = flat ? 0 : r;
 
 	vector<Vertex3D> vertices;
@@ -133,12 +141,14 @@ void MillingMachine::Update(float dt, MillingMaterial * material)
 
 	UpdatePosition(dt);
 	Cut(material);
+
+	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
 void MillingMachine::UpdatePosition(float dt)
 {
-	XMVECTOR a = XMLoadFloat3(&moves[currentMove]);
-	XMVECTOR b = XMLoadFloat3(&moves[currentMove + 1]);
+	XMVECTOR a = XMLoadFloat3(&currentPosition);
+	XMVECTOR b = XMLoadFloat3(&moves[currentMove]);
 	XMVECTOR toEndMove = b - a;
 
 	XMVECTOR dir = XMVector3Normalize(toEndMove);
@@ -148,19 +158,17 @@ void MillingMachine::UpdatePosition(float dt)
 	XMStoreFloat3(&moveLen, XMVector3Length(movement));
 	XMStoreFloat3(&toEndLen, XMVector3Length(toEndMove));
 
-	if (moveLen.x > toEndLen.x) {
+	if (moveLen.x < toEndLen.x) {
 		XMStoreFloat3(&currentPosition, XMLoadFloat3(&currentPosition) + movement);
 	}
 	else {
-		currentPosition = moves[currentMove + 1];
+		currentPosition = moves[currentMove];
 
 		if (moves.size() > currentMove + 1)
-			currentMove = currentMove + 1;
+			currentMove++;
 		else
 			finished = true;
 	}
-
-	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
 void MillingMachine::Cut(MillingMaterial * material)
@@ -171,18 +179,24 @@ void MillingMachine::Cut(MillingMaterial * material)
 	{
 		for (int j = 0; j < material->gridZ; j++)
 		{
-			XMFLOAT3 pos = material->Get(i, j).pos;
+			XMFLOAT3 pos = material->GetVert(i, j).pos;
 			float x = currentPosition.x - pos.x;
 			float z = currentPosition.z - pos.z;
 
 			float distSq = x * x + z * z;
 			if (distSq < rangeSq)
+			{
 				if (flatCut)
 					pos.y = min(pos.y, currentPosition.y);
 				else
 					pos.y = min(pos.y, currentPosition.y + cutRange - sqrt(rangeSq - distSq));
+
+				material->GetVert(i, j).pos = pos;
+			}
 		}
 	}
+
+	material->UpdateVertexBuffer();
 }
 
 //XMVECTOR MillingMachine::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)

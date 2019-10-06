@@ -1,6 +1,7 @@
 #pragma once
 #include "WindowContainer.h"
 #include "Timer.h"
+#include <memory>
 
 class Engine : public WindowContainer
 {

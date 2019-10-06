@@ -15,7 +15,7 @@ using namespace std;
 
 class MillingMachine {
 public:
-	MillingMachine(ID3D11Device * _device, ID3D11DeviceContext * _deviceContext) : device(_device), deviceContext(_deviceContext) {}
+	MillingMachine(ID3D11Device * _device, ID3D11DeviceContext * _deviceContext);
 
 	void LoadDataFromFile(string filePath);
 	void SetMillingCutterMesh(float radius, bool flat);
@@ -26,7 +26,7 @@ public:
 	float maxDepth;
 	bool flatCut;
 	float cutRange;
-	float speed = 10;
+	float speed;
 	bool finished;
 
 private:

@@ -16,6 +16,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 void Engine::Update()
 {
 	float dt = timer.GetMilisecondsElapsed();
+	this->gfx.millingMachine->Update(dt, this->gfx.millingMaterial.get());
 	timer.Restart();
 
 	while (!keyboard.CharBufferIsEmpty())
@@ -43,11 +44,11 @@ void Engine::Update()
 
 	this->gfx.gameObject.AdjustRotation(0.0f, 0.001f*dt, 0.0f);
 
-	float Camera3DSpeed = 0.006f;
+	float Camera3DSpeed = 0.06f;
 
 	if (keyboard.KeyIsPressed(VK_SHIFT))
 	{
-		Camera3DSpeed = 0.3f;
+		Camera3DSpeed = 1;
 	}
 
 	if (keyboard.KeyIsPressed('W'))

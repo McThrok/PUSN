@@ -30,7 +30,7 @@ public:
 	void Draw();
 	void UpdateVertexBuffer();
 	void Randomize();
-	Vertex3D& Get(int x, int z);
+	Vertex3D& GetVert(int x, int z);
 
 	int gridX, gridZ;
 	XMFLOAT3 size;

@@ -29,6 +29,9 @@ public:
 	Sprite sprite;
 	RenderableGameObject gameObject;
 	Light light;
+
+	std::shared_ptr<MillingMaterial> millingMaterial;
+	std::shared_ptr<MillingMachine> millingMachine;
 private:
 	bool InitializeDirectX(HWND hwnd);
 	bool InitializeShaders();
@@ -38,13 +41,9 @@ private:
 	void DrawGui();
 	void DrawFPS();
 
-
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> material_texture;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> material_srv;
 	VertexShader my_vs;
 	PixelShader my_ps;
 
-	std::shared_ptr<MillingMaterial> millingMaterial;
 
 
 

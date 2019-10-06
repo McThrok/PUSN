@@ -28,7 +28,7 @@ void MillingMaterial::Draw()
 	this->deviceContext->DrawIndexed(this->indexbuffer.IndexCount(), 0, 0);
 }
 
-Vertex3D & MillingMaterial::Get(int x, int z)
+Vertex3D & MillingMaterial::GetVert(int x, int z)
 {
 	return vertices[x * gridZ + z];
 }
@@ -43,9 +43,9 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++)
 		{
-			float x = size.x * i / (gridX - 1);
+			float x = size.x * (i - gridX / 2.0) / (gridX - 1);
 			float y = size.y;
-			float z = size.z * j / (gridZ - 1);
+			float z = size.z * (j - gridZ / 2.0) / (gridZ - 1);
 			this->vertices.push_back(Vertex3D(x, y, z, 0, 1, 0));
 		}
 
@@ -87,6 +87,6 @@ void MillingMaterial::Randomize()
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++) {
 			float angle = XM_2PI * (i * 10 + frame) / 100;
-			Get(i, j).pos.y = std::sin(angle);
+			GetVert(i, j).pos.y = std::sin(angle);
 		}
 }
