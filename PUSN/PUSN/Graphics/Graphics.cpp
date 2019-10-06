@@ -17,7 +17,9 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 
 	InitGui(hwnd);
 
-	InitMaterialMesh();
+	//InitMaterialMesh();
+	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
+	millingMaterial->Initialize(100,100);
 	InitMillingCutterMesh(2, false);
 
 	return true;
@@ -85,8 +87,11 @@ void Graphics::RenderFrame()
 	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
 	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
 
-	materialMesh->Draw();
-	millingCutterMesh->Draw();
+	//materialMesh->Draw();
+	//millingCutterMesh->Draw();
+	millingMaterial->Randomize();
+	millingMaterial->UpdateVertexBuffer();
+	millingMaterial->Draw();
 
 
 
@@ -94,26 +99,6 @@ void Graphics::RenderFrame()
 	DrawFPS();
 
 	this->swapchain->Present(0, NULL);
-}
-
-void Graphics::InitMaterialMesh()
-{
-	std::vector<Vertex3D> vertices{
-		Vertex3D(0,0,10,0,1,-1,-1,-1),
-		Vertex3D(10,0,10,1,1,-1,-1,-1),
-		Vertex3D(0,0,0,0,0,-1,-1,-1),
-		Vertex3D(10,0,0,0,0,-1,-1,-1),
-	};
-
-	std::vector<DWORD> indices{
-		0,1,3,
-		0,3,2
-	};
-
-	std::vector<Texture> textures;
-	DirectX::XMMATRIX mtx = XMMatrixIdentity();
-
-	materialMesh = std::shared_ptr<Mesh>(new Mesh(device.Get(), deviceContext.Get(), vertices, indices, textures, mtx));
 }
 
 void Graphics::InitMillingCutterMesh(float radius, bool flat)

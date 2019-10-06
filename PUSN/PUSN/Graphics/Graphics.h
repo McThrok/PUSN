@@ -16,6 +16,7 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <math.h>
+#include "MillingMaterial.h"
 
 class Graphics
 {
@@ -42,8 +43,9 @@ private:
 	VertexShader my_vs;
 	PixelShader my_ps;
 
-	std::shared_ptr<Mesh> materialMesh;
-	void InitMaterialMesh();
+	//std::shared_ptr<Mesh> materialMesh;
+	//void InitMaterialMesh();
+	std::shared_ptr<MillingMaterial> millingMaterial;
 
 	std::shared_ptr<Mesh> millingCutterMesh;
 	void InitMillingCutterMesh(float radius, bool flat);

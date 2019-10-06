@@ -17,6 +17,15 @@ struct Vertex3D
 	Vertex3D(float x, float y, float z, float u, float v, float nx, float ny, float nz)
 		: pos(x, y, z), texCoord(u, v), normal(nx, ny, nz) {}
 
+	Vertex3D(float x, float y, float z, float u, float v)
+		: pos(x, y, z), texCoord(u, v) {}
+
+	Vertex3D(float x, float y, float z, float nx, float ny, float nz)
+		: pos(x, y, z), normal(nx, ny, nz) {}
+
+	Vertex3D(float x, float y, float z)
+		: pos(x, y, z) {}
+
 	DirectX::XMFLOAT3 pos;
 	DirectX::XMFLOAT2 texCoord;
 	DirectX::XMFLOAT3 normal;
