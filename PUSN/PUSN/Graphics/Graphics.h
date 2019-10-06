@@ -16,7 +16,8 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <math.h>
-#include "MillingMaterial.h"
+#include "..\\Milling\\MillingMachine.h"
+#include "..\\Milling\\MillingMaterial.h"
 
 class Graphics
 {
@@ -43,14 +44,8 @@ private:
 	VertexShader my_vs;
 	PixelShader my_ps;
 
-	//std::shared_ptr<Mesh> materialMesh;
-	//void InitMaterialMesh();
 	std::shared_ptr<MillingMaterial> millingMaterial;
 
-	std::shared_ptr<Mesh> millingCutterMesh;
-	void InitMillingCutterMesh(float radius, bool flat);
-	DirectX::XMVECTOR GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c);
-	DirectX::XMFLOAT3 Normalize(XMFLOAT3 v);
 
 
 

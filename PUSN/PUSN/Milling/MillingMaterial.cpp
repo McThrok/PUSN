@@ -6,6 +6,7 @@ MillingMaterial::MillingMaterial(ID3D11Device * device, ID3D11DeviceContext * de
 {
 	this->deviceContext = deviceContext;
 	this->device = device;
+	this->size = { 10, 5, 15 };
 }
 
 MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
@@ -23,7 +24,6 @@ MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
 void MillingMaterial::Draw()
 {
 	UINT offset = 0;
-
 	this->deviceContext->IASetVertexBuffers(0, 1, this->vertexbuffer.GetAddressOf(), this->vertexbuffer.StridePtr(), &offset);
 	this->deviceContext->IASetIndexBuffer(this->indexbuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	this->deviceContext->DrawIndexed(this->indexbuffer.IndexCount(), 0, 0);
@@ -36,13 +36,15 @@ Vertex3D & MillingMaterial::Get(int x, int z)
 
 void MillingMaterial::Initialize(int _gridX, int _gridZ)
 {
-	gridX = _gridX;
-	gridZ = _gridZ;
+	this->gridX = _gridX;
+	this->gridZ = _gridZ;
+	this->transformMatrix = XMMatrixScaling(size.x / _gridX, size.y, size.z / _gridZ);
 
-	vertices.reserve(gridX * gridZ);
+
+	this->vertices.reserve(gridX * gridZ);
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++)
-			vertices.push_back(Vertex3D(i, 0, j, 0, 1, 0));
+			this->vertices.push_back(Vertex3D(i, 0, j, 0, 1, 0));
 
 	HRESULT hr = this->vertexbuffer.Initialize(device, vertices.data(), vertices.size(), true);
 	COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer for mesh.");
@@ -63,13 +65,10 @@ void MillingMaterial::Initialize(int _gridX, int _gridZ)
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());
 	COM_ERROR_IF_FAILED(hr, "Failed to initialize index buffer for mesh.");
 
-	//UpdateVertexBuffer();
 }
 
 void MillingMaterial::UpdateVertexBuffer()
 {
-
-
 	D3D11_MAPPED_SUBRESOURCE resource;
 	auto hr = deviceContext->Map(vertexbuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	COM_ERROR_IF_FAILED(hr, "Failed to map vertex buffer.");
@@ -85,7 +84,7 @@ void MillingMaterial::Randomize()
 
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++) {
-			float angle = XM_2PI *(i*10+ frame) / 100;
+			float angle = XM_2PI * (i * 10 + frame) / 100;
 			Get(i, j).pos.y = std::sin(angle);
 		}
 }

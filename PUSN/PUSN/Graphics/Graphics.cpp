@@ -17,10 +17,9 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 
 	InitGui(hwnd);
 
-	//InitMaterialMesh();
 	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
 	millingMaterial->Initialize(100,100);
-	InitMillingCutterMesh(2, false);
+	//InitMillingCutterMesh(2, false);
 
 	return true;
 }
@@ -87,7 +86,6 @@ void Graphics::RenderFrame()
 	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
 	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
 
-	//materialMesh->Draw();
 	//millingCutterMesh->Draw();
 	millingMaterial->Randomize();
 	millingMaterial->UpdateVertexBuffer();
@@ -99,86 +97,6 @@ void Graphics::RenderFrame()
 	this->swapchain->Present(0, NULL);
 }
 
-void Graphics::InitMillingCutterMesh(float radius, bool flat)
-{
-	float r = radius;
-	int horizontalLvls = 10;
-	int roundLvls = 10;
-	float height = 10;
-	float startHeight = flat ? 0 : r;
-
-	std::vector<Vertex3D> vertices;
-	std::vector<DWORD> indices;
-
-	for (int i = 0; i < horizontalLvls; i++)
-	{
-		float angle = XM_2PI * i / horizontalLvls;
-		float angle2 = XM_2PI * (i + 1) / horizontalLvls;
-		XMFLOAT3 a = Normalize(XMFLOAT3(std::cos(angle), 0, std::sin(angle)));
-		XMFLOAT3 b = Normalize(XMFLOAT3(std::cos(angle2), 0, std::sin(angle2)));
-
-		int count = vertices.size();
-		vertices.push_back(Vertex3D(r*a.x, startHeight, r*a.z, -1, -1, a.x, 0, a.z));
-		vertices.push_back(Vertex3D(r*a.x, height, r*a.z, -1, -1, a.x, 0, a.z));
-		vertices.push_back(Vertex3D(r*b.x, height, r*b.z, -1, -1, b.x, 0, b.z));
-		vertices.push_back(Vertex3D(r*b.x, startHeight, r*b.z, -1, -1, b.x, 0, b.z));
-
-		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
-		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
-	}
-
-	if (!flat)
-	{
-		for (int i = 0; i < horizontalLvls; i++)
-		{
-			float angle = XM_2PI * i / horizontalLvls;
-			float angle2 = XM_2PI * (i + 1) / horizontalLvls;
-
-			for (int j = 0; j < roundLvls; j++)
-			{
-				float roundAngle = XM_PIDIV2 * j / roundLvls;
-				float roundAngle2 = XM_PIDIV2 * (j + 1) / roundLvls;
-
-				XMFLOAT3 a = Normalize(XMFLOAT3(std::cos(angle) *std::sin(roundAngle), std::cos(roundAngle), std::sin(angle) *std::sin(roundAngle)));
-				XMFLOAT3 a2 = Normalize(XMFLOAT3(std::cos(angle) *std::sin(roundAngle2), std::cos(roundAngle2), std::sin(angle) *std::sin(roundAngle2)));
-				XMFLOAT3 b = Normalize(XMFLOAT3(std::cos(angle2) *std::sin(roundAngle), std::cos(roundAngle), std::sin(angle2) *std::sin(roundAngle)));
-				XMFLOAT3 b2 = Normalize(XMFLOAT3(std::cos(angle2) *std::sin(roundAngle2), std::cos(roundAngle2), std::sin(angle2) *std::sin(roundAngle2)));
-
-				int count = vertices.size();
-				vertices.push_back(Vertex3D(r*a.x, r*(1 - a.y), r*a.z, -1, -1, a.x, a.y, a.z));
-				vertices.push_back(Vertex3D(r*a2.x, r*(1 - a2.y), r*a2.z, -1, -1, a2.x, a2.y, a2.z));
-				vertices.push_back(Vertex3D(r*b2.x, r*(1 - b2.y), r*b2.z, -1, -1, b2.x, b2.y, b2.z));
-				vertices.push_back(Vertex3D(r*b.x, r*(1 - b.y), r*b.z, -1, -1, b2.x, b.y, b.z));
-
-				indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
-				indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
-			}
-		}
-	}
-
-	std::vector<Texture> textures;
-	DirectX::XMMATRIX mtx = XMMatrixIdentity();
-
-	millingCutterMesh = std::shared_ptr<Mesh>(new Mesh(device.Get(), deviceContext.Get(), vertices, indices, textures, mtx));
-}
-
-DirectX::XMVECTOR Graphics::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)
-{
-	XMFLOAT3 u, v;
-	XMStoreFloat3(&u, b - a);
-	XMStoreFloat3(&v, c - a);
-
-	XMVECTOR normal = { u.y*v.z - u.z*v.y, u.z*v.x - u.x*v.z, u.x*v.y - u.y*v.z };
-	return normal;
-}
-
-DirectX::XMFLOAT3 Graphics::Normalize(XMFLOAT3 v)
-{
-	XMVECTOR vec = XMLoadFloat3(&v);
-	XMFLOAT3 normalized;
-	XMStoreFloat3(&normalized, XMVector3Normalize(vec));
-	return normalized;
-}
 
 void Graphics::DrawFPS() {
 	//Draw Text

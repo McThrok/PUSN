@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Graphics\ImGui">
       <UniqueIdentifier>{ab262921-691e-4c9a-b7b6-3f3f18bb8cb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Milling">
+      <UniqueIdentifier>{b35e9236-afb6-4182-ab8d-0bef1605a92f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Milling">
+      <UniqueIdentifier>{f2f27172-1ede-4303-91fe-8d527c987801}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -132,11 +138,11 @@
     <ClCompile Include="Graphics\Sprite.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="MillingData.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Milling\MillingMaterial.cpp">
+      <Filter>Source Files\Milling</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\MillingMaterial.cpp">
-      <Filter>Source Files\Graphics</Filter>
+    <ClCompile Include="Milling\MillingMachine.cpp">
+      <Filter>Source Files\Milling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,11 +260,11 @@
     <ClInclude Include="WindowContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MillingData.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Milling\MillingMaterial.h">
+      <Filter>Header Files\Milling</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\MillingMaterial.h">
-      <Filter>Header Files\Graphics</Filter>
+    <ClInclude Include="Milling\MillingMachine.h">
+      <Filter>Header Files\Milling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

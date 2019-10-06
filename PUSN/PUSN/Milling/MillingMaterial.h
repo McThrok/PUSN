@@ -1,27 +1,23 @@
 #pragma once
-#include "Vertex.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "ConstantBuffer.h"
-#include "Texture.h"
+#include "..\\Graphics\\Vertex.h"
+#include "..\\Graphics\\VertexBuffer.h"
+#include "..\\Graphics\\IndexBuffer.h"
+#include "..\\Graphics\\ConstantBuffer.h"
+#include "..\\Graphics\\Texture.h"
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <math.h>
 
-#include "AdapterReader.h"
-#include "Shaders.h"
+#include "..\\Graphics\\AdapterReader.h"
+#include "..\\Graphics\\Shaders.h"
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
-#include "Camera3D.h"
-#include "..\\Timer.h"
-#include "ImGUI\\imgui.h"
-#include "ImGUI\\imgui_impl_win32.h"
-#include "ImGUI\\imgui_impl_dx11.h"
-#include "RenderableGameObject.h"
-#include "Light.h"
-#include "Camera2D.h"
-#include "Sprite.h"
+#include "..\\Graphics\\Camera3D.h"
+#include "..\\Graphics\\RenderableGameObject.h"
+#include "..\\Graphics\\Light.h"
+#include "..\\Graphics\\Camera2D.h"
+#include "..\\Graphics\\Sprite.h"
 #include <memory>
 
 class MillingMaterial
@@ -35,6 +31,9 @@ public:
 	void UpdateVertexBuffer();
 	void Randomize();
 	Vertex3D& Get(int x, int z);
+
+	XMFLOAT3 size;
+	DirectX::XMMATRIX transformMatrix;
 
 private:
 	int gridX, gridZ;

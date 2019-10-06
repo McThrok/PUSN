@@ -27,8 +27,8 @@ void Model::Draw(const XMMATRIX & worldMatrix, const XMMATRIX & viewProjectionMa
 	for (int i = 0; i < meshes.size(); i++)
 	{
 		//Update Constant buffer with WVP Matrix
-		this->cb_vs_vertexshader->data.wvpMatrix = meshes[i].GetTransformMatrix() * worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
-		this->cb_vs_vertexshader->data.worldMatrix = meshes[i].GetTransformMatrix() * worldMatrix; //Calculate World
+		this->cb_vs_vertexshader->data.wvpMatrix = meshes[i].transformMatrix * worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
+		this->cb_vs_vertexshader->data.worldMatrix = meshes[i].transformMatrix * worldMatrix; //Calculate World
 		this->cb_vs_vertexshader->ApplyChanges();
 		meshes[i].Draw();
 	}

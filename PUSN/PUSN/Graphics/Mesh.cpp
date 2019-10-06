@@ -39,8 +39,3 @@ void Mesh::Draw()
 	this->deviceContext->IASetIndexBuffer(this->indexbuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	this->deviceContext->DrawIndexed(this->indexbuffer.IndexCount(), 0, 0);
 }
-
-const DirectX::XMMATRIX & Mesh::GetTransformMatrix()
-{
-	return this->transformMatrix;
-}
