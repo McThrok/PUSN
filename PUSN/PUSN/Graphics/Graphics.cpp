@@ -93,8 +93,6 @@ void Graphics::RenderFrame()
 	millingMaterial->UpdateVertexBuffer();
 	millingMaterial->Draw();
 
-
-
 	DrawGui();
 	DrawFPS();
 
@@ -386,26 +384,6 @@ bool Graphics::InitializeDirectX(HWND hwnd)
 
 bool Graphics::InitializeShaders()
 {
-
-	std::wstring shaderfolder = L"";
-#pragma region DetermineShaderPath
-	if (IsDebuggerPresent() == TRUE)
-	{
-#ifdef _DEBUG //Debug Mode
-#ifdef _WIN64 //x64
-		shaderfolder = L"..\\x64\\Debug\\";
-#else  //x86 (Win32)
-		shaderfolder = L"..\\Debug\\";
-#endif
-#else //Release Mode
-#ifdef _WIN64 //x64
-		shaderfolder = L"..\\x64\\Release\\";
-#else  //x86 (Win32)
-		shaderfolder = L"..\\Release\\";
-#endif
-#endif
-	}
-
 	//2d shaders
 	D3D11_INPUT_ELEMENT_DESC layout2D[] =
 	{
@@ -415,13 +393,13 @@ bool Graphics::InitializeShaders()
 
 	UINT numElements2D = ARRAYSIZE(layout2D);
 
-	if (!vertexshader_2d.Initialize(this->device, shaderfolder + L"vertexshader_2d.cso", layout2D, numElements2D))
+	if (!vertexshader_2d.Initialize(this->device, L"vertexshader_2d.cso", layout2D, numElements2D))
 		return false;
 
-	if (!pixelshader_2d.Initialize(this->device, shaderfolder + L"pixelshader_2d.cso"))
+	if (!pixelshader_2d.Initialize(this->device, L"pixelshader_2d.cso"))
 		return false;
 
-	if (!pixelshader_2d_discard.Initialize(this->device, shaderfolder + L"pixelshader_2d_discard.cso"))
+	if (!pixelshader_2d_discard.Initialize(this->device, L"pixelshader_2d_discard.cso"))
 		return false;
 
 	//3d shaders
@@ -434,20 +412,20 @@ bool Graphics::InitializeShaders()
 
 	UINT numElements3D = ARRAYSIZE(layout3D);
 
-	if (!vertexshader.Initialize(this->device, shaderfolder + L"vertexshader.cso", layout3D, numElements3D))
+	if (!vertexshader.Initialize(this->device, L"vertexshader.cso", layout3D, numElements3D))
 		return false;
 
-	if (!pixelshader.Initialize(this->device, shaderfolder + L"pixelshader.cso"))
+	if (!pixelshader.Initialize(this->device, L"pixelshader.cso"))
 		return false;
 
-	if (!pixelshader_nolight.Initialize(this->device, shaderfolder + L"pixelshader_nolight.cso"))
+	if (!pixelshader_nolight.Initialize(this->device, L"pixelshader_nolight.cso"))
 		return false;
 
 	//-------
-	if (!my_vs.Initialize(this->device, shaderfolder + L"my_vs.cso", layout3D, numElements3D))
+	if (!my_vs.Initialize(this->device, L"my_vs.cso", layout3D, numElements3D))
 		return false;
 
-	if (!my_ps.Initialize(this->device, shaderfolder + L"my_ps.cso"))
+	if (!my_ps.Initialize(this->device, L"my_ps.cso"))
 		return false;
 
 	return true;
