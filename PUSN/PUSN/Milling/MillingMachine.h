@@ -25,7 +25,7 @@ public:
 
 	float maxDepth;
 	bool flatCut;
-	float cutSize;
+	float cutRange;
 	float speed = 10;
 	bool finished;
 
@@ -35,7 +35,6 @@ private:
 	XMFLOAT3 safePosition;
 
 	vector<XMFLOAT3> moves;
-	XMMATRIX baseMtx;
 
 	ID3D11Device * device;
 	ID3D11DeviceContext * deviceContext;

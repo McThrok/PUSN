@@ -18,7 +18,7 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 	InitGui(hwnd);
 
 	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize(100,100);
+	millingMaterial->Initialize({ 10,15,5 }, 100, 100);
 	//InitMillingCutterMesh(2, false);
 
 	return true;

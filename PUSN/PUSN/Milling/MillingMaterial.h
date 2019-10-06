@@ -26,17 +26,16 @@ public:
 	MillingMaterial(ID3D11Device * device, ID3D11DeviceContext * deviceContext);
 	MillingMaterial(const MillingMaterial & milligMaterial);
 
-	void Initialize(int gridX, int gridZ);
+	void Initialize(XMFLOAT3 size, int _gridX, int _gridZ);
 	void Draw();
 	void UpdateVertexBuffer();
 	void Randomize();
 	Vertex3D& Get(int x, int z);
 
+	int gridX, gridZ;
 	XMFLOAT3 size;
-	DirectX::XMMATRIX transformMatrix;
 
 private:
-	int gridX, gridZ;
 
 	std::vector<Vertex3D> vertices;
 	VertexBuffer<Vertex3D> vertexbuffer;

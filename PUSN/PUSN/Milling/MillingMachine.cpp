@@ -4,9 +4,9 @@ void MillingMachine::LoadDataFromFile(string filePath)
 {
 	string extension = filePath.substr(filePath.rfind("."));
 	flatCut = extension[0] == 'f';
-	cutSize = stoi(filePath.substr(1));
+	cutRange = stoi(filePath.substr(1));
 
-	SetMillingCutterMesh(cutSize, flatCut);
+	SetMillingCutterMesh(cutRange, flatCut);
 
 	moves.clear();
 	currentMove = 0;
@@ -122,8 +122,7 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 
 	vector<Texture> textures;
 
-	baseMtx = XMMatrixScaling(0.1, 0.1, 0.1);
-	XMMATRIX mtx = baseMtx * XMMatrixTranslation(safePosition.x, safePosition.y, safePosition.z);
+	XMMATRIX mtx = XMMatrixTranslation(safePosition.x, safePosition.y, safePosition.z);
 
 	millingCutterMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, textures, mtx));
 }
@@ -162,13 +161,29 @@ void MillingMachine::UpdatePosition(float dt)
 			finished = true;
 	}
 
-	millingCutterMesh->transformMatrix = baseMtx * XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
+	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
 void MillingMachine::Cut(MillingMaterial * material)
 {
+	float rangeSq = cutRange * cutRange;
 
+	for (int i = 0; i < material->gridX; i++)
+	{
+		for (int j = 0; j < material->gridZ; j++)
+		{
+			XMFLOAT3 pos = material->Get(i, j).pos;
+			float x = currentPosition.x - pos.x;
+			float z = currentPosition.z - pos.z;
 
+			float distSq = x * x + z * z;
+			if (distSq < rangeSq)
+				if (flatCut)
+					pos.y = min(pos.y, currentPosition.y);
+				else
+					pos.y = min(pos.y, currentPosition.y + cutRange - sqrt(rangeSq - distSq));
+		}
+	}
 }
 
 //XMVECTOR MillingMachine::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)

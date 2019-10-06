@@ -6,7 +6,6 @@ MillingMaterial::MillingMaterial(ID3D11Device * device, ID3D11DeviceContext * de
 {
 	this->deviceContext = deviceContext;
 	this->device = device;
-	this->size = { 10, 5, 15 };
 }
 
 MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
@@ -34,17 +33,22 @@ Vertex3D & MillingMaterial::Get(int x, int z)
 	return vertices[x * gridZ + z];
 }
 
-void MillingMaterial::Initialize(int _gridX, int _gridZ)
+void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 {
 	this->gridX = _gridX;
 	this->gridZ = _gridZ;
-	this->transformMatrix = XMMatrixScaling(size.x / _gridX, size.y, size.z / _gridZ);
+	this->size = size;
 
 
 	this->vertices.reserve(gridX * gridZ);
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++)
-			this->vertices.push_back(Vertex3D(i, 0, j, 0, 1, 0));
+		{
+			float x = size.x*i / (gridX - 1);
+			float y = size.y;
+			float z = size.z*i / (gridZ - 1);
+			this->vertices.push_back(Vertex3D(x, y, z, 0, 1, 0));
+		}
 
 	HRESULT hr = this->vertexbuffer.Initialize(device, vertices.data(), vertices.size(), true);
 	COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer for mesh.");
