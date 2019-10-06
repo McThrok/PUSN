@@ -16,7 +16,9 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 		return false;
 
 	InitGui(hwnd);
-	materialMesh.push_back(GetMaterialMesh());
+
+	InitMaterialMesh();
+	InitMillingCutterMesh(2, false);
 
 	return true;
 }
@@ -55,8 +57,8 @@ void Graphics::RenderFrame()
 	deviceContext->IASetInputLayout(vertexshader.GetInputLayout());
 	//deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
-	
-	{ 
+
+	{
 		//gameObject.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
 	}
 	{
@@ -75,7 +77,7 @@ void Graphics::RenderFrame()
 	//deviceContext->RSSetState(rasterizerState.Get());
 	//deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
 	//deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-	
+
 	cb_vs_vertexshader.data.worldMatrix = XMMatrixIdentity();
 	cb_vs_vertexshader.data.wvpMatrix = Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
 	cb_vs_vertexshader.ApplyChanges();
@@ -83,7 +85,8 @@ void Graphics::RenderFrame()
 	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
 	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
 
-	materialMesh[0].Draw();
+	materialMesh->Draw();
+	millingCutterMesh->Draw();
 
 
 
@@ -93,7 +96,7 @@ void Graphics::RenderFrame()
 	this->swapchain->Present(0, NULL);
 }
 
-Mesh Graphics::GetMaterialMesh()
+void Graphics::InitMaterialMesh()
 {
 	std::vector<Vertex3D> vertices{
 		Vertex3D(0,0,10,0,1,-1,-1,-1),
@@ -110,7 +113,88 @@ Mesh Graphics::GetMaterialMesh()
 	std::vector<Texture> textures;
 	DirectX::XMMATRIX mtx = XMMatrixIdentity();
 
-	return Mesh(device.Get(),deviceContext.Get(), vertices, indices, textures, mtx);
+	materialMesh = std::shared_ptr<Mesh>(new Mesh(device.Get(), deviceContext.Get(), vertices, indices, textures, mtx));
+}
+
+void Graphics::InitMillingCutterMesh(float radius, bool flat)
+{
+	float r = radius;
+	int horizontalLvls = 10;
+	int roundLvls = 10;
+	float height = 10;
+	float startHeight = flat ? 0 : r;
+
+	std::vector<Vertex3D> vertices;
+	std::vector<DWORD> indices;
+
+	for (int i = 0; i < horizontalLvls; i++)
+	{
+		float angle = XM_2PI * i / horizontalLvls;
+		float angle2 = XM_2PI * (i + 1) / horizontalLvls;
+		XMFLOAT3 a = Normalize(XMFLOAT3(std::cos(angle), 0, std::sin(angle)));
+		XMFLOAT3 b = Normalize(XMFLOAT3(std::cos(angle2), 0, std::sin(angle2)));
+
+		int count = vertices.size();
+		vertices.push_back(Vertex3D(r*a.x, startHeight, r*a.z, -1, -1, a.x, 0, a.z));
+		vertices.push_back(Vertex3D(r*a.x, height, r*a.z, -1, -1, a.x, 0, a.z));
+		vertices.push_back(Vertex3D(r*b.x, height, r*b.z, -1, -1, b.x, 0, b.z));
+		vertices.push_back(Vertex3D(r*b.x, startHeight, r*b.z, -1, -1, b.x, 0, b.z));
+
+		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
+		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
+	}
+
+	if (!flat)
+	{
+		for (int i = 0; i < horizontalLvls; i++)
+		{
+			float angle = XM_2PI * i / horizontalLvls;
+			float angle2 = XM_2PI * (i + 1) / horizontalLvls;
+
+			for (int j = 0; j < roundLvls; j++)
+			{
+				float roundAngle = XM_PIDIV2 * j / roundLvls;
+				float roundAngle2 = XM_PIDIV2 * (j + 1) / roundLvls;
+
+				XMFLOAT3 a = Normalize(XMFLOAT3(std::cos(angle) *std::sin(roundAngle), std::cos(roundAngle), std::sin(angle) *std::sin(roundAngle)));
+				XMFLOAT3 a2 = Normalize(XMFLOAT3(std::cos(angle) *std::sin(roundAngle2), std::cos(roundAngle2), std::sin(angle) *std::sin(roundAngle2)));
+				XMFLOAT3 b = Normalize(XMFLOAT3(std::cos(angle2) *std::sin(roundAngle), std::cos(roundAngle), std::sin(angle2) *std::sin(roundAngle)));
+				XMFLOAT3 b2 = Normalize(XMFLOAT3(std::cos(angle2) *std::sin(roundAngle2), std::cos(roundAngle2), std::sin(angle2) *std::sin(roundAngle2)));
+
+				int count = vertices.size();
+				vertices.push_back(Vertex3D(r*a.x, r*(1 - a.y), r*a.z, -1, -1, a.x, a.y, a.z));
+				vertices.push_back(Vertex3D(r*a2.x, r*(1 - a2.y), r*a2.z, -1, -1, a2.x, a2.y, a2.z));
+				vertices.push_back(Vertex3D(r*b2.x, r*(1 - b2.y), r*b2.z, -1, -1, b2.x, b2.y, b2.z));
+				vertices.push_back(Vertex3D(r*b.x, r*(1 - b.y), r*b.z, -1, -1, b2.x, b.y, b.z));
+
+				indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
+				indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
+			}
+		}
+	}
+
+	std::vector<Texture> textures;
+	DirectX::XMMATRIX mtx = XMMatrixIdentity();
+
+	millingCutterMesh = std::shared_ptr<Mesh>(new Mesh(device.Get(), deviceContext.Get(), vertices, indices, textures, mtx));
+}
+
+DirectX::XMVECTOR Graphics::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)
+{
+	XMFLOAT3 u, v;
+	XMStoreFloat3(&u, b - a);
+	XMStoreFloat3(&v, c - a);
+
+	XMVECTOR normal = { u.y*v.z - u.z*v.y, u.z*v.x - u.x*v.z, u.x*v.y - u.y*v.z };
+	return normal;
+}
+
+DirectX::XMFLOAT3 Graphics::Normalize(XMFLOAT3 v)
+{
+	XMVECTOR vec = XMLoadFloat3(&v);
+	XMFLOAT3 normalized;
+	XMStoreFloat3(&normalized, XMVector3Normalize(vec));
+	return normalized;
 }
 
 void Graphics::DrawFPS() {
@@ -323,17 +407,17 @@ bool Graphics::InitializeShaders()
 	if (IsDebuggerPresent() == TRUE)
 	{
 #ifdef _DEBUG //Debug Mode
-	#ifdef _WIN64 //x64
-			shaderfolder = L"..\\x64\\Debug\\";
-	#else  //x86 (Win32)
-			shaderfolder = L"..\\Debug\\";
-	#endif
-	#else //Release Mode
-	#ifdef _WIN64 //x64
-			shaderfolder = L"..\\x64\\Release\\";
-	#else  //x86 (Win32)
-			shaderfolder = L"..\\Release\\";
-	#endif
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Debug\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Debug\\";
+#endif
+#else //Release Mode
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Release\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Release\\";
+#endif
 #endif
 	}
 
@@ -420,7 +504,7 @@ bool Graphics::InitializeScene()
 		if (!sprite.Initialize(this->device.Get(), this->deviceContext.Get(), 256, 256, "Data/Textures/circle.png", cb_vs_vertexshader_2d))
 			return false;
 
-		sprite.SetPosition(XMFLOAT3(windowWidth/2 - sprite.GetWidth()/2, windowHeight/2 - sprite.GetHeight()/2, 0.0f));
+		sprite.SetPosition(XMFLOAT3(windowWidth / 2 - sprite.GetWidth() / 2, windowHeight / 2 - sprite.GetHeight() / 2, 0.0f));
 
 		camera2D.SetProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 

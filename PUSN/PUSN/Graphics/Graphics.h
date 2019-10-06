@@ -13,6 +13,9 @@
 #include "Light.h"
 #include "Camera2D.h"
 #include "Sprite.h"
+#include <memory>
+#include <DirectXMath.h>
+#include <math.h>
 
 class Graphics
 {
@@ -33,14 +36,20 @@ private:
 	void DrawGui();
 	void DrawFPS();
 
-	Mesh GetMaterialMesh();
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> material_texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> material_srv;
 	VertexShader my_vs;
 	PixelShader my_ps;
 
-	std::vector<Mesh> materialMesh;
+	std::shared_ptr<Mesh> materialMesh;
+	void InitMaterialMesh();
+
+	std::shared_ptr<Mesh> millingCutterMesh;
+	void InitMillingCutterMesh(float radius, bool flat);
+	DirectX::XMVECTOR GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c);
+	DirectX::XMFLOAT3 Normalize(XMFLOAT3 v);
+
 
 
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
