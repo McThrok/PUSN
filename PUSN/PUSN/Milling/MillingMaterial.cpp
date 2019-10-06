@@ -39,14 +39,13 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 	this->gridZ = _gridZ;
 	this->size = size;
 
-
 	this->vertices.reserve(gridX * gridZ);
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++)
 		{
-			float x = size.x*i / (gridX - 1);
+			float x = size.x * i / (gridX - 1);
 			float y = size.y;
-			float z = size.z*i / (gridZ - 1);
+			float z = size.z * j / (gridZ - 1);
 			this->vertices.push_back(Vertex3D(x, y, z, 0, 1, 0));
 		}
 
@@ -68,7 +67,6 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());
 	COM_ERROR_IF_FAILED(hr, "Failed to initialize index buffer for mesh.");
-
 }
 
 void MillingMaterial::UpdateVertexBuffer()
