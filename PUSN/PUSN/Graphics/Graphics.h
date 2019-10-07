@@ -44,9 +44,7 @@ private:
 	VertexShader my_vs;
 	PixelShader my_ps;
 
-
-
-
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateWireFrame;
 
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;

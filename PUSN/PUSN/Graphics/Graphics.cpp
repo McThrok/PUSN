@@ -92,7 +92,9 @@ void Graphics::RenderFrame()
 	//millingCutterMesh->Draw();
 	//millingMaterial->Randomize();
 	//millingMaterial->UpdateVertexBuffer();
+	deviceContext->RSSetState(rasterizerStateWireFrame.Get());
 	millingMaterial->Draw();
+	deviceContext->RSSetState(nullptr);
 
 	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
 	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix* Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
@@ -104,7 +106,6 @@ void Graphics::RenderFrame()
 
 	this->swapchain->Present(0, NULL);
 }
-
 
 void Graphics::DrawFPS() {
 	//Draw Text
@@ -438,6 +439,11 @@ bool Graphics::InitializeScene()
 
 		hr = device->CreateShaderResourceView(material_texture.Get(), nullptr, &material_srv);*/
 
+		//Create Rasterizer State
+		CD3D11_RASTERIZER_DESC rasterizerDesc(D3D11_DEFAULT);
+		rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+		hr = this->device->CreateRasterizerState(&rasterizerDesc, this->rasterizerStateWireFrame.GetAddressOf());
+		COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
 	}
 	catch (COMException & exception)
 	{
