@@ -3,6 +3,7 @@
 
 #my
 *.cso
+PUSN/PUSN/imgui.ini
 
 # User-specific files
 *.suo
@@ -262,3 +263,4 @@ paket-files/
 __pycache__/
 *.pyc
 /PNet
+

@@ -16,7 +16,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 void Engine::Update()
 {
 	float dt = timer.GetMilisecondsElapsed();
-	this->gfx.millingMachine->Update(dt, this->gfx.millingMaterial.get());
+	//this->gfx.millingMachine->Update(dt, this->gfx.millingMaterial.get());
 	timer.Restart();
 
 	while (!keyboard.CharBufferIsEmpty())

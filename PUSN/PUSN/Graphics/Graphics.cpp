@@ -101,7 +101,7 @@ void Graphics::RenderFrame()
 	cb_vs_vertexshader.ApplyChanges();
 	millingMachine->millingCutterMesh->Draw();
 
-	//DrawGui();
+	DrawGui();
 	DrawFPS();
 
 	this->swapchain->Present(0, NULL);
@@ -124,28 +124,74 @@ void Graphics::DrawFPS() {
 }
 
 void Graphics::DrawGui() {
-	static int counter = 0;
-	// Start the Dear ImGui frame
+
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	//Create ImGui Test Window
-	ImGui::SetNextWindowPos(ImVec2(50, 400), ImGuiCond_Once);
-	ImGui::Begin("Light Controls");
-	ImGui::DragFloat3("Ambient Light Color", &this->cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("Ambient Light Strength", &this->cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f);
-	ImGui::NewLine();
-	ImGui::DragFloat3("Dynamic Light Color", &this->light.lightColor.x, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat("Dynamic Light Strength", &this->light.lightStrength, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat("Dynamic Light Attenuation A", &this->light.attenuation_a, 0.01f, 0.1f, 10.0f);
-	ImGui::DragFloat("Dynamic Light Attenuation B", &this->light.attenuation_b, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat("Dynamic Light Attenuation C", &this->light.attenuation_c, 0.01f, 0.0f, 10.0f);
-	ImGui::End();
-	//Assemble Together Draw Data
-	ImGui::Render();
-	//Render Draw Data
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	ImGui::SetNextWindowSize(ImVec2(300, 700), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(10, 50), ImGuiCond_Once);
 
+	if (!ImGui::Begin("Main Panel"))
+	{
+		ImGui::End();
+		return;
+	}
+
+	const int buffSize = 256;
+	static char buf[buffSize];
+	ImGui::InputText("path", buf, buffSize);
+	if (ImGui::Button("Load configuration")) {
+
+	}
+
+	ImGui::Separator();
+
+	static bool paused = true;
+
+	if (ImGui::Button("To end")) {
+
+	}
+
+	ImGui::SameLine();
+
+	if (paused) {
+		if (ImGui::Button("Start"))
+			paused = false;
+	}
+	else {
+		if (ImGui::Button("Pause"))
+			paused = true;
+	}
+
+	ImGui::Separator();
+
+	static int x, y, r;
+	ImGui::SliderInt("x", &x, 50, 1000);
+	ImGui::SliderInt("y", &y, 50, 1000);
+	ImGui::SliderInt("r", &r, 5, 20);
+
+	static bool flat = true;
+	ImGui::Checkbox("flat cut", &flat);
+
+	if (ImGui::Button("Apply")) {
+
+	}
+
+	ImGui::Separator();
+
+	static int speed;
+	ImGui::SliderInt("speed", &speed, 50, 1000);
+
+	static bool wireframe = true;
+	ImGui::Checkbox("wirerfme only", &wireframe);
+
+	if (ImGui::Button("Reset and Apply")) {
+
+	}
+
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
 bool Graphics::InitializeDirectX(HWND hwnd)
