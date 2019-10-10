@@ -1,7 +1,6 @@
 #pragma once
 #include "Keyboard/KeyboardClass.h"
 #include "Mouse/MouseClass.h"
-#include "Graphics/Graphics.h"
 #include "ErrorLogger.h"
 
 class WindowContainer
@@ -18,7 +17,6 @@ public:
 protected:
 	KeyboardClass keyboard;
 	MouseClass mouse;
-	Graphics gfx;
 private:
 	void RegisterWindowClass();
 	HWND handle = NULL; //Handle to this window
