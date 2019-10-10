@@ -39,13 +39,14 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 	this->gridZ = _gridZ;
 	this->size = size;
 
+	this->vertices.clear();
 	this->vertices.reserve(gridX * gridZ);
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridZ; j++)
 		{
-			float x = size.x * (i - gridX / 2.0) / (gridX - 1);
+			float x = size.x * (i - (gridX - 1) / 2.0) / (gridX - 1);
 			float y = size.y;
-			float z = size.z * (j - gridZ / 2.0) / (gridZ - 1);
+			float z = size.z * (j - (gridZ - 1) / 2.0) / (gridZ - 1);
 			this->vertices.push_back(Vertex3D(x, y, z, 0, 1, 0));
 		}
 
@@ -56,13 +57,13 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 	indices.reserve(6 * (gridX - 1) * (gridZ - 1));
 	for (int i = 0; i < gridX - 1; i++)
 		for (int j = 0; j < gridZ - 1; j++) {
-			indices.push_back(gridX*i + j);
-			indices.push_back(gridX*i + j + 1);
-			indices.push_back(gridX*(i + 1) + j + 1);
+			indices.push_back(gridZ*i + j);
+			indices.push_back(gridZ*i + j + 1);
+			indices.push_back(gridZ*(i + 1) + j + 1);
 
-			indices.push_back(gridX*i + j);
-			indices.push_back(gridX*(i + 1) + j + 1);
-			indices.push_back(gridX*(i + 1) + j);
+			indices.push_back(gridZ*i + j);
+			indices.push_back(gridZ*(i + 1) + j + 1);
+			indices.push_back(gridZ*(i + 1) + j);
 		}
 
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());

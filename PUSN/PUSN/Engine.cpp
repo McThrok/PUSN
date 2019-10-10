@@ -89,31 +89,6 @@ void Engine::Update()
 
 }
 
-bool Engine::InitializeGraphics()
-{
-	this->fpsTimer.Start();
-
-	if (!InitializeDirectX(this->GetHWND()))
-		return false;
-
-	if (!InitializeShaders())
-		return false;
-
-	if (!InitializeScene())
-		return false;
-
-	InitGui(this->GetHWND());
-
-	std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\t1.k16";
-
-	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize({ 100, 50, 150 }, 100, 100);
-	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
-	millingMachine->LoadDataFromFile(path);
-
-	return true;
-}
-
 void Engine::RenderFrame()
 {
 	cb_ps_light.data.dynamicLightColor = light.lightColor;
@@ -131,7 +106,7 @@ void Engine::RenderFrame()
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->RSSetState(defaultRasterizerState.Get());
-	deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
+	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
 	deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
 
@@ -162,7 +137,7 @@ void Engine::RenderFrame()
 
 	deviceContext->VSSetShader(my_vs.GetShader(), NULL, 0);
 	deviceContext->PSSetShader(my_ps.GetShader(), NULL, 0);
-	///*deviceContext->IASetInputLayout(my_vs.GetInputLayout());
+	//deviceContext->IASetInputLayout(my_vs.GetInputLayout());
 	//deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
 	//deviceContext->RSSetState(rasterizerState.Get());
@@ -179,15 +154,7 @@ void Engine::RenderFrame()
 	//millingCutterMesh->Draw();
 	//millingMaterial->Randomize();
 	//millingMaterial->UpdateVertexBuffer();
-	deviceContext->RSSetState(rasterizerStateWireFrame.Get());
-	millingMaterial->Draw();
-	deviceContext->RSSetState(nullptr);
-
-	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
-	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix* Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
-	cb_vs_vertexshader.ApplyChanges();
-	millingMachine->millingCutterMesh->Draw();
-
+	RenderMilling();
 	RenderGui();
 	RenderFPS();
 
@@ -208,6 +175,22 @@ void Engine::RenderFPS() {
 	spriteBatch->Begin();
 	spriteFont->DrawString(spriteBatch.get(), StringHelper::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
+}
+
+void Engine::RenderMilling()
+{
+	if (guiData->wireframe)
+		deviceContext->RSSetState(rasterizerStateWireFrame.Get());
+	else
+		deviceContext->RSSetState(nullptr);
+
+	millingMaterial->Draw();
+	deviceContext->RSSetState(nullptr);
+
+	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
+	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix* Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+	cb_vs_vertexshader.ApplyChanges();
+	millingMachine->millingCutterMesh->Draw();
 }
 
 void Engine::RenderGui() {
@@ -250,27 +233,68 @@ void Engine::RenderGui() {
 
 	ImGui::Separator();
 
-	ImGui::SliderInt("x", &guiData->gridX, 50, 1000);
-	ImGui::SliderInt("y", &guiData->gridY, 50, 1000);
-	ImGui::SliderFloat("r", &guiData->toolRadius, 5, 20);
+	ImGui::SliderFloat("size x", &guiData->size.x, 50, 300);
+	ImGui::SliderFloat("size y", &guiData->size.y, 20, 100);
+	ImGui::SliderFloat("size z", &guiData->size.z, 50, 300);
+	ImGui::SliderInt("grid x", &guiData->gridX, 50, 1000);
+	ImGui::SliderInt("grid y", &guiData->gridY, 50, 1000);
+	ImGui::SliderFloat("radius", &guiData->toolRadius, 5, 20);
 	ImGui::Checkbox("flat cut", &guiData->flat);
+	if (ImGui::Button("Apply")) {
+		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
+		millingMachine->SetMillingCutterMesh(guiData->toolRadius, guiData->flat);
+	}
 
 	ImGui::Separator();
 
-	ImGui::SliderFloat("speed", &guiData->speed, 50, 1000);
-	ImGui::SliderFloat("max material depth", &guiData->materialDepth, 50, 1000);
-	ImGui::SliderFloat("max tool depth", &guiData->toolDepth, 50, 1000);
+	ImGui::SliderFloat("speed", &guiData->speed, 0.1, 10);
+	ImGui::SliderFloat("max material depth", &guiData->materialDepth, 10, 100);
+	ImGui::SliderFloat("max tool depth", &guiData->toolDepth, 10, 100);
 	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
+
+	ImGui::Separator();
+
+	if (guiData->toolDepthViolated)
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Tool depth violated!");
+
+	if (guiData->materialDepthViolated)
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Material depth violated!");
 
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-bool Engine::InitializeDirectX(HWND hwnd)
+bool Engine::InitializeGraphics()
+{
+	this->fpsTimer.Start();
+
+	if (!InitializeDirectX())
+		return false;
+
+	if (!InitializeShaders())
+		return false;
+
+	if (!InitializeScene())
+		return false;
+
+	InitGui();
+
+	std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\t1.k16";
+
+	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
+	millingMaterial->Initialize({ 100, 50, 150 }, 100, 100);
+	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
+	millingMachine->LoadDataFromFile(path);
+
+	return true;
+}
+
+bool Engine::InitializeDirectX()
 {
 	try
 	{
+		HWND hwnd = this->GetHWND();
 		std::vector<AdapterData> adapters = AdapterReader::GetAdapters();
 
 		if (adapters.size() < 1)
@@ -393,22 +417,22 @@ bool Engine::InitializeDirectX(HWND hwnd)
 		//hr = this->device->CreateRasterizerState(&rasterizerDesc_CullFront, this->rasterizerState_CullFront.GetAddressOf());
 		//COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
 
-		//Create Blend State
-		D3D11_RENDER_TARGET_BLEND_DESC rtbd = { 0 };
-		rtbd.BlendEnable = true;
-		rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-		rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-		rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-		rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
-		rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+		////Create Blend State
+		//D3D11_RENDER_TARGET_BLEND_DESC rtbd = { 0 };
+		//rtbd.BlendEnable = true;
+		//rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+		//rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+		//rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+		//rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+		//rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+		//rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+		//rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		D3D11_BLEND_DESC blendDesc = { 0 };
-		blendDesc.RenderTarget[0] = rtbd;
+		//D3D11_BLEND_DESC blendDesc = { 0 };
+		//blendDesc.RenderTarget[0] = rtbd;
 
-		hr = this->device->CreateBlendState(&blendDesc, this->blendState.GetAddressOf());
-		COM_ERROR_IF_FAILED(hr, "Failed to create blend state.");
+		//hr = this->device->CreateBlendState(&blendDesc, this->blendState.GetAddressOf());
+		//COM_ERROR_IF_FAILED(hr, "Failed to create blend state.");
 
 		spriteBatch = std::make_unique<DirectX::SpriteBatch>(this->deviceContext.Get());
 		spriteFont = std::make_unique<DirectX::SpriteFont>(this->device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
@@ -573,11 +597,11 @@ bool Engine::InitializeScene()
 	return true;
 }
 
-void Engine::InitGui(HWND hwnd) {
+void Engine::InitGui() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(this->GetHWND());
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 }

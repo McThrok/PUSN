@@ -30,15 +30,15 @@ private:
 
 	std::shared_ptr<MillingMaterial> millingMaterial;
 	std::shared_ptr<MillingMachine> millingMachine;
-	Timer timer;
 	shared_ptr<GuiData> guiData;
 
 	bool InitializeGraphics();
-	bool InitializeDirectX(HWND hwnd);
+	bool InitializeDirectX();
 	bool InitializeShaders();
 	bool InitializeScene();
-	void InitGui(HWND hwnd);
+	void InitGui();
 
+	void RenderMilling();
 	void RenderGui();
 	void RenderFPS();
 
@@ -73,7 +73,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState_CullFront;
 
-	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+	//Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
 
 	std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 	std::unique_ptr<DirectX::SpriteFont> spriteFont;
@@ -86,4 +86,5 @@ private:
 	int windowWidth = 0;
 	int windowHeight = 0;
 	Timer fpsTimer;
+	Timer timer;
 };
