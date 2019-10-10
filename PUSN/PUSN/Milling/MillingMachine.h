@@ -25,7 +25,7 @@ public:
 
 	float maxDepth;
 	bool flatCut;
-	float cutRange;
+	float cutRadius;
 	float speed;
 	bool finished;
 
@@ -41,6 +41,7 @@ private:
 
 	XMFLOAT3 Normalize(XMFLOAT3 v);
 	void Cut(MillingMaterial * material);
+	XMFLOAT3 CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &right, const XMFLOAT3 &top, const XMFLOAT3 &down);
 	void UpdatePosition(float dt);
 };
 

@@ -19,7 +19,8 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 void Engine::Update()
 {
 	float dt = timer.GetMilisecondsElapsed();
-	//this->millingMachine->Update(dt, this->millingMaterial.get());
+	if (!guiData->paused)
+		this->millingMachine->Update(dt, this->millingMaterial.get());
 	timer.Restart();
 
 	while (!keyboard.CharBufferIsEmpty())
@@ -208,16 +209,19 @@ void Engine::RenderGui() {
 	}
 
 	const int buffSize = 256;
-	static char buf[buffSize];
+	static char buf[buffSize] = "t1.k16";
 	ImGui::InputText("path", buf, buffSize);
 	if (ImGui::Button("Load configuration")) {
-
+		std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\" + std::string(buf);
+		millingMachine->LoadDataFromFile(path);
 	}
 
 	ImGui::Separator();
 
 	if (ImGui::Button("To end")) {
-
+		while (!millingMachine->finished) {
+			millingMachine->Update(1, millingMaterial.get());
+		}
 	}
 
 	ImGui::SameLine();
@@ -237,11 +241,11 @@ void Engine::RenderGui() {
 	ImGui::SliderFloat("size y", &guiData->size.y, 20, 100);
 	ImGui::SliderFloat("size z", &guiData->size.z, 50, 300);
 	ImGui::SliderInt("grid x", &guiData->gridX, 50, 1000);
-	ImGui::SliderInt("grid y", &guiData->gridY, 50, 1000);
+	ImGui::SliderInt("grid z", &guiData->gridZ, 50, 1000);
 	ImGui::SliderFloat("radius", &guiData->toolRadius, 5, 20);
 	ImGui::Checkbox("flat cut", &guiData->flat);
 	if (ImGui::Button("Apply")) {
-		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
+		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
 		millingMachine->SetMillingCutterMesh(guiData->toolRadius, guiData->flat);
 	}
 
@@ -283,7 +287,7 @@ bool Engine::InitializeGraphics()
 	std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\t1.k16";
 
 	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize({ 100, 50, 150 }, 100, 100);
+	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
 	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
 	millingMachine->LoadDataFromFile(path);
 

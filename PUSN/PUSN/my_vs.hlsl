@@ -31,7 +31,6 @@ VS_OUTPUT main(VS_INPUT input)
 	//if (input.inTexCoord != float2(-1, -1) 
 	//	pos.y += objTexture.Sample(objSamplerState, input.inTexCoord);
 
-	input.inNormal = float3(0, 1, 0);
 	output.outPosition = mul(float4(pos, 1.0f), wvpMatrix);
 	output.outNormal = normalize(mul(float4(input.inNormal, 0.0f), worldMatrix));
 	output.outWorldPos = mul(float4(pos, 1.0f), worldMatrix);

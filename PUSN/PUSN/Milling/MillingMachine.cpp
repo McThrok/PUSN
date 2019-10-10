@@ -12,10 +12,10 @@ MillingMachine::MillingMachine(ID3D11Device * _device, ID3D11DeviceContext * _de
 void MillingMachine::LoadDataFromFile(string filePath)
 {
 	string extension = filePath.substr(filePath.rfind("."));
-	flatCut = extension[1] == 'f';
-	cutRange = stoi(extension.substr(2))/2;
+	bool flatCut = extension[1] == 'f';
+	int cutRadius = stoi(extension.substr(2)) / 2;
 
-	SetMillingCutterMesh(cutRange, flatCut);
+	SetMillingCutterMesh(cutRadius, flatCut);
 
 	moves.clear();
 	currentMove = 0;
@@ -72,6 +72,8 @@ void MillingMachine::LoadDataFromFile(string filePath)
 
 void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 {
+	flatCut = flat;
+	cutRadius = radius;
 	float r = radius;
 	int horizontalLvls = 10;
 	int roundLvls = 10;
@@ -173,7 +175,8 @@ void MillingMachine::UpdatePosition(float dt)
 
 void MillingMachine::Cut(MillingMaterial * material)
 {
-	float rangeSq = cutRange * cutRange;
+	//update heights
+	float rangeSq = cutRadius * cutRadius;
 
 	for (int i = 0; i < material->gridX; i++)
 	{
@@ -189,14 +192,47 @@ void MillingMachine::Cut(MillingMaterial * material)
 				if (flatCut)
 					pos.y = min(pos.y, currentPosition.y);
 				else
-					pos.y = min(pos.y, currentPosition.y + cutRange - sqrt(rangeSq - distSq));
+					pos.y = min(pos.y, currentPosition.y + cutRadius - sqrt(rangeSq - distSq));
 
 				material->GetVert(i, j).pos = pos;
 			}
 		}
 	}
 
+	//update normals
+	for (int i = 0; i < material->gridX; i++)
+	{
+		for (int j = 0; j < material->gridZ; j++)
+		{
+			XMFLOAT3 curr = material->GetVert(i, j).pos;
+
+			XMFLOAT3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
+			XMFLOAT3 right = i == material->gridX-1 ? curr : material->GetVert(i + 1, j).pos;
+			XMFLOAT3 top = j == 0 ? curr : material->GetVert(i, j - 1).pos;
+			XMFLOAT3 down = j == material->gridZ-1 ? curr : material->GetVert(i, j + 1).pos;
+
+			XMFLOAT3 normal = CalculateNormal(left, right, top, down);
+			material->GetVert(i, j).normal = normal;
+		}
+	}
+
 	material->UpdateVertexBuffer();
+}
+
+XMFLOAT3 MillingMachine::CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &right, const XMFLOAT3 &top, const XMFLOAT3 &down)
+{
+	XMVECTOR vecX = XMLoadFloat3(&XMFLOAT3(right.x - left.x, right.y - left.y, right.z - left.z));
+	XMVECTOR vecZ = XMLoadFloat3(&XMFLOAT3(top.x - down.x, top.y - down.y, top.z - down.z));
+	XMFLOAT3 x,y;
+	XMStoreFloat3(&x, vecX);
+	XMStoreFloat3(&y, vecZ);
+	XMVECTOR vecNormal = XMVector3Normalize(XMVector3Cross(vecX, vecZ));
+	XMFLOAT3 normal;
+	XMStoreFloat3(&normal, vecNormal);
+	if (normal.y != 1.0000) {
+
+	}
+	return normal;
 }
 
 //XMVECTOR MillingMachine::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)
