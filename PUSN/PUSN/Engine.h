@@ -1,6 +1,7 @@
 #pragma once
 #include "WindowContainer.h"
 #include "Timer.h"
+#include "GuiData.h"
 #include <memory>
 
 class Engine : public WindowContainer
@@ -11,4 +12,5 @@ public:
 	void RenderFrame();
 private:
 	Timer timer;
+	shared_ptr<GuiData> guiData;
 };

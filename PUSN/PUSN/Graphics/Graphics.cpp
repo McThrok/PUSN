@@ -1,10 +1,11 @@
 #include "Graphics.h"
 
-bool Graphics::Initialize(HWND hwnd, int width, int height)
+bool Graphics::Initialize(HWND hwnd, GuiData* guiData, int width, int height)
 {
 	this->windowWidth = width;
 	this->windowHeight = height;
 	this->fpsTimer.Start();
+	this->guiData = guiData;
 
 	if (!InitializeDirectX(hwnd))
 		return false;
@@ -128,7 +129,7 @@ void Graphics::DrawGui() {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui::SetNextWindowSize(ImVec2(300, 700), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(500, 700), ImGuiCond_Once);
 	ImGui::SetNextWindowPos(ImVec2(10, 50), ImGuiCond_Once);
 
 	if (!ImGui::Begin("Main Panel"))
@@ -146,48 +147,34 @@ void Graphics::DrawGui() {
 
 	ImGui::Separator();
 
-	static bool paused = true;
-
 	if (ImGui::Button("To end")) {
 
 	}
 
 	ImGui::SameLine();
 
-	if (paused) {
+	if (guiData->paused) {
 		if (ImGui::Button("Start"))
-			paused = false;
+			guiData->paused = false;
 	}
 	else {
 		if (ImGui::Button("Pause"))
-			paused = true;
+			guiData->paused = true;
 	}
 
 	ImGui::Separator();
 
-	static int x, y, r;
-	ImGui::SliderInt("x", &x, 50, 1000);
-	ImGui::SliderInt("y", &y, 50, 1000);
-	ImGui::SliderInt("r", &r, 5, 20);
-
-	static bool flat = true;
-	ImGui::Checkbox("flat cut", &flat);
-
-	if (ImGui::Button("Apply")) {
-
-	}
+	ImGui::SliderInt("x", &guiData->gridX, 50, 1000);
+	ImGui::SliderInt("y", &guiData->gridY, 50, 1000);
+	ImGui::SliderFloat("r", &guiData->toolRadius, 5, 20);
+	ImGui::Checkbox("flat cut", &guiData->flat);
 
 	ImGui::Separator();
 
-	static int speed;
-	ImGui::SliderInt("speed", &speed, 50, 1000);
-
-	static bool wireframe = true;
-	ImGui::Checkbox("wirerfme only", &wireframe);
-
-	if (ImGui::Button("Reset and Apply")) {
-
-	}
+	ImGui::SliderFloat("speed", &guiData->speed, 50, 1000);
+	ImGui::SliderFloat("max material depth", &guiData->materialDepth, 50, 1000);
+	ImGui::SliderFloat("max tool depth", &guiData->toolDepth, 50, 1000);
+	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
 
 	ImGui::End();
 	ImGui::Render();

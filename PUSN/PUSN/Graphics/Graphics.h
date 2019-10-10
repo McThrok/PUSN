@@ -18,11 +18,12 @@
 #include <math.h>
 #include "..\\Milling\\MillingMachine.h"
 #include "..\\Milling\\MillingMaterial.h"
+#include "..\\GuiData.h"
 
 class Graphics
 {
 public:
-	bool Initialize(HWND hwnd, int width, int height);
+	bool Initialize(HWND hwnd, GuiData* guiData, int width, int height);
 	void RenderFrame();
 	Camera3D Camera3D;
 	Camera2D camera2D;
@@ -43,6 +44,8 @@ private:
 
 	VertexShader my_vs;
 	PixelShader my_ps;
+
+	GuiData* guiData;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateWireFrame;
 
