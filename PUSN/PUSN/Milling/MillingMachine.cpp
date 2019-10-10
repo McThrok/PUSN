@@ -6,7 +6,12 @@ MillingMachine::MillingMachine(ID3D11Device * _device, ID3D11DeviceContext * _de
 	deviceContext = _deviceContext;
 
 	safePosition = XMFLOAT3(0, 120, 0);
-	speed = 0.5;
+	stepSize = 1;
+	speed = 1;
+	materialDepth = 50;
+	toolDepth = 50;
+	materialDepthViolated = false;
+	toolDepthViolated = false;
 }
 
 void MillingMachine::LoadDataFromFile(string filePath)
@@ -136,25 +141,35 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 	millingCutterMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, textures, mtx));
 }
 
+void MillingMachine::Reset()
+{
+	materialDepthViolated = false;
+	toolDepthViolated = false;
+	restTime = 0;
+	currentPosition = moves[0];
+}
+
 void MillingMachine::Update(float dt, MillingMaterial * material)
 {
-	if (finished)
-		return;
-
-	UpdatePosition(dt);
-	Cut(material);
+	restTime += dt;
+	float timePerStep = stepSize / speed;
+	while (!finished && restTime > timePerStep) {
+		Move();
+		Cut(material);
+		restTime -= timePerStep;
+	}
 
 	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
-void MillingMachine::UpdatePosition(float dt)
+void MillingMachine::Move()
 {
 	XMVECTOR a = XMLoadFloat3(&currentPosition);
 	XMVECTOR b = XMLoadFloat3(&moves[currentMove]);
 	XMVECTOR toEndMove = b - a;
 
 	XMVECTOR dir = XMVector3Normalize(toEndMove);
-	XMVECTOR movement = dir * speed * dt;
+	XMVECTOR movement = dir * stepSize;
 
 	XMFLOAT3 moveLen, toEndLen;
 	XMStoreFloat3(&moveLen, XMVector3Length(movement));
@@ -207,9 +222,9 @@ void MillingMachine::Cut(MillingMaterial * material)
 			XMFLOAT3 curr = material->GetVert(i, j).pos;
 
 			XMFLOAT3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
-			XMFLOAT3 right = i == material->gridX-1 ? curr : material->GetVert(i + 1, j).pos;
+			XMFLOAT3 right = i == material->gridX - 1 ? curr : material->GetVert(i + 1, j).pos;
 			XMFLOAT3 top = j == 0 ? curr : material->GetVert(i, j - 1).pos;
-			XMFLOAT3 down = j == material->gridZ-1 ? curr : material->GetVert(i, j + 1).pos;
+			XMFLOAT3 down = j == material->gridZ - 1 ? curr : material->GetVert(i, j + 1).pos;
 
 			XMFLOAT3 normal = CalculateNormal(left, right, top, down);
 			material->GetVert(i, j).normal = normal;
@@ -223,15 +238,10 @@ XMFLOAT3 MillingMachine::CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &r
 {
 	XMVECTOR vecX = XMLoadFloat3(&XMFLOAT3(right.x - left.x, right.y - left.y, right.z - left.z));
 	XMVECTOR vecZ = XMLoadFloat3(&XMFLOAT3(top.x - down.x, top.y - down.y, top.z - down.z));
-	XMFLOAT3 x,y;
-	XMStoreFloat3(&x, vecX);
-	XMStoreFloat3(&y, vecZ);
 	XMVECTOR vecNormal = XMVector3Normalize(XMVector3Cross(vecX, vecZ));
 	XMFLOAT3 normal;
 	XMStoreFloat3(&normal, vecNormal);
-	if (normal.y != 1.0000) {
 
-	}
 	return normal;
 }
 

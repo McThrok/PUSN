@@ -13,6 +13,8 @@
 #include "Graphics\ImGui\imgui_impl_dx11.h"
 #include "Graphics\ImGui\imgui_impl_win32.h"
 #include <memory>
+#include <stdio.h>
+#include <direct.h>
 
 class Engine : public WindowContainer
 {
@@ -37,7 +39,8 @@ private:
 	bool InitializeShaders();
 	bool InitializeScene();
 	void InitGui();
-
+	void InitMilling();
+	
 	void RenderMilling();
 	void RenderGui();
 	void RenderFPS();
@@ -85,6 +88,8 @@ private:
 
 	int windowWidth = 0;
 	int windowHeight = 0;
+	std::string path;
+
 	Timer fpsTimer;
 	Timer timer;
 };

@@ -19,17 +19,24 @@ public:
 
 	void LoadDataFromFile(string filePath);
 	void SetMillingCutterMesh(float radius, bool flat);
+	void Reset();
 	void Update(float dt, MillingMaterial * material);
 
 	shared_ptr<Mesh> millingCutterMesh;
 
-	float maxDepth;
 	bool flatCut;
 	float cutRadius;
 	float speed;
+	float stepSize;
 	bool finished;
 
+	float materialDepth;
+	float toolDepth;
+	bool toolDepthViolated;
+	bool materialDepthViolated;
+
 private:
+	float restTime;
 	int currentMove;
 	XMFLOAT3 currentPosition;
 	XMFLOAT3 safePosition;
@@ -40,9 +47,9 @@ private:
 	ID3D11DeviceContext * deviceContext;
 
 	XMFLOAT3 Normalize(XMFLOAT3 v);
+	void Move();
 	void Cut(MillingMaterial * material);
 	XMFLOAT3 CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &right, const XMFLOAT3 &top, const XMFLOAT3 &down);
-	void UpdatePosition(float dt);
 };
 
 

@@ -7,6 +7,10 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 	this->windowHeight = height;
 	this->guiData = shared_ptr<GuiData>(new GuiData());
 
+	char cCurrentPath[FILENAME_MAX];
+	_getcwd(cCurrentPath, sizeof(cCurrentPath));
+	this->path = std::string(cCurrentPath) + "\\Paths\\";
+
 	if (!this->InitializeWindowAndMessageHandling(hInstance, window_title, window_class, width, height))
 		return false;
 
@@ -212,17 +216,18 @@ void Engine::RenderGui() {
 	static char buf[buffSize] = "t1.k16";
 	ImGui::InputText("path", buf, buffSize);
 	if (ImGui::Button("Load configuration")) {
-		std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\" + std::string(buf);
-		millingMachine->LoadDataFromFile(path);
+		millingMachine->LoadDataFromFile(path + std::string(buf));
+		guiData->toolRadius = millingMachine->cutRadius;
+		guiData->flat = millingMachine->flatCut;
+		millingMachine->materialDepthViolated = false;
+		millingMachine->toolDepthViolated = false;
 	}
 
 	ImGui::Separator();
 
-	if (ImGui::Button("To end")) {
-		while (!millingMachine->finished) {
-			millingMachine->Update(1, millingMaterial.get());
-		}
-	}
+	if (ImGui::Button("To end")) 
+		while (!millingMachine->finished) 
+			millingMachine->Update(100000, millingMaterial.get());
 
 	ImGui::SameLine();
 
@@ -247,21 +252,23 @@ void Engine::RenderGui() {
 	if (ImGui::Button("Apply")) {
 		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
 		millingMachine->SetMillingCutterMesh(guiData->toolRadius, guiData->flat);
+		millingMachine->Reset();
 	}
 
 	ImGui::Separator();
 
-	ImGui::SliderFloat("speed", &guiData->speed, 0.1, 10);
-	ImGui::SliderFloat("max material depth", &guiData->materialDepth, 10, 100);
-	ImGui::SliderFloat("max tool depth", &guiData->toolDepth, 10, 100);
+	ImGui::SliderFloat("speed", &millingMachine->speed, 0.1, 3);
+	ImGui::SliderFloat("step size", &millingMachine->stepSize, 0.1, 5);
+	ImGui::SliderFloat("max material depth", &millingMachine->materialDepth, 10, 100);
+	ImGui::SliderFloat("max tool depth", &millingMachine->toolDepth, 10, 100);
 	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
 
 	ImGui::Separator();
 
-	if (guiData->toolDepthViolated)
+	if (millingMachine->toolDepthViolated)
 		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Tool depth violated!");
 
-	if (guiData->materialDepthViolated)
+	if (millingMachine->materialDepthViolated)
 		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Material depth violated!");
 
 	ImGui::End();
@@ -283,13 +290,7 @@ bool Engine::InitializeGraphics()
 		return false;
 
 	InitGui();
-
-	std::string path = "C:\\Users\\wojte\\source\\repos\\PUSN\\PUSN\\PUSN\\Paths\\t1.k16";
-
-	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
-	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
-	millingMachine->LoadDataFromFile(path);
+	InitMilling();
 
 	return true;
 }
@@ -608,4 +609,16 @@ void Engine::InitGui() {
 	ImGui_ImplWin32_Init(this->GetHWND());
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
+}
+
+void Engine::InitMilling()
+{
+	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
+	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
+	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
+	millingMachine->LoadDataFromFile(path + "\\t1.k16");
+
+	guiData->toolRadius = millingMachine->cutRadius;
+	guiData->flat = millingMachine->flatCut;
+	millingMachine->Reset();
 }
