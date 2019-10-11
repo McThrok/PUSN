@@ -271,6 +271,9 @@ void Engine::RenderGui() {
 	if (millingMachine->materialDepthViolated)
 		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Material depth violated!");
 
+	if (millingMachine->millingViolated)
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Milling direction violated!");
+
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

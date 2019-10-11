@@ -145,6 +145,7 @@ void MillingMachine::Reset()
 {
 	materialDepthViolated = false;
 	toolDepthViolated = false;
+	millingViolated = false;
 	restTime = 0;
 	currentPosition = moves[0];
 }
@@ -154,15 +155,15 @@ void MillingMachine::Update(float dt, MillingMaterial * material)
 	restTime += dt;
 	float timePerStep = stepSize / speed;
 	while (!finished && restTime > timePerStep) {
-		Move();
-		Cut(material);
+		XMFLOAT3 dir = Move();
+		Cut(dir, material);
 		restTime -= timePerStep;
 	}
 
 	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
-void MillingMachine::Move()
+XMFLOAT3 MillingMachine::Move()
 {
 	XMVECTOR a = XMLoadFloat3(&currentPosition);
 	XMVECTOR b = XMLoadFloat3(&moves[currentMove]);
@@ -186,13 +187,21 @@ void MillingMachine::Move()
 		else
 			finished = true;
 	}
+
+	XMFLOAT3 dirFloat;
+	XMStoreFloat3(&dirFloat, dir);
+
+	return dirFloat;
 }
 
-void MillingMachine::Cut(MillingMaterial * material)
+void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 {
-	//update heights
+	float eps = 0.0000001;
+	bool millingDanger = dir.y < -eps;
+
 	float rangeSq = cutRadius * cutRadius;
 
+	//update heights
 	for (int i = 0; i < material->gridX; i++)
 	{
 		for (int j = 0; j < material->gridZ; j++)
@@ -204,10 +213,14 @@ void MillingMachine::Cut(MillingMaterial * material)
 			float distSq = x * x + z * z;
 			if (distSq < rangeSq)
 			{
-				if (flatCut)
-					pos.y = min(pos.y, currentPosition.y);
-				else
-					pos.y = min(pos.y, currentPosition.y + cutRadius - sqrt(rangeSq - distSq));
+				float newHeight = flatCut ? currentPosition.y : currentPosition.y + cutRadius - sqrt(rangeSq - distSq);
+				if (pos.y > newHeight)
+				{
+					pos.y = newHeight;
+
+					if (millingDanger)
+						millingViolated = true;
+				}
 
 				material->GetVert(i, j).pos = pos;
 			}

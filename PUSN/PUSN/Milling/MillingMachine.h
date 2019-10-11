@@ -32,8 +32,10 @@ public:
 
 	float materialDepth;
 	float toolDepth;
+
 	bool toolDepthViolated;
 	bool materialDepthViolated;
+	bool millingViolated;
 
 private:
 	float restTime;
@@ -47,8 +49,8 @@ private:
 	ID3D11DeviceContext * deviceContext;
 
 	XMFLOAT3 Normalize(XMFLOAT3 v);
-	void Move();
-	void Cut(MillingMaterial * material);
+	XMFLOAT3 Move();
+	void Cut(XMFLOAT3 dir, MillingMaterial * material);
 	XMFLOAT3 CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &right, const XMFLOAT3 &top, const XMFLOAT3 &down);
 };
 
