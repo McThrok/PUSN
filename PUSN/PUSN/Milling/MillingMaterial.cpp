@@ -105,15 +105,3 @@ void MillingMaterial::UpdateVertexBuffer()
 	memcpy(resource.pData, vertices.data(), vertices.size() * sizeof(Vertex3D));
 	deviceContext->Unmap(vertexbuffer.Get(), 0);
 }
-
-void MillingMaterial::Randomize()
-{
-	static int frame = 0;
-	frame++;
-
-	for (int i = 0; i < gridX; i++)
-		for (int j = 0; j < gridZ; j++) {
-			float angle = XM_2PI * (i * 10 + frame) / 100;
-			GetVert(i, j).pos.y = std::sin(angle);
-		}
-}

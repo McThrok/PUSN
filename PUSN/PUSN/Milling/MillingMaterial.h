@@ -32,7 +32,6 @@ public:
 	void Initialize(XMFLOAT3 size, int _gridX, int _gridZ);
 	void Draw();
 	void UpdateVertexBuffer();
-	void Randomize();
 	void Reset();
 	Vertex3D& GetVert(int x, int z);
 	void GetIndicesOfArea(XMFLOAT3 position, float range, int & left, int & right, int & top, int & down);

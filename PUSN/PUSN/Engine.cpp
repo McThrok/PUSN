@@ -254,8 +254,8 @@ void Engine::RenderGui() {
 	ImGui::SliderFloat("size x", &guiData->size.x, 50, 300);
 	ImGui::SliderFloat("size y", &guiData->size.y, 20, 100);
 	ImGui::SliderFloat("size z", &guiData->size.z, 50, 300);
-	ImGui::SliderInt("grid x", &guiData->gridX, 50, 1000);
-	ImGui::SliderInt("grid z", &guiData->gridZ, 50, 1000);
+	ImGui::SliderInt("grid x", &guiData->gridX, 50, 500);
+	ImGui::SliderInt("grid z", &guiData->gridZ, 50, 500);
 	ImGui::SliderFloat("radius", &guiData->toolRadius, 5, 20);
 	ImGui::Checkbox("flat cut", &guiData->flat);
 	if (ImGui::Button("Apply")) {
