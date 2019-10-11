@@ -39,6 +39,11 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 	this->gridZ = _gridZ;
 	this->size = size;
 
+	Reset();
+}
+
+void MillingMaterial::Reset()
+{
 	this->vertices.clear();
 	this->vertices.reserve(gridX * gridZ);
 	for (int i = 0; i < gridX; i++)

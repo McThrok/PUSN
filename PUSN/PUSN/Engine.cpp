@@ -221,12 +221,21 @@ void Engine::RenderGui() {
 		guiData->flat = millingMachine->flatCut;
 		millingMachine->materialDepthViolated = false;
 		millingMachine->toolDepthViolated = false;
+		millingMachine->Reset();
+		guiData->paused = true;
 	}
 
 	ImGui::Separator();
 
-	if (ImGui::Button("To end")) 
-		while (!millingMachine->finished) 
+	if (ImGui::Button("Reset material")) {
+		millingMaterial->Reset();
+		guiData->paused = true;
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("To end"))
+		while (!millingMachine->finished)
 			millingMachine->Update(100000, millingMaterial.get());
 
 	ImGui::SameLine();
@@ -253,14 +262,15 @@ void Engine::RenderGui() {
 		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
 		millingMachine->SetMillingCutterMesh(guiData->toolRadius, guiData->flat);
 		millingMachine->Reset();
+		guiData->paused = true;
 	}
 
 	ImGui::Separator();
 
 	ImGui::SliderFloat("speed", &millingMachine->speed, 0.1, 3);
 	ImGui::SliderFloat("step size", &millingMachine->stepSize, 0.1, 5);
-	ImGui::SliderFloat("max material depth", &millingMachine->materialDepth, 10, 100);
-	ImGui::SliderFloat("max tool depth", &millingMachine->toolDepth, 10, 100);
+	ImGui::SliderFloat("max material depth", &millingMachine->materialDepth, 5, 100);
+	ImGui::SliderFloat("max tool depth", &millingMachine->toolDepth, 5, 100);
 	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
 
 	ImGui::Separator();

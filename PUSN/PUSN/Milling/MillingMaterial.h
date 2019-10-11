@@ -30,6 +30,7 @@ public:
 	void Draw();
 	void UpdateVertexBuffer();
 	void Randomize();
+	void Reset();
 	Vertex3D& GetVert(int x, int z);
 
 	int gridX, gridZ;
