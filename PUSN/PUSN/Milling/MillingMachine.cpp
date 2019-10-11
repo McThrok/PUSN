@@ -72,6 +72,7 @@ void MillingMachine::LoadDataFromFile(string filePath)
 
 		moves.push_back(position);
 	}
+	moves.insert(moves.begin(), safePosition);
 	moves.push_back(safePosition);
 }
 
@@ -201,10 +202,13 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 
 	float rangeSq = cutRadius * cutRadius;
 
+	int left, right, top, down;
+	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
+
 	//update heights
-	for (int i = 0; i < material->gridX; i++)
+	for (int i = left; i < right+1; i++)
 	{
-		for (int j = 0; j < material->gridZ; j++)
+		for (int j = down; j < top+1; j++)
 		{
 			XMFLOAT3 pos = material->GetVert(i, j).pos;
 			float x = currentPosition.x - pos.x;
@@ -233,10 +237,16 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 		}
 	}
 
+
+	left = max(0, left - 1);
+	right = min(material->gridX - 1, right + 1);
+	down = max(0, down - 1);
+	top = min(material->gridZ - 1, top + 1);
+
 	//update normals
-	for (int i = 0; i < material->gridX; i++)
+	for (int i = left; i < right + 1; i++)
 	{
-		for (int j = 0; j < material->gridZ; j++)
+		for (int j = down; j < top + 1; j++)
 		{
 			XMFLOAT3 curr = material->GetVert(i, j).pos;
 

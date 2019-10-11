@@ -20,6 +20,27 @@ MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
 	this->vertices = millingMaterial.vertices;//?
 }
 
+void MillingMaterial::GetIndicesOfArea(XMFLOAT3 position, float range, int & left, int & right, int & top, int & down)
+{
+	//left = 0;
+	//right = gridX - 1;
+	//down = 0;
+	//top = gridZ - 1;
+	//return;
+
+	float leftF = floorf((position.x - range + size.x / 2) / size.x * (gridX - 1));
+	left = max(min((int)leftF, (gridX - 1)), 0);
+
+	float rightF = ceilf((position.x + range + size.x / 2) / size.x * (gridX - 1));
+	right = max(min((int)rightF, (gridX - 1)), 0);
+
+	float downF = floorf((position.z - range + size.z / 2) / size.z * (gridZ - 1));
+	down = max(min((int)downF, (gridZ - 1)), 0);
+
+	float topF = ceilf((position.z + range + size.z / 2) / size.z * (gridZ - 1));
+	top = max(min((int)topF, (gridZ - 1)), 0);
+}
+
 void MillingMaterial::Draw()
 {
 	UINT offset = 0;

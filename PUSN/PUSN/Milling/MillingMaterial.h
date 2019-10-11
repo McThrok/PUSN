@@ -20,6 +20,9 @@
 #include "..\\Graphics\\Sprite.h"
 #include <memory>
 
+using namespace std;
+using namespace DirectX;
+
 class MillingMaterial
 {
 public:
@@ -32,6 +35,7 @@ public:
 	void Randomize();
 	void Reset();
 	Vertex3D& GetVert(int x, int z);
+	void GetIndicesOfArea(XMFLOAT3 position, float range, int & left, int & right, int & top, int & down);
 
 	int gridX, gridZ;
 	XMFLOAT3 size;
