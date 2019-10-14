@@ -50,7 +50,7 @@ void Engine::Update()
 		}
 	}
 
-	this->gameObject.AdjustRotation(0.0f, 0.001f*dt, 0.0f);
+	this->gameObject.AdjustRotation(0.0f, 0.001f * dt, 0.0f);
 
 	float Camera3DSpeed = 0.06f;
 
@@ -138,10 +138,6 @@ void Engine::RenderFrame()
 	}
 	//-------
 
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	deviceContext->VSSetShader(my_vs.GetShader(), NULL, 0);
-	deviceContext->PSSetShader(my_ps.GetShader(), NULL, 0);
 	//deviceContext->IASetInputLayout(my_vs.GetInputLayout());
 	//deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
@@ -149,11 +145,6 @@ void Engine::RenderFrame()
 	//deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
 	//deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-	cb_vs_vertexshader.data.worldMatrix = XMMatrixIdentity();
-	cb_vs_vertexshader.data.wvpMatrix = Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
-	cb_vs_vertexshader.ApplyChanges();
-
-	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
 	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
 
 	//millingCutterMesh->Draw();
@@ -184,16 +175,33 @@ void Engine::RenderFPS() {
 
 void Engine::RenderMilling()
 {
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	deviceContext->VSSetShader(my_vs.GetShader(), NULL, 0);
+	deviceContext->PSSetShader(my_ps.GetShader(), NULL, 0);
+
+	cb_vs_vertexshader.data.worldMatrix = XMMatrixIdentity();
+	cb_vs_vertexshader.data.wvpMatrix = Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+	cb_vs_vertexshader.ApplyChanges();
+
+	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+
+
 	if (guiData->wireframe)
 		deviceContext->RSSetState(rasterizerStateWireFrame.Get());
 	else
 		deviceContext->RSSetState(nullptr);
 
+	if (guiData->flatShading)
+		deviceContext->GSSetShader(my_gs.GetShader(), NULL, 0);
+
 	millingMaterial->Draw();
 	deviceContext->RSSetState(nullptr);
 
+	deviceContext->GSSetShader(NULL, NULL, 0);
+
 	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
-	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix* Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix * Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
 	cb_vs_vertexshader.ApplyChanges();
 	millingMachine->millingCutterMesh->Draw();
 }
@@ -272,6 +280,7 @@ void Engine::RenderGui() {
 	ImGui::SliderFloat("max material depth", &millingMachine->materialDepth, 5, 100);
 	ImGui::SliderFloat("max tool depth", &millingMachine->toolDepth, 5, 100);
 	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
+	ImGui::Checkbox("flat shading", &guiData->flatShading);
 
 	ImGui::Separator();
 
@@ -515,6 +524,9 @@ bool Engine::InitializeShaders()
 		return false;
 
 	if (!my_ps.Initialize(this->device, L"my_ps.cso"))
+		return false;
+
+	if (!my_gs.Initialize(this->device, L"my_gs.cso"))
 		return false;
 
 	return true;

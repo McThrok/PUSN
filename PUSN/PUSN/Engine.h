@@ -47,6 +47,7 @@ private:
 
 	VertexShader my_vs;
 	PixelShader my_ps;
+	GeometryShader my_gs;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateWireFrame;
 

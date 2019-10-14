@@ -14,5 +14,6 @@ public:
 	bool flat = true;
 
 	bool wireframe = true;
+	bool flatShading = false;
 };
 

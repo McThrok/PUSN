@@ -2,6 +2,7 @@
 #include "Keyboard/KeyboardClass.h"
 #include "Mouse/MouseClass.h"
 #include "ErrorLogger.h"
+#include <memory>
 
 class WindowContainer
 {
