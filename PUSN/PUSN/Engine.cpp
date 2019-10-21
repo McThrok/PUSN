@@ -61,19 +61,19 @@ void Engine::Update()
 
 	if (keyboard.KeyIsPressed('W'))
 	{
-		this->Camera3D.AdjustPosition(this->Camera3D.GetForwardVector() * Camera3DSpeed * dt);
+		this->Camera3D.AdjustPosition(this->Camera3D.GetForwardVector(true) * Camera3DSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('S'))
 	{
-		this->Camera3D.AdjustPosition(this->Camera3D.GetBackwardVector() * Camera3DSpeed * dt);
+		this->Camera3D.AdjustPosition(this->Camera3D.GetBackwardVector(true) * Camera3DSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('A'))
 	{
-		this->Camera3D.AdjustPosition(this->Camera3D.GetLeftVector() * Camera3DSpeed * dt);
+		this->Camera3D.AdjustPosition(this->Camera3D.GetLeftVector(true) * Camera3DSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('D'))
 	{
-		this->Camera3D.AdjustPosition(this->Camera3D.GetRightVector() * Camera3DSpeed * dt);
+		this->Camera3D.AdjustPosition(this->Camera3D.GetRightVector(true) * Camera3DSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed(VK_SPACE))
 	{

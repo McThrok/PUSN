@@ -161,6 +161,7 @@ void MillingMachine::Update(float dt, MillingMaterial * material)
 		restTime -= timePerStep;
 	}
 
+	//millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y - cutRadius, currentPosition.z);
 	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
@@ -202,6 +203,7 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 
 	float rangeSq = cutRadius * cutRadius;
 
+	//currentPosition.y -= cutRadius;
 	int left, right, top, down;
 	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
 
@@ -237,6 +239,7 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 		}
 	}
 
+	//currentPosition.y += cutRadius;
 
 	left = max(0, left - 1);
 	right = min(material->gridX - 1, right + 1);
