@@ -75,11 +75,11 @@ void Engine::Update()
 	{
 		this->Camera3D.AdjustPosition(this->Camera3D.GetRightVector(true) * Camera3DSpeed * dt);
 	}
-	if (keyboard.KeyIsPressed(VK_SPACE))
+	if (keyboard.KeyIsPressed('Q'))
 	{
 		this->Camera3D.AdjustPosition(0.0f, Camera3DSpeed * dt, 0.0f);
 	}
-	if (keyboard.KeyIsPressed('Z'))
+	if (keyboard.KeyIsPressed('E'))
 	{
 		this->Camera3D.AdjustPosition(0.0f, -Camera3DSpeed * dt, 0.0f);
 	}
@@ -212,6 +212,16 @@ void Engine::RenderMilling()
 	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix * Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
 	cb_vs_vertexshader.ApplyChanges();
 	millingMachine->millingCutterMesh->Draw();
+
+	if (guiData->showPath) {
+		cb_ps_color.data.color = { 1, 0.2f, 0.2f };
+		cb_ps_color.ApplyChanges();
+
+		cb_vs_vertexshader.data.worldMatrix = millingMachine->pathMesh->transformMatrix;
+		cb_vs_vertexshader.data.wvpMatrix = millingMachine->pathMesh->transformMatrix * Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
+		cb_vs_vertexshader.ApplyChanges();
+		millingMachine->pathMesh->Draw();
+	}
 }
 
 void Engine::RenderGui() {
@@ -289,6 +299,7 @@ void Engine::RenderGui() {
 	ImGui::SliderFloat("max tool depth", &millingMachine->toolDepth, 5, 100);
 	ImGui::Checkbox("wirerfme only", &guiData->wireframe);
 	ImGui::Checkbox("flat shading", &guiData->flatShading);
+	ImGui::Checkbox("show path", &guiData->showPath);
 
 	ImGui::Separator();
 

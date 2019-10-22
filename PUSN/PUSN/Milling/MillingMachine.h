@@ -19,10 +19,12 @@ public:
 
 	void LoadDataFromFile(string filePath);
 	void SetMillingCutterMesh(float radius, bool flat);
+	void SetPathMesh();
 	void Reset();
 	void Update(float dt, MillingMaterial * material);
 
 	shared_ptr<Mesh> millingCutterMesh;
+	shared_ptr<Mesh> pathMesh;
 
 	bool flatCut;
 	float cutRadius;

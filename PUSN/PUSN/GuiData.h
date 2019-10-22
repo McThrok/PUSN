@@ -15,5 +15,6 @@ public:
 
 	bool wireframe = true;
 	bool flatShading = false;
+	bool showPath = false;
 };
 
