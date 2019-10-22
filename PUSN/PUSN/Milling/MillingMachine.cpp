@@ -161,7 +161,6 @@ void MillingMachine::Update(float dt, MillingMaterial * material)
 		restTime -= timePerStep;
 	}
 
-	//millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y - cutRadius, currentPosition.z);
 	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
@@ -203,7 +202,6 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 
 	float rangeSq = cutRadius * cutRadius;
 
-	//currentPosition.y -= cutRadius;
 	int left, right, top, down;
 	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
 
@@ -239,7 +237,6 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial * material)
 		}
 	}
 
-	//currentPosition.y += cutRadius;
 
 	left = max(0, left - 1);
 	right = min(material->gridX - 1, right + 1);
@@ -276,16 +273,6 @@ XMFLOAT3 MillingMachine::CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &r
 
 	return normal;
 }
-
-//XMVECTOR MillingMachine::GetTriangleNormalCW(XMVECTOR a, XMVECTOR b, XMVECTOR c)
-//{
-//	XMFLOAT3 u, v;
-//	XMStoreFloat3(&u, b - a);
-//	XMStoreFloat3(&v, c - a);
-//
-//	XMVECTOR normal = { u.y*v.z - u.z*v.y, u.z*v.x - u.x*v.z, u.x*v.y - u.y*v.z };
-//	return normal;
-//}
 
 XMFLOAT3 MillingMachine::Normalize(XMFLOAT3 v)
 {

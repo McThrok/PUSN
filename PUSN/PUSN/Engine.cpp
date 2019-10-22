@@ -180,12 +180,16 @@ void Engine::RenderMilling()
 	deviceContext->VSSetShader(my_vs.GetShader(), NULL, 0);
 	deviceContext->PSSetShader(my_ps.GetShader(), NULL, 0);
 
+	deviceContext->PSSetConstantBuffers(0, 1, cb_ps_color.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+
+
 	cb_vs_vertexshader.data.worldMatrix = XMMatrixIdentity();
 	cb_vs_vertexshader.data.wvpMatrix = Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
 	cb_vs_vertexshader.ApplyChanges();
 
-	deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
-
+	cb_ps_color.data.color = { 0.8f, 0.7f, 0.2f };
+	cb_ps_color.ApplyChanges();
 
 	if (guiData->wireframe)
 		deviceContext->RSSetState(rasterizerStateWireFrame.Get());
@@ -199,6 +203,10 @@ void Engine::RenderMilling()
 	deviceContext->RSSetState(nullptr);
 
 	deviceContext->GSSetShader(NULL, NULL, 0);
+
+
+	cb_ps_color.data.color = { 0.7f, 0.7f, 0.7f };
+	cb_ps_color.ApplyChanges();
 
 	cb_vs_vertexshader.data.worldMatrix = millingMachine->millingCutterMesh->transformMatrix;
 	cb_vs_vertexshader.data.wvpMatrix = millingMachine->millingCutterMesh->transformMatrix * Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix();
@@ -551,6 +559,9 @@ bool Engine::InitializeScene()
 		COM_ERROR_IF_FAILED(hr, "Failed to initialize 2d constant buffer.");
 
 		hr = this->cb_vs_vertexshader.Initialize(this->device.Get(), this->deviceContext.Get());
+		COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
+
+		hr = this->cb_ps_color.Initialize(this->device.Get(), this->deviceContext.Get());
 		COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
 		hr = this->cb_ps_light.Initialize(this->device.Get(), this->deviceContext.Get());
