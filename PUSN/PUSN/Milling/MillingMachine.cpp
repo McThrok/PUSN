@@ -18,7 +18,7 @@ void MillingMachine::LoadDataFromFile(string filePath)
 {
 	string extension = filePath.substr(filePath.rfind("."));
 	bool flatCut = extension[1] == 'f';
-	int cutRadius = stoi(extension.substr(2)) / 2;
+	float cutRadius = stoi(extension.substr(2)) / 2.0;
 
 	SetMillingCutterMesh(cutRadius, flatCut);
 
