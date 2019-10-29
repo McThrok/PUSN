@@ -8,7 +8,7 @@ public:
 
 	int gridX = 100;
 	int gridZ = 100;
-	DirectX::XMFLOAT3 size = DirectX::XMFLOAT3(100, 50, 150);
+	DirectX::XMFLOAT3 size = DirectX::XMFLOAT3(150, 50, 150);
 
 	float toolRadius = 6;
 	bool flat = true;
