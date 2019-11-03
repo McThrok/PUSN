@@ -22,7 +22,6 @@ public:
 private:
 
 	Camera3D Camera3D;
-	RenderableGameObject gameObject;
 	Light light;
 
 	std::shared_ptr<MillingMaterial> millingMaterial;

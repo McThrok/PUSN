@@ -15,12 +15,12 @@ void Camera3D::SetProjectionValues(float fovDegrees, float aspectRatio, float ne
 	this->projectionMatrix = XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
 }
 
-const XMMATRIX & Camera3D::GetViewMatrix() const
+const XMMATRIX& Camera3D::GetViewMatrix() const
 {
 	return this->viewMatrix;
 }
 
-const XMMATRIX & Camera3D::GetProjectionMatrix() const
+const XMMATRIX& Camera3D::GetProjectionMatrix() const
 {
 	return this->projectionMatrix;
 }
@@ -28,7 +28,8 @@ const XMMATRIX & Camera3D::GetProjectionMatrix() const
 void Camera3D::UpdateMatrix() //Updates view matrix and also updates the movement vectors
 {
 	//Calculate Camera3D rotation matrix
-	XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(this->rot.x, this->rot.y, this->rot.z);
+	//XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(this->rot.x, this->rot.y, this->rot.z);
+	XMMATRIX camRotationMatrix =  XMMatrixRotationX(this->rot.x)* XMMatrixRotationZ(this->rot.z);
 	//Calculate unit vector of cam target based off Camera3D forward value transformed by cam rotation matrix
 	XMVECTOR camTarget = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, camRotationMatrix);
 	//Adjust cam target to be offset by the Camera3D's current position

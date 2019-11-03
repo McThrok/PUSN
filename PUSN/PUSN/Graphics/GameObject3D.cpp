@@ -28,34 +28,34 @@ void GameObject3D::SetLookAtPos(XMFLOAT3 lookAtPos)
 	this->SetRotation(pitch, yaw, 0.0f);
 }
 
-const XMVECTOR & GameObject3D::GetForwardVector(bool omitY)
+const XMVECTOR& GameObject3D::GetForwardVector(bool omitZ)
 {
-	if (omitY)
-		return vec_forward_noY;
+	if (omitZ)
+		return vec_forward_noZ;
 	else
 		return vec_forward;
 }
 
-const XMVECTOR & GameObject3D::GetRightVector(bool omitY)
+const XMVECTOR& GameObject3D::GetRightVector(bool omitZ)
 {
-	if (omitY)
-		return vec_right_noY;
+	if (omitZ)
+		return vec_right_noZ;
 	else
 		return vec_right;
 }
 
-const XMVECTOR & GameObject3D::GetBackwardVector(bool omitY)
+const XMVECTOR& GameObject3D::GetBackwardVector(bool omitZ)
 {
-	if (omitY)
-		return vec_backward_noY;
+	if (omitZ)
+		return vec_backward_noZ;
 	else
 		return vec_backward;
 }
 
-const XMVECTOR & GameObject3D::GetLeftVector(bool omitY)
+const XMVECTOR& GameObject3D::GetLeftVector(bool omitZ)
 {
-	if (omitY)
-		return vec_left_noY;
+	if (omitZ)
+		return vec_left_noZ;
 	else
 		return vec_left;
 }
@@ -67,15 +67,15 @@ void GameObject3D::UpdateMatrix()
 
 void GameObject3D::UpdateDirectionVectors()
 {
-	XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, 0.0f);
+	XMMATRIX vecRotationMatrix = XMMatrixRotationX(rot.x) * XMMatrixRotationZ(rot.z);
 	vec_forward = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
 	vec_backward = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
 	vec_left = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
 	vec_right = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
 
-	XMMATRIX vecRotationMatrixNoY = XMMatrixRotationRollPitchYaw(0.0f, rot.y, 0.0f);
-	vec_forward_noY = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrixNoY);
-	vec_backward_noY = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrixNoY);
-	vec_left_noY = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrixNoY);
-	vec_right_noY = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrixNoY);
+	XMMATRIX vecRotationMatrixnoZ = XMMatrixRotationZ(rot.z);
+	vec_forward_noZ = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrixnoZ);
+	vec_backward_noZ = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrixnoZ);
+	vec_left_noZ = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrixnoZ);
+	vec_right_noZ = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrixnoZ);
 }

@@ -45,12 +45,10 @@ void Engine::Update()
 		{
 			if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
 			{
-				this->Camera3D.AdjustRotation((float)me.GetPosY() * 0.01f, (float)me.GetPosX() * 0.01f, 0);
+				this->Camera3D.AdjustRotation((float)me.GetPosY() * 0.01f, 0, (float)me.GetPosX() * 0.01f);
 			}
 		}
 	}
-
-	this->gameObject.AdjustRotation(0.0f, 0.001f * dt, 0.0f);
 
 	float Camera3DSpeed = 0.06f;
 
@@ -77,11 +75,11 @@ void Engine::Update()
 	}
 	if (keyboard.KeyIsPressed('Q'))
 	{
-		this->Camera3D.AdjustPosition(0.0f, Camera3DSpeed * dt, 0.0f);
+		this->Camera3D.AdjustPosition(0.0f, 0.0f, Camera3DSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('E'))
 	{
-		this->Camera3D.AdjustPosition(0.0f, -Camera3DSpeed * dt, 0.0f);
+		this->Camera3D.AdjustPosition(0.0f, 0.0f, -Camera3DSpeed * dt);
 	}
 
 	if (keyboard.KeyIsPressed('C'))
@@ -581,14 +579,12 @@ bool Engine::InitializeScene()
 		this->cb_ps_light.data.ambientLightColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		this->cb_ps_light.data.ambientLightStrength = 1.0f;
 
-		if (!gameObject.Initialize("Data\\Objects\\Nanosuit\\Nanosuit.obj", this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
-			return false;
 
 		if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
 			return false;
 
-		Camera3D.SetPosition(0.0f, 200.0f, -100.0f);
-		Camera3D.SetRotation(1.2, 0, 0);
+		Camera3D.SetPosition(0.0f, 100.0f, 200.0f);
+		Camera3D.SetRotation(1.2f, 0.0f, 0.0f);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
 
 
