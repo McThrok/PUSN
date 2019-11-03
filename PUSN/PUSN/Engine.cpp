@@ -587,13 +587,6 @@ bool Engine::InitializeScene()
 		if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
 			return false;
 
-		if (!sprite.Initialize(this->device.Get(), this->deviceContext.Get(), 256, 256, "Data/Textures/circle.png", cb_vs_vertexshader_2d))
-			return false;
-
-		sprite.SetPosition(XMFLOAT3(windowWidth / 2 - sprite.GetWidth() / 2, windowHeight / 2 - sprite.GetHeight() / 2, 0.0f));
-
-		camera2D.SetProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
-
 		Camera3D.SetPosition(0.0f, 200.0f, -100.0f);
 		Camera3D.SetRotation(1.2, 0, 0);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);

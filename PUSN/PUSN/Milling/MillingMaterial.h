@@ -16,8 +16,6 @@
 #include "..\\Graphics\\Camera3D.h"
 #include "..\\Graphics\\RenderableGameObject.h"
 #include "..\\Graphics\\Light.h"
-#include "..\\Graphics\\Camera2D.h"
-#include "..\\Graphics\\Sprite.h"
 #include <memory>
 
 using namespace std;

@@ -172,8 +172,6 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Graphics\Camera2D.cpp" />
-    <ClCompile Include="Graphics\GameObject2D.cpp" />
     <ClCompile Include="Graphics\GameObject3D.cpp" />
     <ClCompile Include="Graphics\Color.cpp" />
     <ClCompile Include="Graphics\GameObject.cpp" />
@@ -199,15 +197,12 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="Graphics\RenderableGameObject.cpp" />
     <ClCompile Include="Graphics\Shaders.cpp" />
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="Graphics\Sprite.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graphics\Camera2D.h" />
-    <ClInclude Include="Graphics\GameObject2D.h" />
     <ClInclude Include="Graphics\GameObject3D.h" />
     <ClInclude Include="Graphics\Color.h" />
     <ClInclude Include="COMException.h" />
@@ -239,7 +234,6 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="Mouse\MouseEvent.h" />
     <ClInclude Include="Graphics\RenderableGameObject.h" />
     <ClInclude Include="Graphics\Shaders.h" />
-    <ClInclude Include="Graphics\Sprite.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\VertexBuffer.h" />

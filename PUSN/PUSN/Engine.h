@@ -2,9 +2,6 @@
 #include "WindowContainer.h"
 #include "Timer.h"
 #include "GuiData.h"
-#include "Graphics\Camera2D.h"
-#include "Graphics\Camera2D.h"
-#include "Graphics\Sprite.h"
 #include "Graphics\RenderableGameObject.h"
 #include "Graphics\Light.h"
 #include "Milling\MillingMachine.h"
@@ -25,8 +22,6 @@ public:
 private:
 
 	Camera3D Camera3D;
-	Camera2D camera2D;
-	Sprite sprite;
 	RenderableGameObject gameObject;
 	Light light;
 
