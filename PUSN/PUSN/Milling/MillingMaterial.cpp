@@ -16,7 +16,7 @@ MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
 	this->vertexbuffer = millingMaterial.vertexbuffer;
 
 	this->gridX = millingMaterial.gridX;
-	this->gridZ = millingMaterial.gridZ;
+	this->gridY = millingMaterial.gridY;
 	this->vertices = millingMaterial.vertices;//?
 }
 
@@ -34,11 +34,11 @@ void MillingMaterial::GetIndicesOfArea(XMFLOAT3 position, float range, int & lef
 	float rightF = ceilf((position.x + range + size.x / 2) / size.x * (gridX - 1));
 	right = max(min((int)rightF, (gridX - 1)), 0);
 
-	float downF = floorf((position.z - range + size.z / 2) / size.z * (gridZ - 1));
-	down = max(min((int)downF, (gridZ - 1)), 0);
+	float downF = floorf((position.y - range + size.y / 2) / size.y * (gridY - 1));
+	down = max(min((int)downF, (gridY - 1)), 0);
 
-	float topF = ceilf((position.z + range + size.z / 2) / size.z * (gridZ - 1));
-	top = max(min((int)topF, (gridZ - 1)), 0);
+	float topF = ceilf((position.y + range + size.y / 2) / size.y * (gridY - 1));
+	top = max(min((int)topF, (gridY - 1)), 0);
 }
 
 void MillingMaterial::Draw()
@@ -49,15 +49,15 @@ void MillingMaterial::Draw()
 	this->deviceContext->DrawIndexed(this->indexbuffer.IndexCount(), 0, 0);
 }
 
-Vertex3D & MillingMaterial::GetVert(int x, int z)
+Vertex3D & MillingMaterial::GetVert(int x, int y)
 {
-	return vertices[x * gridZ + z];
+	return vertices[x * gridY + y];
 }
 
-void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
+void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridY)
 {
 	this->gridX = _gridX;
-	this->gridZ = _gridZ;
+	this->gridY = _gridY;
 	this->size = size;
 
 	Reset();
@@ -66,30 +66,30 @@ void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridZ)
 void MillingMaterial::Reset()
 {
 	this->vertices.clear();
-	this->vertices.reserve(gridX * gridZ);
+	this->vertices.reserve(gridX * gridY);
 	for (int i = 0; i < gridX; i++)
-		for (int j = 0; j < gridZ; j++)
+		for (int j = 0; j < gridY; j++)
 		{
 			float x = size.x * (i - (gridX - 1) / 2.0) / (gridX - 1);
-			float y = size.y;
-			float z = size.z * (j - (gridZ - 1) / 2.0) / (gridZ - 1);
-			this->vertices.push_back(Vertex3D(x, y, z, 0, 1, 0));
+			float y = size.y * (j - (gridY - 1) / 2.0) / (gridY - 1);
+			float z = size.z;
+			this->vertices.push_back(Vertex3D(x, y, z, 0, 0, 1));
 		}
 
 	HRESULT hr = this->vertexbuffer.Initialize(device, vertices.data(), vertices.size(), true);
 	COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer for mesh.");
 
 	std::vector<DWORD> indices;
-	indices.reserve(6 * (gridX - 1) * (gridZ - 1));
+	indices.reserve(6 * (gridX - 1) * (gridY - 1));
 	for (int i = 0; i < gridX - 1; i++)
-		for (int j = 0; j < gridZ - 1; j++) {
-			indices.push_back(gridZ*i + j);
-			indices.push_back(gridZ*i + j + 1);
-			indices.push_back(gridZ*(i + 1) + j + 1);
+		for (int j = 0; j < gridY - 1; j++) {
+			indices.push_back(gridY*(i + 1) + j + 1);
+			indices.push_back(gridY*i + j + 1);
+			indices.push_back(gridY*i + j);
 
-			indices.push_back(gridZ*i + j);
-			indices.push_back(gridZ*(i + 1) + j + 1);
-			indices.push_back(gridZ*(i + 1) + j);
+			indices.push_back(gridY*(i + 1) + j);
+			indices.push_back(gridY*(i + 1) + j + 1);
+			indices.push_back(gridY*i + j);
 		}
 
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());

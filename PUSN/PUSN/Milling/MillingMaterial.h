@@ -27,14 +27,14 @@ public:
 	MillingMaterial(ID3D11Device * device, ID3D11DeviceContext * deviceContext);
 	MillingMaterial(const MillingMaterial & milligMaterial);
 
-	void Initialize(XMFLOAT3 size, int _gridX, int _gridZ);
+	void Initialize(XMFLOAT3 size, int _gridX, int _gridY);
 	void Draw();
 	void UpdateVertexBuffer();
 	void Reset();
-	Vertex3D& GetVert(int x, int z);
+	Vertex3D& GetVert(int x, int y);
 	void GetIndicesOfArea(XMFLOAT3 position, float range, int & left, int & right, int & top, int & down);
 
-	int gridX, gridZ;
+	int gridX, gridY;
 	XMFLOAT3 size;
 
 private:

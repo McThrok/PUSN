@@ -7,8 +7,8 @@ public:
 	bool paused = true;
 
 	int gridX = 100;
-	int gridZ = 100;
-	DirectX::XMFLOAT3 size = DirectX::XMFLOAT3(150, 50, 150);
+	int gridY = 100;
+	DirectX::XMFLOAT3 size = DirectX::XMFLOAT3(150, 150, 50);
 
 	float toolRadius = 6;
 	bool flat = true;

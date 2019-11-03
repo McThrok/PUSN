@@ -276,7 +276,7 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 	left = max(0, left - 1);
 	right = min(material->gridX - 1, right + 1);
 	down = max(0, down - 1);
-	top = min(material->gridZ - 1, top + 1);
+	top = min(material->gridY - 1, top + 1);
 
 	//update normals
 	for (int i = left; i < right + 1; i++)
@@ -288,7 +288,7 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 			XMFLOAT3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
 			XMFLOAT3 right = i == material->gridX - 1 ? curr : material->GetVert(i + 1, j).pos;
 			XMFLOAT3 top = j == 0 ? curr : material->GetVert(i, j - 1).pos;
-			XMFLOAT3 down = j == material->gridZ - 1 ? curr : material->GetVert(i, j + 1).pos;
+			XMFLOAT3 down = j == material->gridY - 1 ? curr : material->GetVert(i, j + 1).pos;
 
 			XMFLOAT3 normal = CalculateNormal(left, right, top, down);
 			material->GetVert(i, j).normal = normal;

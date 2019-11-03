@@ -278,14 +278,14 @@ void Engine::RenderGui() {
 	ImGui::Separator();
 
 	ImGui::SliderFloat("size x", &guiData->size.x, 50, 300);
-	ImGui::SliderFloat("size y", &guiData->size.z, 50, 300);
-	ImGui::SliderFloat("size z", &guiData->size.y, 20, 100);
+	ImGui::SliderFloat("size y", &guiData->size.y, 50, 300);
+	ImGui::SliderFloat("size z", &guiData->size.z, 20, 100);
 	ImGui::SliderInt("grid x", &guiData->gridX, 50, 500);
-	ImGui::SliderInt("grid y", &guiData->gridZ, 50, 500);
+	ImGui::SliderInt("grid y", &guiData->gridY, 50, 500);
 	ImGui::SliderFloat("radius", &guiData->toolRadius, 5, 20);
 	ImGui::Checkbox("flat cut", &guiData->flat);
 	if (ImGui::Button("Apply")) {
-		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
+		millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
 		millingMachine->SetMillingCutterMesh(guiData->toolRadius, guiData->flat);
 		millingMachine->Reset();
 		guiData->paused = true;
@@ -654,7 +654,7 @@ void Engine::InitGui() {
 void Engine::InitMilling()
 {
 	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
-	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridZ);
+	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
 	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
 	millingMachine->LoadDataFromFile(path + "\\t1.k16");
 
