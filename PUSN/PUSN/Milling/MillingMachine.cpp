@@ -55,6 +55,7 @@ void MillingMachine::LoadDataFromFile(string filePath)
 		if (str[0] == 'Y') {
 			pos = str.find(".");
 			position.y = stof(str.substr(1, pos + 4));
+			position.y = -position.y;//LH coords
 			str = str.substr(pos + 4);
 		}
 		else {
@@ -155,15 +156,15 @@ void MillingMachine::SetPathMesh()
 	{
 		int count = vertices.size();
 		XMFLOAT3 right = { width / 2,0,0 };
-		if (moves[i].x != moves[i + 1].x || moves[i].z != moves[i + 1].z) {
+		if (moves[i].x != moves[i + 1].x || moves[i].y != moves[i + 1].y) {
 			XMVECTOR dir = (XMLoadFloat3(&moves[i + 1]) - XMLoadFloat3(&moves[i]));
-			XMStoreFloat3(&right, (width / 2) * XMVector3Normalize(XMVector3Cross({ 0,1,0 }, dir)));
+			XMStoreFloat3(&right, (width / 2) * XMVector3Normalize(XMVector3Cross({ 0,0,1 }, dir)));
 		}
 
-		vertices.push_back(Vertex3D(moves[i].x - right.x, moves[i].y, moves[i].z - right.z, 0, 1, 0));
-		vertices.push_back(Vertex3D(moves[i + 1].x - right.x, moves[i + 1].y, moves[i + 1].z - right.z, 0, 1, 0));
-		vertices.push_back(Vertex3D(moves[i + 1].x + right.x, moves[i + 1].y, moves[i + 1].z + right.z, 0, 1, 0));
-		vertices.push_back(Vertex3D(moves[i].x + right.x, moves[i].y, moves[i].z + right.z, 0, 1, 0));
+		vertices.push_back(Vertex3D(moves[i].x - right.x, moves[i].y - right.y, moves[i].z, 0, 0, 1));
+		vertices.push_back(Vertex3D(moves[i + 1].x - right.x, moves[i + 1].y - right.y, moves[i + 1].z, 0, 0, 1));
+		vertices.push_back(Vertex3D(moves[i + 1].x + right.x, moves[i + 1].y + right.y, moves[i + 1].z, 0, 0, 1));
+		vertices.push_back(Vertex3D(moves[i].x + right.x, moves[i].y + right.y, moves[i].z, 0, 0, 1));
 
 		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
@@ -233,7 +234,7 @@ XMFLOAT3 MillingMachine::Move()
 void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 {
 	float eps = 0.0000000;
-	bool millingDanger = flatCut && dir.y < -eps;
+	bool millingDanger = flatCut && dir.z < -eps;
 
 	float rangeSq = cutRadius * cutRadius;
 
@@ -247,24 +248,24 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 		{
 			XMFLOAT3 pos = material->GetVert(i, j).pos;
 			float x = currentPosition.x - pos.x;
-			float z = currentPosition.z - pos.z;
+			float y = currentPosition.y - pos.y;
 
-			float distSq = x * x + z * z;
+			float distSq = x * x + y * y;
 			if (distSq < rangeSq)
 			{
-				float newHeight = flatCut ? currentPosition.y : currentPosition.y + cutRadius - sqrt(rangeSq - distSq);
-				if (pos.y > newHeight)
+				float newHeight = flatCut ? currentPosition.z : currentPosition.z + cutRadius - sqrt(rangeSq - distSq);
+				if (pos.z > newHeight)
 				{
-					if (newHeight < material->size.y - materialDepth)
+					if (newHeight < material->size.z - materialDepth)
 						materialDepthViolated = true;
 
-					if (pos.y - newHeight > toolDepth)
+					if (pos.z - newHeight > toolDepth)
 						toolDepthViolated = true;
 
 					if (millingDanger)
 						millingViolated = true;
 
-					pos.y = newHeight;
+					pos.z = newHeight;
 				}
 
 				material->GetVert(i, j).pos = pos;
@@ -287,8 +288,8 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 
 			XMFLOAT3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
 			XMFLOAT3 right = i == material->gridX - 1 ? curr : material->GetVert(i + 1, j).pos;
-			XMFLOAT3 top = j == 0 ? curr : material->GetVert(i, j - 1).pos;
-			XMFLOAT3 down = j == material->gridY - 1 ? curr : material->GetVert(i, j + 1).pos;
+			XMFLOAT3 down = j == 0 ? curr : material->GetVert(i, j - 1).pos;
+			XMFLOAT3 top = j == material->gridY - 1 ? curr : material->GetVert(i, j + 1).pos;
 
 			XMFLOAT3 normal = CalculateNormal(left, right, top, down);
 			material->GetVert(i, j).normal = normal;
