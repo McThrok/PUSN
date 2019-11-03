@@ -5,7 +5,7 @@ MillingMachine::MillingMachine(ID3D11Device* _device, ID3D11DeviceContext* _devi
 	device = _device;
 	deviceContext = _deviceContext;
 
-	safePosition = XMFLOAT3(0, 120, 0);
+	safePosition = XMFLOAT3(0, 0, 120);
 	stepSize = 1;
 	speed = 1;
 	materialDepth = 50;
@@ -52,7 +52,16 @@ void MillingMachine::LoadDataFromFile(string filePath)
 			position.x = moves.back().x;
 		}
 
-		if (str[0] == 'Y') {//Z
+		if (str[0] == 'Y') {
+			pos = str.find(".");
+			position.y = stof(str.substr(1, pos + 4));
+			str = str.substr(pos + 4);
+		}
+		else {
+			position.y = moves.back().y;
+		}
+
+		if (str[0] == 'Z') {
 			pos = str.find(".");
 			position.z = stof(str.substr(1, pos + 4));
 			str = str.substr(pos + 4);
@@ -61,14 +70,6 @@ void MillingMachine::LoadDataFromFile(string filePath)
 			position.z = moves.back().z;
 		}
 
-		if (str[0] == 'Z') {//Y
-			pos = str.find(".");
-			position.y = stof(str.substr(1, pos + 4));
-			str = str.substr(pos + 4);
-		}
-		else {
-			position.y = moves.back().y;
-		}
 
 		moves.push_back(position);
 	}
@@ -95,14 +96,14 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 	{
 		float angle = XM_2PI * i / horizontalLvls;
 		float angle2 = XM_2PI * (i + 1) / horizontalLvls;
-		XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle), 0, sin(angle)));
-		XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2), 0, sin(angle2)));
+		XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle), sin(angle), 0));
+		XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2), sin(angle2), 0));
 
 		int count = vertices.size();
-		vertices.push_back(Vertex3D(r * a.x, startHeight, r * a.z, -1, -1, a.x, 0, a.z));
-		vertices.push_back(Vertex3D(r * a.x, height, r * a.z, -1, -1, a.x, 0, a.z));
-		vertices.push_back(Vertex3D(r * b.x, height, r * b.z, -1, -1, b.x, 0, b.z));
-		vertices.push_back(Vertex3D(r * b.x, startHeight, r * b.z, -1, -1, b.x, 0, b.z));
+		vertices.push_back(Vertex3D(r * b.x, r * b.y, startHeight, b.x, b.y, 0));
+		vertices.push_back(Vertex3D(r * b.x, r * b.y, height, b.x, b.y, 0));
+		vertices.push_back(Vertex3D(r * a.x, r * a.y, height, a.x, a.y, 0));
+		vertices.push_back(Vertex3D(r * a.x, r * a.y, startHeight, a.x, a.y, 0));
 
 		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
@@ -120,16 +121,16 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 				float roundAngle = XM_PIDIV2 * j / roundLvls;
 				float roundAngle2 = XM_PIDIV2 * (j + 1) / roundLvls;
 
-				XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle), cos(roundAngle), sin(angle) * sin(roundAngle)));
-				XMFLOAT3 a2 = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle2), cos(roundAngle2), sin(angle) * sin(roundAngle2)));
-				XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle), cos(roundAngle), sin(angle2) * sin(roundAngle)));
-				XMFLOAT3 b2 = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle2), cos(roundAngle2), sin(angle2) * sin(roundAngle2)));
+				XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle), sin(angle) * sin(roundAngle), cos(roundAngle)));
+				XMFLOAT3 a2 = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle2), sin(angle) * sin(roundAngle2), cos(roundAngle2)));
+				XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle), sin(angle2) * sin(roundAngle), cos(roundAngle)));
+				XMFLOAT3 b2 = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle2), sin(angle2) * sin(roundAngle2), cos(roundAngle2)));
 
 				int count = vertices.size();
-				vertices.push_back(Vertex3D(r * a.x, r * (1 - a.y), r * a.z, -1, -1, a.x, a.y, a.z));
-				vertices.push_back(Vertex3D(r * a2.x, r * (1 - a2.y), r * a2.z, -1, -1, a2.x, a2.y, a2.z));
-				vertices.push_back(Vertex3D(r * b2.x, r * (1 - b2.y), r * b2.z, -1, -1, b2.x, b2.y, b2.z));
-				vertices.push_back(Vertex3D(r * b.x, r * (1 - b.y), r * b.z, -1, -1, b2.x, b.y, b.z));
+				vertices.push_back(Vertex3D(r * b.x, r * b.y, r * (1 - b.z), b2.x, b.y, b.z));
+				vertices.push_back(Vertex3D(r * b2.x, r * b2.y, r * (1 - b2.z), b2.x, b2.y, b2.z));
+				vertices.push_back(Vertex3D(r * a2.x, r * a2.y, r * (1 - a2.z), a2.x, a2.y, a2.z));
+				vertices.push_back(Vertex3D(r * a.x, r * a.y, r * (1 - a.z), a.x, a.y, a.z));
 
 				indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 				indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
