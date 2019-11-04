@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Milling">
       <UniqueIdentifier>{f2f27172-1ede-4303-91fe-8d527c987801}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Milling\Bezier">
+      <UniqueIdentifier>{78d166c0-83df-4c04-92dd-52f8908d1190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Milling\Bezier">
+      <UniqueIdentifier>{f6641f60-d903-416f-b6fd-9c08c7418b81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -130,6 +136,9 @@
       <Filter>Source Files\Milling</Filter>
     </ClCompile>
     <ClCompile Include="Milling\MillingMachine.cpp">
+      <Filter>Source Files\Milling</Filter>
+    </ClCompile>
+    <ClCompile Include="PathGenerator.cpp">
       <Filter>Source Files\Milling</Filter>
     </ClCompile>
   </ItemGroup>
@@ -244,6 +253,15 @@
     </ClInclude>
     <ClInclude Include="GuiData.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PathGenerator.h">
+      <Filter>Header Files\Milling</Filter>
+    </ClInclude>
+    <ClInclude Include="BezierSurface.h">
+      <Filter>Header Files\Milling\Bezier</Filter>
+    </ClInclude>
+    <ClInclude Include="IntersectionCurve.h">
+      <Filter>Header Files\Milling\Bezier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
