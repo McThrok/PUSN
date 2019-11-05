@@ -55,7 +55,6 @@ void MillingMachine::LoadDataFromFile(string filePath)
 		if (str[0] == 'Y') {
 			pos = str.find(".");
 			position.y = stof(str.substr(1, pos + 4));
-			position.y = -position.y;//LH coords
 			str = str.substr(pos + 4);
 		}
 		else {
@@ -101,10 +100,10 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 		XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2), sin(angle2), 0));
 
 		int count = vertices.size();
-		vertices.push_back(Vertex3D(r * b.x, r * b.y, startHeight, b.x, b.y, 0));
-		vertices.push_back(Vertex3D(r * b.x, r * b.y, height, b.x, b.y, 0));
-		vertices.push_back(Vertex3D(r * a.x, r * a.y, height, a.x, a.y, 0));
 		vertices.push_back(Vertex3D(r * a.x, r * a.y, startHeight, a.x, a.y, 0));
+		vertices.push_back(Vertex3D(r * a.x, r * a.y, height, a.x, a.y, 0));
+		vertices.push_back(Vertex3D(r * b.x, r * b.y, height, b.x, b.y, 0));
+		vertices.push_back(Vertex3D(r * b.x, r * b.y, startHeight, b.x, b.y, 0));
 
 		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
@@ -128,10 +127,10 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 				XMFLOAT3 b2 = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle2), sin(angle2) * sin(roundAngle2), cos(roundAngle2)));
 
 				int count = vertices.size();
-				vertices.push_back(Vertex3D(r * b.x, r * b.y, r * (1 - b.z), b2.x, b.y, b.z));
-				vertices.push_back(Vertex3D(r * b2.x, r * b2.y, r * (1 - b2.z), b2.x, b2.y, b2.z));
-				vertices.push_back(Vertex3D(r * a2.x, r * a2.y, r * (1 - a2.z), a2.x, a2.y, a2.z));
 				vertices.push_back(Vertex3D(r * a.x, r * a.y, r * (1 - a.z), a.x, a.y, a.z));
+				vertices.push_back(Vertex3D(r * a2.x, r * a2.y, r * (1 - a2.z), a2.x, a2.y, a2.z));
+				vertices.push_back(Vertex3D(r * b2.x, r * b2.y, r * (1 - b2.z), b2.x, b2.y, b2.z));
+				vertices.push_back(Vertex3D(r * b.x, r * b.y, r * (1 - b.z), b2.x, b.y, b.z));
 
 				indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 				indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
@@ -161,10 +160,10 @@ void MillingMachine::SetPathMesh()
 			XMStoreFloat3(&right, (width / 2) * XMVector3Normalize(XMVector3Cross({ 0,0,1 }, dir)));
 		}
 
-		vertices.push_back(Vertex3D(moves[i].x - right.x, moves[i].y - right.y, moves[i].z, 0, 0, 1));
+		vertices.push_back(Vertex3D(moves[i].x + right.x, moves[i].y + right.y, moves[i].z, 0, 0, 1));
 		vertices.push_back(Vertex3D(moves[i + 1].x - right.x, moves[i + 1].y - right.y, moves[i + 1].z, 0, 0, 1));
 		vertices.push_back(Vertex3D(moves[i + 1].x + right.x, moves[i + 1].y + right.y, moves[i + 1].z, 0, 0, 1));
-		vertices.push_back(Vertex3D(moves[i].x + right.x, moves[i].y + right.y, moves[i].z, 0, 0, 1));
+		vertices.push_back(Vertex3D(moves[i].x - right.x, moves[i].y - right.y, moves[i].z, 0, 0, 1));
 
 		indices.push_back(count); indices.push_back(count + 1); indices.push_back(count + 2);
 		indices.push_back(count); indices.push_back(count + 2); indices.push_back(count + 3);
@@ -302,8 +301,8 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 XMFLOAT3 MillingMachine::CalculateNormal(const XMFLOAT3& left, const XMFLOAT3& right, const XMFLOAT3& top, const XMFLOAT3& down)
 {
 	XMVECTOR vecX = XMLoadFloat3(&XMFLOAT3(right.x - left.x, right.y - left.y, right.z - left.z));
-	XMVECTOR vecZ = XMLoadFloat3(&XMFLOAT3(top.x - down.x, top.y - down.y, top.z - down.z));
-	XMVECTOR vecNormal = XMVector3Normalize(XMVector3Cross(vecX, vecZ));
+	XMVECTOR vecY = XMLoadFloat3(&XMFLOAT3(top.x - down.x, top.y - down.y, top.z - down.z));
+	XMVECTOR vecNormal = XMVector3Normalize(XMVector3Cross(vecX, vecY));
 	XMFLOAT3 normal;
 	XMStoreFloat3(&normal, vecNormal);
 

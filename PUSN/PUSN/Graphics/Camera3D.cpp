@@ -12,7 +12,7 @@ Camera3D::Camera3D()
 void Camera3D::SetProjectionValues(float fovDegrees, float aspectRatio, float nearZ, float farZ)
 {
 	float fovRadians = (fovDegrees / 360.0f) * XM_2PI;
-	this->projectionMatrix = XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
+	this->projectionMatrix = XMMatrixPerspectiveFovRH(fovRadians, aspectRatio, nearZ, farZ);
 }
 
 const XMMATRIX& Camera3D::GetViewMatrix() const
@@ -37,7 +37,7 @@ void Camera3D::UpdateMatrix() //Updates view matrix and also updates the movemen
 	//Calculate up direction based on current rotation
 	XMVECTOR upDir = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, camRotationMatrix);
 	//Rebuild view matrix
-	this->viewMatrix = XMMatrixLookAtLH(this->posVector, camTarget, upDir);
+	this->viewMatrix = XMMatrixLookAtRH(this->posVector, camTarget, upDir);
 
 	this->UpdateDirectionVectors();
 }

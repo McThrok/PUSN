@@ -45,7 +45,7 @@ void Engine::Update()
 		{
 			if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
 			{
-				this->Camera3D.AdjustRotation((float)me.GetPosY() * 0.01f, 0, (float)me.GetPosX() * 0.01f);
+				this->Camera3D.AdjustRotation(-(float)me.GetPosY() * 0.01f, 0, -(float)me.GetPosX() * 0.01f);
 			}
 		}
 	}
@@ -583,8 +583,8 @@ bool Engine::InitializeScene()
 		if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
 			return false;
 
-		Camera3D.SetPosition(0.0f, 100.0f, 200.0f);
-		Camera3D.SetRotation(1.2f, 0.0f, 0.0f);
+		Camera3D.SetPosition(0.0f, -100.0f, 200.0f);
+		//Camera3D.SetRotation(1.2f, 0.0f, 0.0f);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
 
 

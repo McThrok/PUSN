@@ -83,13 +83,13 @@ void MillingMaterial::Reset()
 	indices.reserve(6 * (gridX - 1) * (gridY - 1));
 	for (int i = 0; i < gridX - 1; i++)
 		for (int j = 0; j < gridY - 1; j++) {
-			indices.push_back(gridY*(i + 1) + j + 1);
+			indices.push_back(gridY*i + j);
 			indices.push_back(gridY*i + j + 1);
-			indices.push_back(gridY*i + j);
-
-			indices.push_back(gridY*(i + 1) + j);
 			indices.push_back(gridY*(i + 1) + j + 1);
+
 			indices.push_back(gridY*i + j);
+			indices.push_back(gridY*(i + 1) + j + 1);
+			indices.push_back(gridY*(i + 1) + j);
 		}
 
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());
