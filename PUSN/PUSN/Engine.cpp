@@ -657,4 +657,8 @@ void Engine::InitMilling()
 	guiData->toolRadius = millingMachine->cutRadius;
 	guiData->flat = millingMachine->flatCut;
 	millingMachine->Reset();
+
+	//qwe
+	PathGenerator p;
+	p.LoadElephant();
 }

@@ -21,6 +21,27 @@ public:
 	int heightPatchCount;
 	bool WrappedV;
 
+	BezierSurfaceC0(int ph, int pw, bool cylinder = false)
+	{
+		
+		WrappedV = cylinder;
+		heightPatchCount = ph;
+		widthPatchCount = pw;
+		int h = GetHeightVertexCount();
+		int w = GetWidthVertexCount();
+
+		_controlVertices = vector < vector<XMFLOAT3>>(4);
+		for (int i = 0; i < h; i++)
+		{
+			_controlVertices[i] = vector<XMFLOAT3>(4);
+			for (int j = 0; j < w; j++) {
+				if (cylinder && j == w - 1)
+					_controlVertices[i][j] = _controlVertices[i][0];
+				else
+					_controlVertices[i][j] = { (float)i,(float)j,0 };
+			}
+		}
+	}
 
 	BezierSurfaceC0(string data, bool cylinder = false)
 	{
@@ -215,6 +236,16 @@ public:
 		XMFLOAT3 div = GetValueDivW(ph, pw, hh, ww);
 		XMFLOAT3 result;
 		XMStoreFloat3(&result, XMLoadFloat3(&div) * widthPatchCount);
+
+		return result;
+	}
+	XMFLOAT3 EvaluateNormal(XMFLOAT2 hw) {
+		XMFLOAT3 du = EvaluateDU(hw);
+		XMFLOAT3 dv = EvaluateDV(hw);
+
+		XMVECTOR cross = XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&du), XMLoadFloat3(&dv)));
+		XMFLOAT3 result;
+		XMStoreFloat3(&result,cross );
 
 		return result;
 	}

@@ -138,7 +138,7 @@
     <ClCompile Include="Milling\MillingMachine.cpp">
       <Filter>Source Files\Milling</Filter>
     </ClCompile>
-    <ClCompile Include="PathGenerator.cpp">
+    <ClCompile Include="Milling\PathGenerator.cpp">
       <Filter>Source Files\Milling</Filter>
     </ClCompile>
   </ItemGroup>
@@ -254,14 +254,14 @@
     <ClInclude Include="GuiData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PathGenerator.h">
-      <Filter>Header Files\Milling</Filter>
-    </ClInclude>
     <ClInclude Include="BezierSurface.h">
       <Filter>Header Files\Milling\Bezier</Filter>
     </ClInclude>
     <ClInclude Include="IntersectionCurve.h">
       <Filter>Header Files\Milling\Bezier</Filter>
+    </ClInclude>
+    <ClInclude Include="Milling\PathGenerator.h">
+      <Filter>Header Files\Milling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

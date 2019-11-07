@@ -12,6 +12,7 @@
 #include <memory>
 #include <stdio.h>
 #include <direct.h>
+#include "Milling/PathGenerator.h"
 
 class Engine : public WindowContainer
 {

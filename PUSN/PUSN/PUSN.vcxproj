@@ -196,7 +196,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="Mouse\MouseEvent.cpp" />
     <ClCompile Include="Graphics\RenderableGameObject.cpp" />
     <ClCompile Include="Graphics\Shaders.cpp" />
-    <ClCompile Include="PathGenerator.cpp" />
+    <ClCompile Include="Milling\PathGenerator.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
@@ -237,7 +237,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="Mouse\MouseEvent.h" />
     <ClInclude Include="Graphics\RenderableGameObject.h" />
     <ClInclude Include="Graphics\Shaders.h" />
-    <ClInclude Include="PathGenerator.h" />
+    <ClInclude Include="Milling\PathGenerator.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\VertexBuffer.h" />

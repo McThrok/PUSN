@@ -21,7 +21,7 @@ public:
 
 struct UpdStruct
 {
-	IIntersect Obj;
+	IIntersect * Obj;
 	XMFLOAT2 UV;
 	XMFLOAT2 UVNew;
 	bool Backed;
@@ -39,20 +39,16 @@ struct UpdateUVStruct
 //
 //class IntersectionCurve
 //{
-//	private static int _count = 0;
+//	//private static int _count = 0;
 //
-//	private static float _gradientEps = 0.0001f;
-//	private static float _startGradientAlpha = 0.01f;
+//	//private static float _gradientEps = 0.0001f;
+//	//private static float _startGradientAlpha = 0.01f;
 //
-//	public static float _newtonStartAlpha = 0.002f;
-//	public static float _finalEpsilon = 0.01f;
-//	public static float _alphaEpsilon = 0.001f;
+//	//public static float _newtonStartAlpha = 0.002f;
+//	//public static float _finalEpsilon = 0.01f;
+//	//public static float _alphaEpsilon = 0.001f;
 //
-//	public IntersectionCurve()
-//	{
-//		Name = nameof(IntersectionCurve) + " " + _count++.ToString();
-//	}
-//
+//	
 //	public List<XMFLOAT3> Verts{ get; }
 //	private readonly List<XMFLOAT3> _uv0;
 //	private readonly List<XMFLOAT3> _uv1;
@@ -268,24 +264,24 @@ struct UpdateUVStruct
 //		return new IntersectionCurve(pointsList, uvList0, uvList1);
 //	}
 //
-//	private static Vector4 GetNewtonIterationPoint(IIntersect obj0, IIntersect obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
+//	private static Vector4 GetNewtonIterationPoint(IIntersect * obj0, IIntersect * obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
 //	{
 //		var mat = GetJacobi(obj0, obj1, uv0, uv1, uvNew0, uvNew1);
 //		var vec = GetF(obj0, obj1, uv0, uv1, uvNew0, uvNew1, alpha);
 //		return vec.Multiply(mat);
 //	}
-//	public static Matrix4x4 GetJacobi(IIntersect obj0, IIntersect obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1)
+//	public static Matrix4x4 GetJacobi(IIntersect * obj0, IIntersect * obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1)
 //	{
-//		XMFLOAT3 dU0 = obj0.EvaluateDU(uv0);
-//		XMFLOAT3 dV0 = obj0.EvaluateDV(uv0);
-//		XMFLOAT3 dU1 = obj1.EvaluateDU(uv1);
-//		XMFLOAT3 dV1 = obj1.EvaluateDV(uv1);
+//		XMFLOAT3 dU0 = obj0->EvaluateDU(uv0);
+//		XMFLOAT3 dV0 = obj0->EvaluateDV(uv0);
+//		XMFLOAT3 dU1 = obj1->EvaluateDU(uv1);
+//		XMFLOAT3 dV1 = obj1->EvaluateDV(uv1);
 //
 //		XMFLOAT3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
-//		dU0 = obj0.EvaluateDU(uvNew0);
-//		dV0 = obj0.EvaluateDV(uvNew0);
-//		dU1 = -obj1.EvaluateDU(uvNew1);
-//		dV1 = -obj1.EvaluateDV(uvNew1);
+//		dU0 = obj0->EvaluateDU(uvNew0);
+//		dV0 = obj0->EvaluateDV(uvNew0);
+//		dU1 = -obj1->EvaluateDU(uvNew1);
+//		dV1 = -obj1->EvaluateDV(uvNew1);
 //
 //		var dot1 = XMFLOAT3.Dot(dU0, normalT);
 //		var dot2 = XMFLOAT3.Dot(dV0, normalT);
@@ -326,7 +322,7 @@ struct UpdateUVStruct
 //		return normalT;
 //	}
 //
-//	private static UpdateUVStruct UpdateUV(IIntersect obj, XMFLOAT2 uv, XMFLOAT2 uvDiff, bool backed)
+//	private static UpdateUVStruct UpdateUV(IIntersect * obj, XMFLOAT2 uv, XMFLOAT2 uvDiff, bool backed)
 //	{
 //		bool backThisTime = false;
 //		bool end = false;
@@ -336,7 +332,7 @@ struct UpdateUVStruct
 //
 //		if (_uNew < 0)
 //		{
-//			if (obj.IsWrappedU)
+//			if (obj->IsWrappedU)
 //			{
 //				_uNew = 1;
 //			}
@@ -355,7 +351,7 @@ struct UpdateUVStruct
 //		}
 //		else if (_uNew > 1)
 //		{
-//			if (obj.IsWrappedU)
+//			if (obj->IsWrappedU)
 //			{
 //				_uNew = 0;
 //			}
@@ -375,7 +371,7 @@ struct UpdateUVStruct
 //
 //		if (_vNew > 1)
 //		{
-//			if (obj.IsWrappedV)
+//			if (obj->IsWrappedV)
 //			{
 //				_vNew = 0;
 //			}
@@ -394,7 +390,7 @@ struct UpdateUVStruct
 //		}
 //		else if (_vNew < 0)
 //		{
-//			if (obj.IsWrappedV)
+//			if (obj->IsWrappedV)
 //			{
 //				_vNew = 1;
 //			}
