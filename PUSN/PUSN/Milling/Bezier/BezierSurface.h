@@ -11,19 +11,26 @@
 using namespace DirectX;
 using namespace std;
 
-class BezierSurfaceC0 : public IIntersect
+class BezierSurfaceC0
 {
 public:
-
 	vector<vector<XMFLOAT3>> _controlVertices;
 
+	static int count;
+	int id;
 	int widthPatchCount;
 	int heightPatchCount;
 	bool WrappedV;
 
+	int GetId() { return id; };
+	bool IsWrappedU() { return false; }
+	bool IsWrappedV() { return WrappedV; }
+
 	BezierSurfaceC0(int ph, int pw, bool cylinder = false)
 	{
-		
+		id = count;
+		count++;
+
 		WrappedV = cylinder;
 		heightPatchCount = ph;
 		widthPatchCount = pw;
@@ -42,11 +49,13 @@ public:
 			}
 		}
 	}
-
 	BezierSurfaceC0(string data, bool cylinder = false)
 	{
+		id = count;
+		count++;
+
 		vector<string> parts;
-		split(data, parts);
+		StringHelper::Split(data, parts);
 
 		WrappedV = cylinder;
 		heightPatchCount = stoi(parts[1]);
@@ -70,19 +79,8 @@ public:
 	XMFLOAT3 StringToPosition(string data)
 	{
 		vector<string> parts;
-		split(data, parts, ';');
+		StringHelper::Split(data, parts, ';');
 		return XMFLOAT3(stof(parts[0]), stof(parts[1]), stof(parts[2]));
-	}
-	void split(const string& str, vector<string>& cont, char delim = ' ')
-	{
-		size_t current, previous = 0;
-		current = str.find(delim);
-		while (current != string::npos) {
-			cont.push_back(str.substr(previous, current - previous));
-			previous = current + 1;
-			current = str.find(delim, previous);
-		}
-		cont.push_back(str.substr(previous, current - previous));
 	}
 
 	int GetWidthVertexCount()
@@ -245,10 +243,11 @@ public:
 
 		XMVECTOR cross = XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&du), XMLoadFloat3(&dv)));
 		XMFLOAT3 result;
-		XMStoreFloat3(&result,cross );
+		XMStoreFloat3(&result, cross);
 
 		return result;
 	}
 
 };
 
+BezierSurfaceC0::count = 0;

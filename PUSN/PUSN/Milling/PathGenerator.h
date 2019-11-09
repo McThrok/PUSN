@@ -25,6 +25,8 @@
 #include "MillingMaterial.h"
 #include "Bezier/BezierSurface.h"
 #include "Bezier/IntersectionCurve.h"
+#include "../StringHelper.h"
+#include <memory>
 
 using namespace std;
 using namespace DirectX;
@@ -33,7 +35,7 @@ class PathGenerator
 {
 public:
 	MillingMaterial* material;
-	vector< BezierSurfaceC0*> model;
+	vector< shared_ptr<BezierSurfaceC0>> model;
 
 	void LoadElephant();
 };

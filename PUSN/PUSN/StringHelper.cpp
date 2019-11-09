@@ -7,7 +7,7 @@ std::wstring StringHelper::StringToWide(std::string str)
 	return wide_string;
 }
 
-std::string StringHelper::GetDirectoryFromPath(const std::string & filepath)
+std::string StringHelper::GetDirectoryFromPath(const std::string& filepath)
 {
 	size_t off1 = filepath.find_last_of('\\');
 	size_t off2 = filepath.find_last_of('/');
@@ -27,7 +27,7 @@ std::string StringHelper::GetDirectoryFromPath(const std::string & filepath)
 	return filepath.substr(0, std::max(off1, off2));
 }
 
-std::string StringHelper::GetFileExtension(const std::string & filename)
+std::string StringHelper::GetFileExtension(const std::string& filename)
 {
 	size_t off = filename.find_last_of('.');
 	if (off == std::string::npos)
@@ -35,4 +35,16 @@ std::string StringHelper::GetFileExtension(const std::string & filename)
 		return {};
 	}
 	return std::string(filename.substr(off + 1));
+}
+
+void StringHelper::Split(const std::string& str, std::vector<std::string>& cont, char delim)
+{
+	size_t current, previous = 0;
+	current = str.find(delim);
+	while (current != std::string::npos) {
+		cont.push_back(str.substr(previous, current - previous));
+		previous = current + 1;
+		current = str.find(delim, previous);
+	}
+	cont.push_back(str.substr(previous, current - previous));
 }

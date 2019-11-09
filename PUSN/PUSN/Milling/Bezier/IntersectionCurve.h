@@ -3,25 +3,14 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <math.h>
+#include "BezierSurface.h"
 
 using namespace DirectX;
 using namespace std;
 
-class IIntersect
-{
-public:
-	virtual int GetId() = 0;
-	virtual bool IsWrappedU() = 0;
-	virtual bool IsWrappedV() = 0;
-
-	virtual XMFLOAT3 Evaluate(XMFLOAT2 hw) = 0;
-	virtual XMFLOAT3 EvaluateDU(XMFLOAT2 hw) = 0;
-	virtual XMFLOAT3 EvaluateDV(XMFLOAT2 hw) = 0;
-};
-
 struct UpdStruct
 {
-	IIntersect * Obj;
+	BezierSurfaceC0 * Obj;
 	XMFLOAT2 UV;
 	XMFLOAT2 UVNew;
 	bool Backed;
@@ -60,7 +49,7 @@ struct UpdateUVStruct
 //		_uv1 = uv1.Select(v = > new XMFLOAT3(v, 0)).ToList();
 //	}
 //
-//	public static IntersectionCurve FindIntersectionCurve(List<IIntersect> objs, XMFLOAT3 cursorPos, float precision)
+//	public static IntersectionCurve FindIntersectionCurve(List<BezierSurfaceC0> objs, XMFLOAT3 cursorPos, float precision)
 //	{
 //		float maxDist = float.MaxValue;
 //		XMFLOAT2 p0 = XMFLOAT2.zero;
@@ -94,7 +83,7 @@ struct UpdateUVStruct
 //		return Gradient(objs[0], objs[1], p0, p1, precision);
 //	}
 //
-//	private static IntersectionCurve Gradient(IIntersect obj0, IIntersect obj1, XMFLOAT2 value0, XMFLOAT2 value1, float precision)
+//	private static IntersectionCurve Gradient(BezierSurfaceC0 obj0, BezierSurfaceC0 obj1, XMFLOAT2 value0, XMFLOAT2 value1, float precision)
 //	{
 //		var p0 = obj0.Evaluate(value0);
 //		var p1 = obj1.Evaluate(value1);
@@ -143,7 +132,7 @@ struct UpdateUVStruct
 //
 //		return MyFriendNewton(obj0, obj1, value0, value1, precision);
 //	}
-//	private static List<XMFLOAT2> GetGradient(IIntersect obj0, IIntersect obj1, XMFLOAT2 point0, XMFLOAT2 point1)
+//	private static List<XMFLOAT2> GetGradient(BezierSurfaceC0 obj0, BezierSurfaceC0 obj1, XMFLOAT2 point0, XMFLOAT2 point1)
 //	{
 //		var eval0 = obj0.Evaluate(point0);
 //		var eval1 = obj1.Evaluate(point1);
@@ -161,7 +150,7 @@ struct UpdateUVStruct
 //
 //		return new List<XMFLOAT2>() { grad0, grad1 };
 //	}
-//	private static IntersectionCurve MyFriendNewton(IIntersect obj0, IIntersect obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, float precision)
+//	private static IntersectionCurve MyFriendNewton(BezierSurfaceC0 obj0, BezierSurfaceC0 obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, float precision)
 //	{
 //		var newtonAlpha = _newtonStartAlpha;
 //
@@ -264,13 +253,13 @@ struct UpdateUVStruct
 //		return new IntersectionCurve(pointsList, uvList0, uvList1);
 //	}
 //
-//	private static Vector4 GetNewtonIterationPoint(IIntersect * obj0, IIntersect * obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
+//	private static Vector4 GetNewtonIterationPoint(BezierSurfaceC0* obj0, BezierSurfaceC0* obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
 //	{
 //		var mat = GetJacobi(obj0, obj1, uv0, uv1, uvNew0, uvNew1);
 //		var vec = GetF(obj0, obj1, uv0, uv1, uvNew0, uvNew1, alpha);
 //		return vec.Multiply(mat);
 //	}
-//	public static Matrix4x4 GetJacobi(IIntersect * obj0, IIntersect * obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1)
+//	public static Matrix4x4 GetJacobi(BezierSurfaceC0* obj0, BezierSurfaceC0* obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1)
 //	{
 //		XMFLOAT3 dU0 = obj0->EvaluateDU(uv0);
 //		XMFLOAT3 dV0 = obj0->EvaluateDV(uv0);
@@ -295,7 +284,7 @@ struct UpdateUVStruct
 //		Matrix4x4.Invert(jacobiMatrix, out Matrix4x4 inv);
 //		return inv;
 //	}
-//	public static Vector4 GetF(IIntersect obj0, IIntersect obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
+//	public static Vector4 GetF(BezierSurfaceC0 obj0, BezierSurfaceC0 obj1, XMFLOAT2 uv0, XMFLOAT2 uv1, XMFLOAT2 uvNew0, XMFLOAT2 uvNew1, float alpha)
 //	{
 //		XMFLOAT3 P0 = obj0.Evaluate(uv0);
 //		XMFLOAT3 Q = obj1.Evaluate(uvNew1);
@@ -322,7 +311,7 @@ struct UpdateUVStruct
 //		return normalT;
 //	}
 //
-//	private static UpdateUVStruct UpdateUV(IIntersect * obj, XMFLOAT2 uv, XMFLOAT2 uvDiff, bool backed)
+//	private static UpdateUVStruct UpdateUV(BezierSurfaceC0* obj, XMFLOAT2 uv, XMFLOAT2 uvDiff, bool backed)
 //	{
 //		bool backThisTime = false;
 //		bool end = false;

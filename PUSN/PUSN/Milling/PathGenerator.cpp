@@ -8,9 +8,21 @@ void PathGenerator::LoadElephant()
 	string filePath = path + "wt_elephant.mg1";
 
 	ifstream file(filePath);
-	string str;
-	while (getline(file, str)) {
-		string a = str;
+	string line;
+	while (getline(file, line)) {
+
+		vector<string> header;
+		StringHelper::Split(line, header);
+		string elementName = header[0];
+		int n = stoi(header[1]);
+		for (int j = 0; j < n; j++)
+		{
+			getline(file, line);
+			if (elementName == "surfaceC0")
+				model.push_back(make_shared<BezierSurfaceC0>(new BezierSurfaceC0(line)));
+			else if (elementName == "tubeC0")
+				model.push_back(make_shared<BezierSurfaceC0>(new BezierSurfaceC0(line), true));
+		}
 
 	}
 }
