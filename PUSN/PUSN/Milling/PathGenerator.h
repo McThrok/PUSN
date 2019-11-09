@@ -37,6 +37,7 @@ public:
 	MillingMaterial* material;
 	vector< shared_ptr<BezierSurfaceC0>> model;
 
+	void InitMaterial();
 	void LoadElephant();
 };
 

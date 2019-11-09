@@ -172,6 +172,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Milling\Bezier\BezierSurface.cpp" />
     <ClCompile Include="Graphics\GameObject3D.cpp" />
     <ClCompile Include="Graphics\Color.cpp" />
     <ClCompile Include="Graphics\GameObject.cpp" />
@@ -204,7 +205,6 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BezierSurface.h" />
     <ClInclude Include="Graphics\GameObject3D.h" />
     <ClInclude Include="Graphics\Color.h" />
     <ClInclude Include="COMException.h" />
@@ -225,7 +225,8 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="Graphics\ImGui\imstb_truetype.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="GuiData.h" />
-    <ClInclude Include="IntersectionCurve.h" />
+    <ClInclude Include="Milling\Bezier\BezierSurface.h" />
+    <ClInclude Include="Milling\Bezier\IntersectionCurve.h" />
     <ClInclude Include="Milling\MillingMachine.h" />
     <ClInclude Include="Keyboard\KeyboardClass.h" />
     <ClInclude Include="Keyboard\KeyboardEvent.h" />

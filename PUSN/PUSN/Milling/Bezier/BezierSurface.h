@@ -6,7 +6,7 @@
 #include <vector>
 #include <math.h>
 #include <string>
-#include "IntersectionCurve.h"
+#include "../../StringHelper.h"
 
 using namespace DirectX;
 using namespace std;
@@ -37,10 +37,10 @@ public:
 		int h = GetHeightVertexCount();
 		int w = GetWidthVertexCount();
 
-		_controlVertices = vector < vector<XMFLOAT3>>(4);
+		_controlVertices = vector < vector<XMFLOAT3>>(w);
 		for (int i = 0; i < h; i++)
 		{
-			_controlVertices[i] = vector<XMFLOAT3>(4);
+			_controlVertices[i] = vector<XMFLOAT3>(h);
 			for (int j = 0; j < w; j++) {
 				if (cylinder && j == w - 1)
 					_controlVertices[i][j] = _controlVertices[i][0];
@@ -63,15 +63,20 @@ public:
 		int h = GetHeightVertexCount();
 		int w = GetWidthVertexCount();
 
-		_controlVertices = vector < vector<XMFLOAT3>>(4);
+		_controlVertices = vector < vector<XMFLOAT3>>(h);
 		for (int i = 0; i < h; i++)
 		{
-			_controlVertices[i] = vector<XMFLOAT3>(4);
+			_controlVertices[i] = vector<XMFLOAT3>(w);
 			for (int j = 0; j < w; j++) {
-				if (cylinder && j == w - 1)
-					_controlVertices[i][j] = _controlVertices[i][0];
-				else
+				if (cylinder) {
+					if (j == w - 1)
+						_controlVertices[i][j] = _controlVertices[i][0];
+					else
+						_controlVertices[i][j] = StringToPosition(parts[i * (w - 1) + j + 3]);
+				}
+				else {
 					_controlVertices[i][j] = StringToPosition(parts[i * w + j + 3]);
+				}
 			}
 		}
 	}
@@ -249,5 +254,3 @@ public:
 	}
 
 };
-
-BezierSurfaceC0::count = 0;
