@@ -659,7 +659,8 @@ void Engine::InitMilling()
 	millingMachine->Reset();
 
 	//qwe
-	PathGenerator p;
+	PathGenerator p(millingMaterial->gridX, millingMaterial->gridY, millingMaterial->size);
 	p.LoadElephant();
-	millingMaterial->SetModel(p.GetModel());
+	p.GeneratePaths();
+	//millingMaterial->SetModel(p.GetModel());
 }

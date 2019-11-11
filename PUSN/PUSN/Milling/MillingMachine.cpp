@@ -76,6 +76,8 @@ void MillingMachine::LoadDataFromFile(string filePath)
 	moves.insert(moves.begin(), safePosition);
 	moves.push_back(safePosition);
 
+	file.close();
+
 	SetPathMesh();
 }
 
