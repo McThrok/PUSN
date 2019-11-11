@@ -35,13 +35,12 @@ using namespace DirectX;
 class PathGenerator
 {
 public:
-	int resX, resY;
-	XMFLOAT3 size;
+	MillingMaterial* material;
 	XMMATRIX modelTransform;
 
 	vector<vector<float>> heightMap;
 
-	PathGenerator(int _resX, int _resY, XMFLOAT3 _size);
+	PathGenerator(MillingMaterial * _material);
 	vector<shared_ptr<BezierSurfaceC0>> model;
 	vector<BezierSurfaceC0*> GetModel();
 
@@ -52,5 +51,6 @@ public:
 	void GenerateHeightMap();
 	vector<XMFLOAT3> GenerateFirstPath();
 	void GeneratePaths();
+	float GetHighestZ(float x, float z);
 };
 

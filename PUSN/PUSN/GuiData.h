@@ -6,8 +6,8 @@ class GuiData
 public:
 	bool paused = true;
 
-	int gridX = 300;
-	int gridY = 300;
+	int gridX = 100;
+	int gridY = 100;
 	DirectX::XMFLOAT3 size = DirectX::XMFLOAT3(150, 150, 50);
 
 	float toolRadius = 6;

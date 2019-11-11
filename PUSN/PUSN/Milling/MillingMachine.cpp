@@ -234,7 +234,7 @@ XMFLOAT3 MillingMachine::Move()
 
 void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 {
-	float eps = 0.0000000;
+	float eps = 0.0000001;
 	bool millingDanger = flatCut && dir.z < -eps;
 
 	float rangeSq = cutRadius * cutRadius;
