@@ -55,7 +55,6 @@ Vertex3D& MillingMaterial::GetVert(int x, int y)
 }
 
 
-
 void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridY)
 {
 	this->gridX = _gridX;

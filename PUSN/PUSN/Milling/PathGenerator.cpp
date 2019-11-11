@@ -81,23 +81,91 @@ void PathGenerator::SavePath(vector<XMFLOAT3> moves, string filePath)
 	}
 }
 
-
 void PathGenerator::GenerateHeightMap()
 {
 	heightMap.resize(resX);
 	for (int i = 0; i < resX; i++)
 		heightMap[i] = vector<float>(resY, 0.0f);
+
+
+	for (int i = 0; i < model.size(); i++)
+	{
+		BezierSurfaceC0* surf = model[i].get();
+		for (int j = 0; j < resX; j++)
+		{
+			for (int k = 0; k < resY; k++)
+			{
+				float u = 1.0f * j / resX;
+				float v = 1.0f * k / resY;
+				XMFLOAT3 point = surf->Evaluate(XMFLOAT2(u, v));
+
+				XMStoreFloat3(&point, XMVector3TransformCoord(XMLoadFloat3(&point), modelTransform));
+
+				int x = static_cast<int>(point.x);
+				int y = static_cast<int>(point.y);
+
+				if (x < resX && y < resY && x >= 0 && y >= 0)
+					heightMap[j][k] = max(heightMap[j][k], point.z);
+			}
+		}
+	}
 }
+
 vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 {
+	vector<XMFLOAT3> path;
+
+	//k16
+	float xoff = 10;
+	float yoff = 10;
+	float safeZ = size.z + 20;
+
+	XMFLOAT3 start = { 0, -yoff, safeZ };
+	path.push_back(start);
+
+	float x, y;
+	bool reversed = false;
+	for (x = 0; x < size.x + xoff; x += xoff)
+	{
+		vector<XMFLOAT3> subPath;
+
+		XMFLOAT3 ystart = { x, -yoff, 10 };
+		subPath.push_back(ystart);
+
+		for (y = 0; y < size.y + yoff; y += yoff)
+		{
+			XMFLOAT3 point = { x, y, 10 };
+			subPath.push_back(point);
+		}
+		y = 170;
+
+		XMFLOAT3 end = { x, y, 10 };
+		subPath.push_back(end);
+
+		if (reversed)
+			path.insert(path.end(), subPath.rbegin(),subPath.rend());
+		else
+			path.insert(path.end(), subPath.begin(), subPath.end());
+
+		reversed = !reversed;
+	}
+
+	XMFLOAT3 end = { x, y, safeZ };
+	path.push_back(end);
+
+	for (int i = 0; i < path.size(); i++)
+	{
+		path[i].x -= size.x / 2;
+		path[i].y -= size.y / 2;
+	}
 
 
-	return vector<XMFLOAT3>();
+	return path;
 }
 
-void PathGenerator::GeneratePaths() {
-	GenerateHeightMap();
+void PathGenerator::GeneratePaths()
+{
+	//GenerateHeightMap();
 	vector<XMFLOAT3> moves = GenerateFirstPath();
 	SavePath(moves, "Paths\\elephant\\test1.k16");
-
 }
