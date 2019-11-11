@@ -2,13 +2,13 @@
 
 
 
-MillingMaterial::MillingMaterial(ID3D11Device * device, ID3D11DeviceContext * deviceContext)
+MillingMaterial::MillingMaterial(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
 	this->deviceContext = deviceContext;
 	this->device = device;
 }
 
-MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
+MillingMaterial::MillingMaterial(const MillingMaterial& millingMaterial)
 {
 	this->deviceContext = millingMaterial.deviceContext;
 	this->device = millingMaterial.device;
@@ -20,7 +20,7 @@ MillingMaterial::MillingMaterial(const MillingMaterial & millingMaterial)
 	this->vertices = millingMaterial.vertices;//?
 }
 
-void MillingMaterial::GetIndicesOfArea(XMFLOAT3 position, float range, int & left, int & right, int & top, int & down)
+void MillingMaterial::GetIndicesOfArea(XMFLOAT3 position, float range, int& left, int& right, int& top, int& down)
 {
 	//left = 0;
 	//right = gridX - 1;
@@ -49,10 +49,12 @@ void MillingMaterial::Draw()
 	this->deviceContext->DrawIndexed(this->indexbuffer.IndexCount(), 0, 0);
 }
 
-Vertex3D & MillingMaterial::GetVert(int x, int y)
+Vertex3D& MillingMaterial::GetVert(int x, int y)
 {
 	return vertices[x * gridY + y];
 }
+
+
 
 void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridY)
 {
@@ -83,13 +85,13 @@ void MillingMaterial::Reset()
 	indices.reserve(6 * (gridX - 1) * (gridY - 1));
 	for (int i = 0; i < gridX - 1; i++)
 		for (int j = 0; j < gridY - 1; j++) {
-			indices.push_back(gridY*i + j);
-			indices.push_back(gridY*i + j + 1);
-			indices.push_back(gridY*(i + 1) + j + 1);
+			indices.push_back(gridY * i + j);
+			indices.push_back(gridY * i + j + 1);
+			indices.push_back(gridY * (i + 1) + j + 1);
 
-			indices.push_back(gridY*i + j);
-			indices.push_back(gridY*(i + 1) + j + 1);
-			indices.push_back(gridY*(i + 1) + j);
+			indices.push_back(gridY * i + j);
+			indices.push_back(gridY * (i + 1) + j + 1);
+			indices.push_back(gridY * (i + 1) + j);
 		}
 
 	hr = this->indexbuffer.Initialize(device, indices.data(), indices.size());
@@ -104,4 +106,43 @@ void MillingMaterial::UpdateVertexBuffer()
 
 	memcpy(resource.pData, vertices.data(), vertices.size() * sizeof(Vertex3D));
 	deviceContext->Unmap(vertexbuffer.Get(), 0);
+}
+
+void MillingMaterial::SetModel(vector<BezierSurfaceC0*> model)
+{
+	XMMATRIX transform = XMMatrixScaling(3, 3, 3) * XMMatrixTranslation(45, 50, 5);
+
+	for (int i = 0; i < gridX; i++)
+		for (int j = 0; j < gridY; j++) {
+			Vertex3D& vert = GetVert(i, j);
+			vert.pos.z = 0;
+		}
+
+	for (int i = 0; i < model.size(); i++)
+	{
+		BezierSurfaceC0* surf = model[i];
+		for (int j = 0; j < 100; j++)
+		{
+			for (int k = 0; k < 100; k++)
+			{
+				float u = j / 100.0;
+				float v = k / 100.0;
+				XMFLOAT3 point = surf->Evaluate(XMFLOAT2(u, v));
+
+				XMStoreFloat3(&point, XMVector3TransformCoord(XMLoadFloat3(&point), transform));
+
+				int x = static_cast<int>(point.x);
+				int y = static_cast<int>(point.y);
+
+				if (x < gridX && y < gridY && x >= 0 && y >= 0) {
+					Vertex3D& vert = GetVert(x, y);
+					vert.pos.z = max(vert.pos.z, point.z);
+				}
+			}
+
+		}
+
+
+	}
+	UpdateVertexBuffer();
 }

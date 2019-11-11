@@ -661,4 +661,5 @@ void Engine::InitMilling()
 	//qwe
 	PathGenerator p;
 	p.LoadElephant();
+	millingMaterial->SetModel(p.GetModel());
 }

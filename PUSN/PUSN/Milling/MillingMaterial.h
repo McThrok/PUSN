@@ -16,6 +16,7 @@
 #include "..\\Graphics\\Camera3D.h"
 #include "..\\Graphics\\RenderableGameObject.h"
 #include "..\\Graphics\\Light.h"
+#include "Bezier/BezierSurface.h"
 #include <memory>
 
 using namespace std;
@@ -37,8 +38,9 @@ public:
 	int gridX, gridY;
 	XMFLOAT3 size;
 
-private:
+	void SetModel(vector<BezierSurfaceC0*> model);
 
+private:
 	std::vector<Vertex3D> vertices;
 	VertexBuffer<Vertex3D> vertexbuffer;
 	IndexBuffer indexbuffer;

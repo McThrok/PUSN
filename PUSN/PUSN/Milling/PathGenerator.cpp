@@ -1,7 +1,13 @@
 #include "PathGenerator.h"
 
-void PathGenerator::InitMaterial()
+vector<BezierSurfaceC0*> PathGenerator::GetModel()
 {
+	vector<BezierSurfaceC0*> result;
+
+	for (int i = 0; i < model.size(); i++)
+		result.push_back(model[i].get());
+
+	return result;
 }
 
 void PathGenerator::LoadElephant()

@@ -26,7 +26,6 @@
 #include "Bezier/BezierSurface.h"
 #include "Bezier/IntersectionCurve.h"
 #include "../StringHelper.h"
-#include <memory>
 
 using namespace std;
 using namespace DirectX;
@@ -34,10 +33,9 @@ using namespace DirectX;
 class PathGenerator
 {
 public:
-	MillingMaterial* material;
-	vector< shared_ptr<BezierSurfaceC0>> model;
+	vector<shared_ptr<BezierSurfaceC0>> model;
+	vector<BezierSurfaceC0*> GetModel();
 
-	void InitMaterial();
 	void LoadElephant();
 };
 
