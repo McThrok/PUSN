@@ -110,7 +110,7 @@ void MillingMaterial::UpdateVertexBuffer()
 
 void MillingMaterial::SetModel(vector<BezierSurfaceC0*> model)
 {
-	XMMATRIX transform = XMMatrixScaling(3, 3, 3) * XMMatrixTranslation(45, 50, 5);
+	XMMATRIX transform = XMMatrixScaling(gridX / 35.0f, gridY / 35.0f, 3) * XMMatrixTranslation(gridX / 2.25f, gridY / 2.25f, 3);
 
 	for (int i = 0; i < gridX; i++)
 		for (int j = 0; j < gridY; j++) {
@@ -121,12 +121,12 @@ void MillingMaterial::SetModel(vector<BezierSurfaceC0*> model)
 	for (int i = 0; i < model.size(); i++)
 	{
 		BezierSurfaceC0* surf = model[i];
-		for (int j = 0; j < 100; j++)
+		for (int j = 0; j < gridX; j++)
 		{
-			for (int k = 0; k < 100; k++)
+			for (int k = 0; k < gridY; k++)
 			{
-				float u = j / 100.0;
-				float v = k / 100.0;
+				float u = 1.0f * j / gridX;
+				float v = 1.0f * k / gridY;
 				XMFLOAT3 point = surf->Evaluate(XMFLOAT2(u, v));
 
 				XMStoreFloat3(&point, XMVector3TransformCoord(XMLoadFloat3(&point), transform));
