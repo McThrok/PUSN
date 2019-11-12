@@ -40,7 +40,7 @@ public:
 
 	vector<vector<float>> heightMap;
 
-	PathGenerator(MillingMaterial * _material);
+	PathGenerator(MillingMaterial* _material);
 	vector<shared_ptr<BezierSurfaceC0>> model;
 	vector<BezierSurfaceC0*> GetModel();
 
@@ -51,6 +51,6 @@ public:
 	void GenerateHeightMap();
 	vector<XMFLOAT3> GenerateFirstPath();
 	void GeneratePaths();
-	float GetHighestZ(float x, float z);
+	float GetZ(float cpx, float cpy);
 };
 

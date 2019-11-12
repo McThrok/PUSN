@@ -63,6 +63,7 @@ void PathGenerator::LoadElephant()
 	}
 
 }
+
 void PathGenerator::SavePath(vector<XMFLOAT3> moves, string filePath)
 {
 	stringstream ss;
@@ -101,10 +102,6 @@ void PathGenerator::GenerateHeightMap()
 	for (int i = 0; i < material->gridX; i++)
 		heightMap[i] = vector<float>(material->gridY, 0.0f);
 
-	//for (int i = 0; i < material->gridX; i++)
-	//	for (int j = 0; j < material->gridY; j++)
-	//		material->GetVert(i, j).pos.z = 0;
-
 	for (int k = 0; k < model.size(); k++)
 	{
 		BezierSurfaceC0* surf = model[k].get();
@@ -135,17 +132,17 @@ void PathGenerator::GenerateHeightMap()
 	//material->UpdateVertexBuffer();
 }
 
-float PathGenerator::GetHighestZ(float x, float y)
+float PathGenerator::GetZ(float cpx, float cpy)
 {
 	float cutRadius = 8;
 	float rangeSq = cutRadius * cutRadius;
-	XMFLOAT3 currentPosition{ x, y, 0 };
+	XMFLOAT3 currentPosition{ cpx, cpy, 0 };
 
 	int left, right, top, down;
 	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
 
 	float result = 0;
-	//update heights
+
 	for (int i = left; i < right + 1; i++)
 	{
 		for (int j = down; j < top + 1; j++)
@@ -154,9 +151,8 @@ float PathGenerator::GetHighestZ(float x, float y)
 			float x = currentPosition.x - pos.x;
 			float y = currentPosition.y - pos.y;
 
-			float distSq = x * x + y * y;
-
 			float z = heightMap[i][j];
+			float distSq = x * x + y * y;
 			float zoff = cutRadius - sqrt(rangeSq - y * y);
 
 			result = max(result, z - zoff);
@@ -171,7 +167,7 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 	vector<XMFLOAT3> path;
 
 	//k16
-	float xoff = 6;
+	float xoff = 4;
 	float yoff = 8;
 	float safeZ = material->size.z + 20;
 
@@ -186,19 +182,29 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 	{
 		vector<XMFLOAT3> subPath;
 
-		float z = 0;
-		XMFLOAT3 ystart = { x, -bound.y - yoff, z };
-		subPath.push_back(ystart);
+		float prevZ = 0;
+		subPath.push_back({ x, -bound.y - yoff, 0 });
 
 		for (y = -bound.y; y < bound.y + yoff; y += yoff)
 		{
-			z = GetHighestZ(x, y);
-			XMFLOAT3 point = { x, y, z };
-			subPath.push_back(point);
+			float z = GetZ(x, y);
+
+			if (prevZ == z)
+				continue;
+
+			if (z < prevZ) {
+				subPath.push_back({ x, y , prevZ });
+				subPath.push_back({ x, y , z });
+			}
+			if (z > prevZ) {
+				subPath.push_back({ x, y - yoff , prevZ });
+				subPath.push_back({ x, y - yoff , z });
+			}
+
+			prevZ = z;
 		}
 
-		XMFLOAT3 end = { x, y, z };
-		subPath.push_back(end);
+		subPath.push_back({ x, y, 0 });
 
 		if (reversed)
 			path.insert(path.end(), subPath.rbegin(), subPath.rend());
