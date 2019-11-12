@@ -290,6 +290,11 @@ void Engine::RenderGui() {
 		guiData->paused = true;
 	}
 
+
+	if (ImGui::Button("GeneratePaths")) {
+		pathGenerator->GeneratePaths();
+	}
+
 	ImGui::Separator();
 
 	ImGui::SliderFloat("speed", &millingMachine->speed, 0.1, 3);
@@ -660,9 +665,5 @@ void Engine::InitMilling()
 	guiData->flat = millingMachine->flatCut;
 	millingMachine->Reset();
 
-	//qwe
-	PathGenerator p(millingMaterial.get());
-	p.LoadElephant();
-	p.GeneratePaths();
-	//millingMaterial->SetModel(p.GetModel());
+	pathGenerator = std::shared_ptr<PathGenerator>(new PathGenerator(millingMaterial.get()));
 }

@@ -36,7 +36,7 @@ class PathGenerator
 {
 public:
 	MillingMaterial* material;
-	XMMATRIX modelTransform;
+	//XMMATRIX modelTransform;
 
 	vector<vector<float>> heightMap;
 

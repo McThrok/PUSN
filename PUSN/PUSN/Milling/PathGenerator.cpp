@@ -3,7 +3,6 @@
 PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
-	XMMATRIX transform = XMMatrixScaling(material->gridX / 35.0f, material->gridY / 35.0f, 3) * XMMatrixTranslation(material->gridX / 2.25f, material->gridY / 2.25f, 3);
 }
 
 vector<BezierSurfaceC0*> PathGenerator::GetModel()
@@ -18,6 +17,8 @@ vector<BezierSurfaceC0*> PathGenerator::GetModel()
 
 void PathGenerator::LoadElephant()
 {
+	model.clear();
+
 	char cCurrentPath[FILENAME_MAX];
 	_getcwd(cCurrentPath, sizeof(cCurrentPath));
 	string path = std::string(cCurrentPath) + "\\Models\\";
@@ -46,6 +47,21 @@ void PathGenerator::LoadElephant()
 				model.push_back(make_shared<BezierSurfaceC0>(BezierSurfaceC0(line, true)));
 		}
 	}
+
+	XMMATRIX modelTransform = XMMatrixScaling(material->gridX / 35.0f, material->gridY / 35.0f, 3) * XMMatrixTranslation(material->gridX / 2.25f, material->gridY / 2.25f, -3);
+
+	for (int k = 0; k < model.size(); k++)
+	{
+		BezierSurfaceC0* surf = model[k].get();
+		for (int i = 0; i < surf->GetWidthVertexCount(); i++)
+		{
+			for (int j = 0; j < surf->GetHeightVertexCount(); j++)
+			{
+				XMStoreFloat3(&surf->GetVert(i, j), XMVector3TransformCoord(XMLoadFloat3(&surf->GetVert(i, j)), modelTransform));
+			}
+		}
+	}
+
 }
 void PathGenerator::SavePath(vector<XMFLOAT3> moves, string filePath)
 {
@@ -85,33 +101,42 @@ void PathGenerator::GenerateHeightMap()
 	for (int i = 0; i < material->gridX; i++)
 		heightMap[i] = vector<float>(material->gridY, 0.0f);
 
+	//for (int i = 0; i < material->gridX; i++)
+	//	for (int j = 0; j < material->gridY; j++)
+	//		material->GetVert(i, j).pos.z = 0;
 
-	for (int i = 0; i < model.size(); i++)
+	for (int k = 0; k < model.size(); k++)
 	{
-		BezierSurfaceC0* surf = model[i].get();
-		for (int j = 0; j < material->gridX; j++)
+		BezierSurfaceC0* surf = model[k].get();
+		for (int i = 0; i < material->gridX; i++)
 		{
-			for (int k = 0; k < material->gridY; k++)
+			for (int j = 0; j < material->gridY; j++)
 			{
-				float u = 1.0f * j / material->gridX;
-				float v = 1.0f * k / material->gridY;
+				float u = 1.0f * i / material->gridX;
+				float v = 1.0f * j / material->gridY;
 				XMFLOAT3 point = surf->Evaluate(XMFLOAT2(u, v));
 
-				XMStoreFloat3(&point, XMVector3TransformCoord(XMLoadFloat3(&point), modelTransform));
 
 				int x = static_cast<int>(point.x);
 				int y = static_cast<int>(point.y);
 
 				if (x < material->gridX && y < material->gridY && x >= 0 && y >= 0)
-					heightMap[j][k] = max(heightMap[j][k], point.z);
+					heightMap[x][y] = max(heightMap[x][y], -point.z);
 			}
+
 		}
+
 	}
+
+	//for (int i = 0; i < material->gridX; i++)
+	//	for (int j = 0; j < material->gridY; j++)
+	//		material->GetVert(i, j).pos.z = heightMap[i][j];
+
+	//material->UpdateVertexBuffer();
 }
 
 float PathGenerator::GetHighestZ(float x, float y)
 {
-	return 0;
 	float cutRadius = 8;
 	float rangeSq = cutRadius * cutRadius;
 	XMFLOAT3 currentPosition{ x, y, 0 };
@@ -146,8 +171,8 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 	vector<XMFLOAT3> path;
 
 	//k16
-	float xoff = 10;
-	float yoff = 10;
+	float xoff = 6;
+	float yoff = 8;
 	float safeZ = material->size.z + 20;
 
 	XMFLOAT2 bound = { material->size.x / 2, material->size.y / 2 };
@@ -192,6 +217,8 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 
 void PathGenerator::GeneratePaths()
 {
+	LoadElephant();
+
 	GenerateHeightMap();
 	vector<XMFLOAT3> moves = GenerateFirstPath();
 	SavePath(moves, "Paths\\elephant\\test1.k16");

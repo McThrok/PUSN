@@ -88,6 +88,11 @@ public:
 		return XMFLOAT3(stof(parts[0]), stof(parts[1]), stof(parts[2]));
 	}
 
+	XMFLOAT3& GetVert(int w, int h)
+	{
+		return _controlVertices[h][w];
+	}
+
 	int GetWidthVertexCount()
 	{
 		return 3 * widthPatchCount + 1;

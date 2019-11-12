@@ -25,6 +25,7 @@ private:
 	Camera3D Camera3D;
 	Light light;
 
+	std::shared_ptr<PathGenerator> pathGenerator;
 	std::shared_ptr<MillingMaterial> millingMaterial;
 	std::shared_ptr<MillingMachine> millingMachine;
 	shared_ptr<GuiData> guiData;

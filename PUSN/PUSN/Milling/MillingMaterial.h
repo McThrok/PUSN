@@ -38,8 +38,6 @@ public:
 	int gridX, gridY;
 	XMFLOAT3 size;
 
-	void SetModel(vector<BezierSurfaceC0*> model);
-
 private:
 	std::vector<Vertex3D> vertices;
 	VertexBuffer<Vertex3D> vertexbuffer;
