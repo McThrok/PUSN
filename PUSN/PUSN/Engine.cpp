@@ -112,42 +112,11 @@ void Engine::RenderFrame()
 	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
 	deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-
-	////sprite mask
-	//deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-	//deviceContext->IASetInputLayout(vertexshader_2d.GetInputLayout());
-	//deviceContext->PSSetShader(pixelshader_2d_discard.GetShader(), NULL, 0);
-	//deviceContext->VSSetShader(vertexshader_2d.GetShader(), NULL, 0);
-	//sprite.Draw(camera2D.GetWorldMatrix() * camera2D.GetOrthoMatrix());
-
-
 	deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
 	deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
 	deviceContext->IASetInputLayout(vertexshader.GetInputLayout());
-	//deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 	deviceContext->OMSetDepthStencilState(defaultDepthStencilState.Get(), 0);
 
-	{
-		//gameObject.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
-	}
-	{
-		//deviceContext->PSSetShader(pixelshader_nolight.GetShader(), NULL, 0);
-		//light.Draw(Camera3D.GetViewMatrix() * Camera3D.GetProjectionMatrix());
-	}
-	//-------
-
-	//deviceContext->IASetInputLayout(my_vs.GetInputLayout());
-	//deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
-
-	//deviceContext->RSSetState(rasterizerState.Get());
-	//deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
-	//deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-
-	//deviceContext->PSSetShaderResources(0, 1, material_srv.GetAddressOf());*/
-
-	//millingCutterMesh->Draw();
-	//millingMaterial->Randomize();
-	//millingMaterial->UpdateVertexBuffer();
 	RenderMilling();
 	RenderGui();
 	RenderFPS();
@@ -420,70 +389,6 @@ bool Engine::InitializeDirectX()
 		hr = this->device->CreateDepthStencilState(&depthstencildesc, this->defaultDepthStencilState.GetAddressOf());
 		COM_ERROR_IF_FAILED(hr, "Failed to create depth stencil state.");
 
-		//CD3D11_DEPTH_STENCIL_DESC depthstencildesc_drawMask(D3D11_DEFAULT);
-		//depthstencildesc_drawMask.DepthEnable = FALSE;
-		//depthstencildesc_drawMask.StencilEnable = TRUE;
-
-		//depthstencildesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-		//depthstencildesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-		//depthstencildesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
-		//depthstencildesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
-
-		//hr = this->device->CreateDepthStencilState(&depthstencildesc_drawMask, this->depthStencilState_drawMask.GetAddressOf());
-		//COM_ERROR_IF_FAILED(hr, "Failed to create depth stencil state for drawing mask.");
-
-		//CD3D11_DEPTH_STENCIL_DESC depthstencildesc_applyMask(D3D11_DEFAULT);
-		//depthstencildesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-		//depthstencildesc_applyMask.StencilEnable = TRUE;
-
-		//depthstencildesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-		//depthstencildesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-		//depthstencildesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
-		//depthstencildesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-		//depthstencildesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-		//hr = this->device->CreateDepthStencilState(&depthstencildesc_applyMask, this->depthStencilState_applyMask.GetAddressOf());
-		//COM_ERROR_IF_FAILED(hr, "Failed to create depth stencil state for applying mask.");
-
-
-
-		////Create Rasterizer State
-		//CD3D11_RASTERIZER_DESC rasterizerDesc(D3D11_DEFAULT);
-		//hr = this->device->CreateRasterizerState(&rasterizerDesc, this->rasterizerState.GetAddressOf());
-		//COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
-
-		////Create Rasterizer State for culling front
-		//CD3D11_RASTERIZER_DESC rasterizerDesc_CullFront(D3D11_DEFAULT);
-		//rasterizerDesc_CullFront.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
-		//hr = this->device->CreateRasterizerState(&rasterizerDesc_CullFront, this->rasterizerState_CullFront.GetAddressOf());
-		//COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
-
-		////Create Blend State
-		//D3D11_RENDER_TARGET_BLEND_DESC rtbd = { 0 };
-		//rtbd.BlendEnable = true;
-		//rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-		//rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-		//rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		//rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-		//rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
-		//rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		//rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
-
-		//D3D11_BLEND_DESC blendDesc = { 0 };
-		//blendDesc.RenderTarget[0] = rtbd;
-
-		//hr = this->device->CreateBlendState(&blendDesc, this->blendState.GetAddressOf());
-		//COM_ERROR_IF_FAILED(hr, "Failed to create blend state.");
-
 		spriteBatch = std::make_unique<DirectX::SpriteBatch>(this->deviceContext.Get());
 		spriteFont = std::make_unique<DirectX::SpriteFont>(this->device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
 
@@ -592,43 +497,6 @@ bool Engine::InitializeScene()
 		Camera3D.SetPosition(0.0f, -100.0f, 200.0f);
 		//Camera3D.SetRotation(1.2f, 0.0f, 0.0f);
 		Camera3D.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
-
-
-		//---------------------------------------------
-		/*int N = 10;
-
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
-		desc.Width = N;
-		desc.Height = N;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-
-		hr = device->CreateTexture2D(&desc, nullptr, material_texture.GetAddressOf());
-
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		deviceContext->Map(material_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		unsigned int* data = ((unsigned int*)mappedResource.pData);
-
-		for (int i = 0; i < N; i++)
-		{
-			for (int j = 0; j < N; j++)
-			{
-				int a = 255, r = 255, g = 255, b = 255;
-				data[(j + i * N)] = (a << 24) + (r << 16) + (g << 8) + b;
-			}
-		}
-
-		deviceContext->Unmap(material_texture.Get(), 0);
-
-		hr = device->CreateShaderResourceView(material_texture.Get(), nullptr, &material_srv);*/
 
 		//Create Rasterizer State
 		CD3D11_RASTERIZER_DESC rasterizerDesc(D3D11_DEFAULT);

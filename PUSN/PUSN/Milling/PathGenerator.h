@@ -3,7 +3,6 @@
 #include "..\\Graphics\\VertexBuffer.h"
 #include "..\\Graphics\\IndexBuffer.h"
 #include "..\\Graphics\\ConstantBuffer.h"
-#include "..\\Graphics\\Texture.h"
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <math.h>
@@ -14,16 +13,10 @@
 #include <stdio.h>
 #include <direct.h>
 #include <iomanip>
-
-#include "..\\Graphics\\AdapterReader.h"
-#include "..\\Graphics\\Shaders.h"
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
-#include <WICTextureLoader.h>
-#include "..\\Graphics\\Camera3D.h"
-#include "..\\Graphics\\RenderableGameObject.h"
-#include "..\\Graphics\\Light.h"
+#include <SimpleMath.h>
 #include <memory>
+
+#include "..\\Graphics\\Shaders.h"
 #include "MillingMaterial.h"
 #include "Bezier/BezierSurface.h"
 #include "Bezier/IntersectionCurve.h"
@@ -31,6 +24,7 @@
 
 using namespace std;
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 class PathGenerator
 {
@@ -45,11 +39,11 @@ public:
 	vector<BezierSurfaceC0*> GetModel();
 
 
-	void SavePath(vector<XMFLOAT3> moves, string filePath);
+	void SavePath(vector<Vector3> moves, string filePath);
 
 	void LoadElephant();
 	void GenerateHeightMap();
-	vector<XMFLOAT3> GenerateFirstPath(float minZ);
+	vector<Vector3> GenerateFirstPath(float minZ);
 	void GeneratePaths();
 	float GetZ(float cpx, float cpy);
 };

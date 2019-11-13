@@ -64,7 +64,7 @@ void PathGenerator::LoadElephant()
 
 }
 
-void PathGenerator::SavePath(vector<XMFLOAT3> moves, string filePath)
+void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 {
 	stringstream ss;
 
@@ -72,7 +72,7 @@ void PathGenerator::SavePath(vector<XMFLOAT3> moves, string filePath)
 	{
 		ss << "N9G01";
 
-		XMFLOAT3& point = moves[i];
+		Vector3& point = moves[i];
 
 		if (i == 0 || point.x != moves[i - 1].x)
 			ss << "X" << fixed << std::setprecision(3) << point.x;
@@ -111,7 +111,7 @@ void PathGenerator::GenerateHeightMap()
 			{
 				float u = 1.0f * i / material->gridX;
 				float v = 1.0f * j / material->gridY;
-				XMFLOAT3 point = surf->Evaluate(XMFLOAT2(u, v));
+				Vector3 point = surf->Evaluate(Vector2(u, v));
 
 
 				int x = static_cast<int>(point.x);
@@ -136,7 +136,7 @@ float PathGenerator::GetZ(float cpx, float cpy)
 {
 	float cutRadius = 8;
 	float rangeSq = cutRadius * cutRadius;
-	XMFLOAT3 currentPosition{ cpx, cpy, 0 };
+	Vector3 currentPosition{ cpx, cpy, 0 };
 
 	int left, right, top, down;
 	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
@@ -147,7 +147,7 @@ float PathGenerator::GetZ(float cpx, float cpy)
 	{
 		for (int j = down; j < top + 1; j++)
 		{
-			XMFLOAT3 pos = material->GetVert(i, j).pos;
+			Vector3 pos = material->GetVert(i, j).pos;
 			float x = currentPosition.x - pos.x;
 			float y = currentPosition.y - pos.y;
 
@@ -162,25 +162,25 @@ float PathGenerator::GetZ(float cpx, float cpy)
 	return result;
 }
 
-vector<XMFLOAT3> PathGenerator::GenerateFirstPath(float minZ)
+vector<Vector3> PathGenerator::GenerateFirstPath(float minZ)
 {
-	vector<XMFLOAT3> path;
+	vector<Vector3> path;
 
 	//k16
 	float xoff = 4;
 	float yoff = 8;
 	float safeZ = material->size.z + 20;
 
-	XMFLOAT2 bound = { material->size.x / 2, material->size.y / 2 };
+	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
-	XMFLOAT3 start = { -bound.x, -bound.y - yoff, safeZ };
+	Vector3 start = { -bound.x, -bound.y - yoff, safeZ };
 	path.push_back(start);
 
 	float x, y;
 	bool reversed = false;
 	for (x = -bound.x; x < bound.x + xoff; x += xoff)
 	{
-		vector<XMFLOAT3> subPath;
+		vector<Vector3> subPath;
 
 		float prevZ = 0;
 		subPath.push_back({ x, -bound.y - yoff, minZ });
@@ -214,7 +214,7 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath(float minZ)
 		reversed = !reversed;
 	}
 
-	XMFLOAT3 end = { x, y, safeZ };
+	Vector3 end = { x, y, safeZ };
 	path.push_back(end);
 
 
@@ -226,8 +226,8 @@ void PathGenerator::GeneratePaths()
 	LoadElephant();
 
 	GenerateHeightMap();
-	vector<XMFLOAT3> moves = GenerateFirstPath(5);
-	vector<XMFLOAT3> moves2 = GenerateFirstPath(0);
+	vector<Vector3> moves = GenerateFirstPath(5);
+	vector<Vector3> moves2 = GenerateFirstPath(0);
 
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
 
