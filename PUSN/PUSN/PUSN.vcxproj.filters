@@ -129,6 +129,9 @@
     <ClCompile Include="Milling\Bezier\BezierSurface.cpp">
       <Filter>Source Files\Milling\Bezier</Filter>
     </ClCompile>
+    <ClCompile Include="Milling\Bezier\IntersectionCurve.cpp">
+      <Filter>Source Files\Milling\Bezier</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">

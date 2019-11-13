@@ -172,6 +172,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Milling\Bezier\IntersectionCurve.cpp" />
     <ClCompile Include="Milling\Bezier\BezierSurface.cpp" />
     <ClCompile Include="Graphics\GameObject3D.cpp" />
     <ClCompile Include="Graphics\GameObject.cpp" />
