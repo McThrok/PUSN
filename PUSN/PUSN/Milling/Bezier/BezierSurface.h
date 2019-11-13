@@ -7,14 +7,16 @@
 #include <math.h>
 #include <string>
 #include "../../StringHelper.h"
+#include <SimpleMath.h>
 
-using namespace DirectX;
 using namespace std;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 class BezierSurfaceC0
 {
 public:
-	vector<vector<XMFLOAT3>> _controlVertices;
+	vector<vector<Vector3>> _controlVertices;
 
 	static int count;
 	int id;
@@ -37,10 +39,10 @@ public:
 		int h = GetHeightVertexCount();
 		int w = GetWidthVertexCount();
 
-		_controlVertices = vector < vector<XMFLOAT3>>(w);
+		_controlVertices = vector < vector<Vector3>>(w);
 		for (int i = 0; i < h; i++)
 		{
-			_controlVertices[i] = vector<XMFLOAT3>(h);
+			_controlVertices[i] = vector<Vector3>(h);
 			for (int j = 0; j < w; j++) {
 				if (cylinder && j == w - 1)
 					_controlVertices[i][j] = _controlVertices[i][0];
@@ -63,10 +65,10 @@ public:
 		int h = GetHeightVertexCount();
 		int w = GetWidthVertexCount();
 
-		_controlVertices = vector < vector<XMFLOAT3>>(h);
+		_controlVertices = vector < vector<Vector3>>(h);
 		for (int i = 0; i < h; i++)
 		{
-			_controlVertices[i] = vector<XMFLOAT3>(w);
+			_controlVertices[i] = vector<Vector3>(w);
 			for (int j = 0; j < w; j++) {
 				if (cylinder) {
 					if (j == w - 1)
@@ -81,14 +83,14 @@ public:
 		}
 	}
 
-	XMFLOAT3 StringToPosition(string data)
+	Vector3 StringToPosition(string data)
 	{
 		vector<string> parts;
 		StringHelper::Split(data, parts, ';');
-		return XMFLOAT3(stof(parts[0]), stof(parts[1]), stof(parts[2]));
+		return Vector3(stof(parts[0]), stof(parts[1]), stof(parts[2]));
 	}
 
-	XMFLOAT3& GetVert(int w, int h)
+	Vector3& GetVert(int w, int h)
 	{
 		return _controlVertices[h][w];
 	}
@@ -133,7 +135,7 @@ public:
 		return 0;
 	}
 
-	XMFLOAT3 GetValue(int idxH, int idxW, float tu, float tv)
+	Vector3 GetValue(int idxH, int idxW, float tu, float tv)
 	{
 		XMVECTOR point = { 0,0,0 };
 		for (int h = 0; h < 4; h++)
@@ -144,12 +146,12 @@ public:
 			}
 		}
 
-		XMFLOAT3 result;
+		Vector3 result;
 		XMStoreFloat3(&result, point);
 
 		return result;
 	}
-	XMFLOAT3 GetValueDivH(int idxH, int idxW, float tu, float tv)
+	Vector3 GetValueDivH(int idxH, int idxW, float tu, float tv)
 	{
 		XMVECTOR point = { 0,0,0 };
 		for (int h = 0; h < 4; h++)
@@ -160,12 +162,12 @@ public:
 			}
 		}
 
-		XMFLOAT3 result;
+		Vector3 result;
 		XMStoreFloat3(&result, point);
 
 		return result;
 	}
-	XMFLOAT3 GetValueDivW(int idxH, int idxW, float tu, float tv)
+	Vector3 GetValueDivW(int idxH, int idxW, float tu, float tv)
 	{
 		XMVECTOR point = { 0,0,0 };
 		for (int h = 0; h < 4; h++)
@@ -176,13 +178,13 @@ public:
 			}
 		}
 
-		XMFLOAT3 result;
+		Vector3 result;
 		XMStoreFloat3(&result, point);
 
 		return result;
 	}
 
-	XMFLOAT3 Evaluate(XMFLOAT2 hw)
+	Vector3 Evaluate(Vector2 hw)
 	{
 		float h = hw.x;
 		float w = hw.y;
@@ -201,7 +203,7 @@ public:
 
 		return GetValue(ph, pw, hh, ww);
 	}
-	XMFLOAT3 EvaluateDU(XMFLOAT2 hw)
+	Vector3 EvaluateDU(Vector2 hw)
 	{
 		float h = hw.x;
 		float w = hw.y;
@@ -218,13 +220,13 @@ public:
 			pw = pwc - 1;
 		float ww = w * pwc - pw;
 
-		XMFLOAT3 div = GetValueDivH(ph, pw, hh, ww);
-		XMFLOAT3 result;
+		Vector3 div = GetValueDivH(ph, pw, hh, ww);
+		Vector3 result;
 		XMStoreFloat3(&result, XMLoadFloat3(&div) * heightPatchCount);
 
 		return result;
 	}
-	XMFLOAT3 EvaluateDV(XMFLOAT2 hw)
+	Vector3 EvaluateDV(Vector2 hw)
 	{
 		float h = hw.x;
 		float w = hw.y;
@@ -241,18 +243,18 @@ public:
 			pw = pwc - 1;
 		float ww = w * pwc - pw;
 
-		XMFLOAT3 div = GetValueDivW(ph, pw, hh, ww);
-		XMFLOAT3 result;
+		Vector3 div = GetValueDivW(ph, pw, hh, ww);
+		Vector3 result;
 		XMStoreFloat3(&result, XMLoadFloat3(&div) * widthPatchCount);
 
 		return result;
 	}
-	XMFLOAT3 EvaluateNormal(XMFLOAT2 hw) {
-		XMFLOAT3 du = EvaluateDU(hw);
-		XMFLOAT3 dv = EvaluateDV(hw);
+	Vector3 EvaluateNormal(Vector2 hw) {
+		Vector3 du = EvaluateDU(hw);
+		Vector3 dv = EvaluateDV(hw);
 
 		XMVECTOR cross = XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&du), XMLoadFloat3(&dv)));
-		XMFLOAT3 result;
+		Vector3 result;
 		XMStoreFloat3(&result, cross);
 
 		return result;

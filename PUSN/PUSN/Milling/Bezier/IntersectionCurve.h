@@ -4,9 +4,11 @@
 #include <DirectXMath.h>
 #include <math.h>
 #include "BezierSurface.h"
+#include <SimpleMath.h>
 
-using namespace DirectX;
 using namespace std;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 struct UpdStruct
 {

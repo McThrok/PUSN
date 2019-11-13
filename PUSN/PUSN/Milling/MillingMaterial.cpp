@@ -20,7 +20,7 @@ MillingMaterial::MillingMaterial(const MillingMaterial& millingMaterial)
 	this->vertices = millingMaterial.vertices;//?
 }
 
-void MillingMaterial::GetIndicesOfArea(XMFLOAT3 position, float range, int& left, int& right, int& top, int& down)
+void MillingMaterial::GetIndicesOfArea(Vector3 position, float range, int& left, int& right, int& top, int& down)
 {
 	//left = 0;
 	//right = gridX - 1;
@@ -54,7 +54,7 @@ Vertex3D& MillingMaterial::GetVert(int x, int y)
 	return vertices[x * gridY + y];
 }
 
-void MillingMaterial::Initialize(XMFLOAT3 size, int _gridX, int _gridY)
+void MillingMaterial::Initialize(Vector3 size, int _gridX, int _gridY)
 {
 	this->gridX = _gridX;
 	this->gridY = _gridY;

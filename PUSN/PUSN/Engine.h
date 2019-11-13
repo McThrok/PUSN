@@ -1,9 +1,11 @@
 #pragma once
+#include <d3d11.h>
+#include <DirectXMath.h>
+#include <SimpleMath.h>
+
 #include "WindowContainer.h"
 #include "Timer.h"
 #include "GuiData.h"
-#include "Graphics\RenderableGameObject.h"
-#include "Graphics\Light.h"
 #include "Milling\MillingMachine.h"
 #include "Milling\MillingMaterial.h"
 #include "Graphics\ImGui\imgui.h"
@@ -14,6 +16,10 @@
 #include <direct.h>
 #include "Milling/PathGenerator.h"
 
+using namespace std;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
 class Engine : public WindowContainer
 {
 public:
@@ -23,7 +29,6 @@ public:
 private:
 
 	Camera3D Camera3D;
-	Light light;
 
 	std::shared_ptr<PathGenerator> pathGenerator;
 	std::shared_ptr<MillingMaterial> millingMaterial;

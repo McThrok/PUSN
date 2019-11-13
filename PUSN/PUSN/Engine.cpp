@@ -1,6 +1,6 @@
 #include "Engine.h"
 
-bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
+bool Engine::Initialize(HINSTANCE hInstance,string window_title,string window_class, int width, int height)
 {
 	timer.Start();
 	this->windowWidth = width;
@@ -9,7 +9,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::stri
 
 	char cCurrentPath[FILENAME_MAX];
 	_getcwd(cCurrentPath, sizeof(cCurrentPath));
-	this->path = std::string(cCurrentPath) + "\\Paths\\";
+	this->path =string(cCurrentPath) + "\\Paths\\";
 
 	if (!this->InitializeWindowAndMessageHandling(hInstance, window_title, window_class, width, height))
 		return false;
@@ -82,27 +82,10 @@ void Engine::Update()
 		this->Camera3D.AdjustPosition(0.0f, 0.0f, -Camera3DSpeed * dt);
 	}
 
-	if (keyboard.KeyIsPressed('C'))
-	{
-		XMVECTOR lightPosition = this->Camera3D.GetPositionVector();
-		lightPosition += this->Camera3D.GetForwardVector();
-		this->light.SetPosition(lightPosition);
-		this->light.SetRotation(this->Camera3D.GetRotationFloat3());
-	}
-
 }
 
 void Engine::RenderFrame()
 {
-	cb_ps_light.data.dynamicLightColor = light.lightColor;
-	cb_ps_light.data.dynamicLightStrength = light.lightStrength;
-	cb_ps_light.data.dynamicLightPosition = light.GetPositionFloat3();
-	cb_ps_light.data.dynamicLightAttenuation_a = light.attenuation_a;
-	cb_ps_light.data.dynamicLightAttenuation_b = light.attenuation_b;
-	cb_ps_light.data.dynamicLightAttenuation_c = light.attenuation_c;
-	cb_ps_light.ApplyChanges();
-	deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
-
 	float bgcolor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	deviceContext->ClearRenderTargetView(defaultRenderTargetView.Get(), bgcolor);
 	deviceContext->ClearDepthStencilView(defaultDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -127,16 +110,16 @@ void Engine::RenderFrame()
 void Engine::RenderFPS() {
 	//Draw Text
 	static int fpsCounter = 0;
-	static std::string fpsString = "FPS: 0";
+	static string fpsString = "FPS: 0";
 	fpsCounter += 1;
 	if (fpsTimer.GetMilisecondsElapsed() > 1000.0)
 	{
-		fpsString = "FPS: " + std::to_string(fpsCounter);
+		fpsString = "FPS: " +to_string(fpsCounter);
 		fpsCounter = 0;
 		fpsTimer.Restart();
 	}
 	spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), StringHelper::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+	spriteFont->DrawString(spriteBatch.get(), StringHelper::StringToWide(fpsString).c_str(), XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, XMFLOAT2(0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
 }
 
@@ -210,7 +193,7 @@ void Engine::RenderGui() {
 	static char buf[buffSize] = "elephant\\test1.k16";
 	ImGui::InputText("path", buf, buffSize);
 	if (ImGui::Button("Load configuration")) {
-		millingMachine->LoadDataFromFile(path + std::string(buf));
+		millingMachine->LoadDataFromFile(path +string(buf));
 		guiData->toolRadius = millingMachine->cutRadius;
 		guiData->flat = millingMachine->flatCut;
 		millingMachine->materialDepthViolated = false;
@@ -389,8 +372,8 @@ bool Engine::InitializeDirectX()
 		hr = this->device->CreateDepthStencilState(&depthstencildesc, this->defaultDepthStencilState.GetAddressOf());
 		COM_ERROR_IF_FAILED(hr, "Failed to create depth stencil state.");
 
-		spriteBatch = std::make_unique<DirectX::SpriteBatch>(this->deviceContext.Get());
-		spriteFont = std::make_unique<DirectX::SpriteFont>(this->device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
+		spriteBatch =make_unique<SpriteBatch>(this->deviceContext.Get());
+		spriteFont =make_unique<SpriteFont>(this->device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
 
 		//Create sampler description for sampler state
 		CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
@@ -465,13 +448,13 @@ bool Engine::InitializeScene()
 	try
 	{
 		//Load Texture
-		HRESULT hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
+		HRESULT hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
 		COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
-		hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
+		hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
 		COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
-		hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
+		hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
 		COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
 		//Initialize Constant Buffer(s)
@@ -489,10 +472,6 @@ bool Engine::InitializeScene()
 
 		this->cb_ps_light.data.ambientLightColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		this->cb_ps_light.data.ambientLightStrength = 1.0f;
-
-
-		if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
-			return false;
 
 		Camera3D.SetPosition(0.0f, -100.0f, 200.0f);
 		//Camera3D.SetRotation(1.2f, 0.0f, 0.0f);
@@ -523,9 +502,9 @@ void Engine::InitGui() {
 
 void Engine::InitMilling()
 {
-	millingMaterial = std::shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
+	millingMaterial =shared_ptr<MillingMaterial>(new MillingMaterial(device.Get(), deviceContext.Get()));
 	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
-	millingMachine = std::shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
+	millingMachine =shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
 	//millingMachine->LoadDataFromFile(path + "\\t1.k16");
 	millingMachine->LoadDataFromFile(path + "elephant\\test1.k16");
 
@@ -533,5 +512,5 @@ void Engine::InitMilling()
 	guiData->flat = millingMachine->flatCut;
 	millingMachine->Reset();
 
-	pathGenerator = std::shared_ptr<PathGenerator>(new PathGenerator(millingMaterial.get()));
+	pathGenerator =shared_ptr<PathGenerator>(new PathGenerator(millingMaterial.get()));
 }

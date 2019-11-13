@@ -1,5 +1,9 @@
 #pragma once
-#include "Model.h"
+#include "GameObject.h"
+#include <DirectXMath.h>
+
+using namespace std;
+using namespace DirectX;
 
 class GameObject
 {

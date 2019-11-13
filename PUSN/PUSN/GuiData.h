@@ -1,5 +1,10 @@
 #pragma once
 #include <DirectXMath.h>
+#include <SimpleMath.h>
+
+using namespace std;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 class GuiData
 {

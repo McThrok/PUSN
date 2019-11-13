@@ -5,7 +5,7 @@ MillingMachine::MillingMachine(ID3D11Device* _device, ID3D11DeviceContext* _devi
 	device = _device;
 	deviceContext = _deviceContext;
 
-	safePosition = XMFLOAT3(0, 0, 120);
+	safePosition = Vector3(0, 0, 120);
 	stepSize = 1;
 	speed = 1;
 	materialDepth = 50;
@@ -40,7 +40,7 @@ void MillingMachine::LoadDataFromFile(string filePath)
 		if (str.substr(pos + 1, 2) != "01")
 			continue;
 
-		XMFLOAT3 position;
+		Vector3 position;
 		str = str.substr(pos + 3);
 
 		if (str[0] == 'X') {
@@ -98,8 +98,8 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 	{
 		float angle = XM_2PI * i / horizontalLvls;
 		float angle2 = XM_2PI * (i + 1) / horizontalLvls;
-		XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle), sin(angle), 0));
-		XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2), sin(angle2), 0));
+		Vector3 a = Normalize(Vector3(cos(angle), sin(angle), 0));
+		Vector3 b = Normalize(Vector3(cos(angle2), sin(angle2), 0));
 
 		int count = vertices.size();
 		vertices.push_back(Vertex3D(r * a.x, r * a.y, startHeight, a.x, a.y, 0));
@@ -123,10 +123,10 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 				float roundAngle = XM_PIDIV2 * j / roundLvls;
 				float roundAngle2 = XM_PIDIV2 * (j + 1) / roundLvls;
 
-				XMFLOAT3 a = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle), sin(angle) * sin(roundAngle), cos(roundAngle)));
-				XMFLOAT3 a2 = Normalize(XMFLOAT3(cos(angle) * sin(roundAngle2), sin(angle) * sin(roundAngle2), cos(roundAngle2)));
-				XMFLOAT3 b = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle), sin(angle2) * sin(roundAngle), cos(roundAngle)));
-				XMFLOAT3 b2 = Normalize(XMFLOAT3(cos(angle2) * sin(roundAngle2), sin(angle2) * sin(roundAngle2), cos(roundAngle2)));
+				Vector3 a = Normalize(Vector3(cos(angle) * sin(roundAngle), sin(angle) * sin(roundAngle), cos(roundAngle)));
+				Vector3 a2 = Normalize(Vector3(cos(angle) * sin(roundAngle2), sin(angle) * sin(roundAngle2), cos(roundAngle2)));
+				Vector3 b = Normalize(Vector3(cos(angle2) * sin(roundAngle), sin(angle2) * sin(roundAngle), cos(roundAngle)));
+				Vector3 b2 = Normalize(Vector3(cos(angle2) * sin(roundAngle2), sin(angle2) * sin(roundAngle2), cos(roundAngle2)));
 
 				int count = vertices.size();
 				vertices.push_back(Vertex3D(r * a.x, r * a.y, r * (1 - a.z), a.x, a.y, a.z));
@@ -140,10 +140,9 @@ void MillingMachine::SetMillingCutterMesh(float radius, bool flat)
 		}
 	}
 
-	vector<Texture> textures;
 	XMMATRIX mtx = XMMatrixTranslation(safePosition.x, safePosition.y, safePosition.z);
 
-	millingCutterMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, textures, mtx));
+	millingCutterMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, mtx));
 }
 
 void MillingMachine::SetPathMesh()
@@ -156,7 +155,7 @@ void MillingMachine::SetPathMesh()
 	for (int i = 0; i < (int)moves.size() - 1; i++)
 	{
 		int count = vertices.size();
-		XMFLOAT3 right = { width / 2,0,0 };
+		Vector3 right = { width / 2,0,0 };
 		if (moves[i].x != moves[i + 1].x || moves[i].y != moves[i + 1].y) {
 			XMVECTOR dir = (XMLoadFloat3(&moves[i + 1]) - XMLoadFloat3(&moves[i]));
 			XMStoreFloat3(&right, (width / 2) * XMVector3Normalize(XMVector3Cross({ 0,0,1 }, dir)));
@@ -173,10 +172,9 @@ void MillingMachine::SetPathMesh()
 		indices.push_back(count + 3); indices.push_back(count + 1); indices.push_back(count + 0);
 	}
 
-	vector<Texture> textures;
 	XMMATRIX mtx = XMMatrixIdentity();
 
-	pathMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, textures, mtx));
+	pathMesh = shared_ptr<Mesh>(new Mesh(device, deviceContext, vertices, indices, mtx));
 }
 
 void MillingMachine::Reset()
@@ -193,7 +191,7 @@ void MillingMachine::Update(float dt, MillingMaterial* material)
 	restTime += dt;
 	float timePerStep = stepSize / speed;
 	while (!finished && restTime > timePerStep) {
-		XMFLOAT3 dir = Move();
+		Vector3 dir = Move();
 		Cut(dir, material);
 		restTime -= timePerStep;
 	}
@@ -201,7 +199,7 @@ void MillingMachine::Update(float dt, MillingMaterial* material)
 	millingCutterMesh->transformMatrix = XMMatrixTranslation(currentPosition.x, currentPosition.y, currentPosition.z);
 }
 
-XMFLOAT3 MillingMachine::Move()
+Vector3 MillingMachine::Move()
 {
 	XMVECTOR a = XMLoadFloat3(&currentPosition);
 	XMVECTOR b = XMLoadFloat3(&moves[currentMove]);
@@ -210,7 +208,7 @@ XMFLOAT3 MillingMachine::Move()
 	XMVECTOR dir = XMVector3Normalize(toEndMove);
 	XMVECTOR movement = dir * stepSize;
 
-	XMFLOAT3 moveLen, toEndLen;
+	Vector3 moveLen, toEndLen;
 	XMStoreFloat3(&moveLen, XMVector3Length(movement));
 	XMStoreFloat3(&toEndLen, XMVector3Length(toEndMove));
 
@@ -226,13 +224,13 @@ XMFLOAT3 MillingMachine::Move()
 			finished = true;
 	}
 
-	XMFLOAT3 dirFloat;
+	Vector3 dirFloat;
 	XMStoreFloat3(&dirFloat, dir);
 
 	return dirFloat;
 }
 
-void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
+void MillingMachine::Cut(Vector3 dir, MillingMaterial* material)
 {
 	float eps = 0.0000001;
 	bool millingDanger = flatCut && dir.z < -eps;
@@ -247,7 +245,7 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 	{
 		for (int j = down; j < top + 1; j++)
 		{
-			XMFLOAT3 pos = material->GetVert(i, j).pos;
+			Vector3 pos = material->GetVert(i, j).pos;
 			float x = currentPosition.x - pos.x;
 			float y = currentPosition.y - pos.y;
 
@@ -285,14 +283,14 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 	{
 		for (int j = down; j < top + 1; j++)
 		{
-			XMFLOAT3 curr = material->GetVert(i, j).pos;
+			Vector3 curr = material->GetVert(i, j).pos;
 
-			XMFLOAT3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
-			XMFLOAT3 right = i == material->gridX - 1 ? curr : material->GetVert(i + 1, j).pos;
-			XMFLOAT3 down = j == 0 ? curr : material->GetVert(i, j - 1).pos;
-			XMFLOAT3 top = j == material->gridY - 1 ? curr : material->GetVert(i, j + 1).pos;
+			Vector3 left = i == 0 ? curr : material->GetVert(i - 1, j).pos;
+			Vector3 right = i == material->gridX - 1 ? curr : material->GetVert(i + 1, j).pos;
+			Vector3 down = j == 0 ? curr : material->GetVert(i, j - 1).pos;
+			Vector3 top = j == material->gridY - 1 ? curr : material->GetVert(i, j + 1).pos;
 
-			XMFLOAT3 normal = CalculateNormal(left, right, top, down);
+			Vector3 normal = CalculateNormal(left, right, top, down);
 			material->GetVert(i, j).normal = normal;
 		}
 	}
@@ -300,21 +298,21 @@ void MillingMachine::Cut(XMFLOAT3 dir, MillingMaterial* material)
 	material->UpdateVertexBuffer();
 }
 
-XMFLOAT3 MillingMachine::CalculateNormal(const XMFLOAT3& left, const XMFLOAT3& right, const XMFLOAT3& top, const XMFLOAT3& down)
+Vector3 MillingMachine::CalculateNormal(const Vector3& left, const Vector3& right, const Vector3& top, const Vector3& down)
 {
-	XMVECTOR vecX = XMLoadFloat3(&XMFLOAT3(right.x - left.x, right.y - left.y, right.z - left.z));
-	XMVECTOR vecY = XMLoadFloat3(&XMFLOAT3(top.x - down.x, top.y - down.y, top.z - down.z));
+	XMVECTOR vecX = XMLoadFloat3(&Vector3(right.x - left.x, right.y - left.y, right.z - left.z));
+	XMVECTOR vecY = XMLoadFloat3(&Vector3(top.x - down.x, top.y - down.y, top.z - down.z));
 	XMVECTOR vecNormal = XMVector3Normalize(XMVector3Cross(vecX, vecY));
-	XMFLOAT3 normal;
+	Vector3 normal;
 	XMStoreFloat3(&normal, vecNormal);
 
 	return normal;
 }
 
-XMFLOAT3 MillingMachine::Normalize(XMFLOAT3 v)
+Vector3 MillingMachine::Normalize(Vector3 v)
 {
 	XMVECTOR vec = XMLoadFloat3(&v);
-	XMFLOAT3 normalized;
+	Vector3 normalized;
 	XMStoreFloat3(&normalized, XMVector3Normalize(vec));
 	return normalized;
 }

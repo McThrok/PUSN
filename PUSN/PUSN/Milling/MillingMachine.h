@@ -9,9 +9,11 @@
 
 #include "MillingMaterial.h"
 #include "..\\Graphics\\Mesh.h"
+#include <SimpleMath.h>
 
-using namespace DirectX;
 using namespace std;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 class MillingMachine {
 public:
@@ -42,18 +44,18 @@ public:
 private:
 	float restTime;
 	int currentMove;
-	XMFLOAT3 currentPosition;
-	XMFLOAT3 safePosition;
+	Vector3 currentPosition;
+	Vector3 safePosition;
 
-	vector<XMFLOAT3> moves;
+	vector<Vector3> moves;
 
 	ID3D11Device * device;
 	ID3D11DeviceContext * deviceContext;
 
-	XMFLOAT3 Normalize(XMFLOAT3 v);
-	XMFLOAT3 Move();
-	void Cut(XMFLOAT3 dir, MillingMaterial * material);
-	XMFLOAT3 CalculateNormal(const XMFLOAT3 &left, const XMFLOAT3 &right, const XMFLOAT3 &top, const XMFLOAT3 &down);
+	Vector3 Normalize(Vector3 v);
+	Vector3 Move();
+	void Cut(Vector3 dir, MillingMaterial * material);
+	Vector3 CalculateNormal(const Vector3 &left, const Vector3 &right, const Vector3 &top, const Vector3 &down);
 };
 
 
