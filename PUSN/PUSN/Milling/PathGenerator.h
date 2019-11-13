@@ -49,7 +49,7 @@ public:
 
 	void LoadElephant();
 	void GenerateHeightMap();
-	vector<XMFLOAT3> GenerateFirstPath();
+	vector<XMFLOAT3> GenerateFirstPath(float minZ);
 	void GeneratePaths();
 	float GetZ(float cpx, float cpy);
 };

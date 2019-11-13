@@ -48,7 +48,7 @@ void PathGenerator::LoadElephant()
 		}
 	}
 
-	XMMATRIX modelTransform = XMMatrixScaling(material->gridX / 35.0f, material->gridY / 35.0f, 3) * XMMatrixTranslation(material->gridX / 2.25f, material->gridY / 2.25f, -3);
+	XMMATRIX modelTransform = XMMatrixScaling(material->gridX / 35.0f, material->gridY / 35.0f, 5) * XMMatrixTranslation(material->gridX / 2.25f, material->gridY / 2.25f, -3);
 
 	for (int k = 0; k < model.size(); k++)
 	{
@@ -100,7 +100,7 @@ void PathGenerator::GenerateHeightMap()
 {
 	heightMap.resize(material->gridX);
 	for (int i = 0; i < material->gridX; i++)
-		heightMap[i] = vector<float>(material->gridY, 0.0f);
+		heightMap[i] = vector<float>(material->gridY, 0);
 
 	for (int k = 0; k < model.size(); k++)
 	{
@@ -118,18 +118,18 @@ void PathGenerator::GenerateHeightMap()
 				int y = static_cast<int>(point.y);
 
 				if (x < material->gridX && y < material->gridY && x >= 0 && y >= 0)
-					heightMap[x][y] = max(heightMap[x][y], -point.z);
+					heightMap[x][y] = (max(heightMap[x][y], -point.z));
 			}
 
 		}
 
 	}
 
-	//for (int i = 0; i < material->gridX; i++)
-	//	for (int j = 0; j < material->gridY; j++)
-	//		material->GetVert(i, j).pos.z = heightMap[i][j];
+	/*for (int i = 0; i < material->gridX; i++)
+		for (int j = 0; j < material->gridY; j++)
+			material->GetVert(i, j).pos.z = heightMap[i][j];
 
-	//material->UpdateVertexBuffer();
+	material->UpdateVertexBuffer();*/
 }
 
 float PathGenerator::GetZ(float cpx, float cpy)
@@ -162,7 +162,7 @@ float PathGenerator::GetZ(float cpx, float cpy)
 	return result;
 }
 
-vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
+vector<XMFLOAT3> PathGenerator::GenerateFirstPath(float minZ)
 {
 	vector<XMFLOAT3> path;
 
@@ -183,11 +183,11 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 		vector<XMFLOAT3> subPath;
 
 		float prevZ = 0;
-		subPath.push_back({ x, -bound.y - yoff, 0 });
+		subPath.push_back({ x, -bound.y - yoff, minZ });
 
 		for (y = -bound.y; y < bound.y + yoff; y += yoff)
 		{
-			float z = GetZ(x, y);
+			float z = max(minZ, GetZ(x, y));
 
 			if (prevZ == z)
 				continue;
@@ -204,7 +204,7 @@ vector<XMFLOAT3> PathGenerator::GenerateFirstPath()
 			prevZ = z;
 		}
 
-		subPath.push_back({ x, y, 0 });
+		subPath.push_back({ x, y, minZ });
 
 		if (reversed)
 			path.insert(path.end(), subPath.rbegin(), subPath.rend());
@@ -226,6 +226,10 @@ void PathGenerator::GeneratePaths()
 	LoadElephant();
 
 	GenerateHeightMap();
-	vector<XMFLOAT3> moves = GenerateFirstPath();
+	vector<XMFLOAT3> moves = GenerateFirstPath(5);
+	vector<XMFLOAT3> moves2 = GenerateFirstPath(0);
+
+	moves.insert(moves.end(), moves2.begin(), moves2.end());
+
 	SavePath(moves, "Paths\\elephant\\test1.k16");
 }
