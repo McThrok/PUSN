@@ -3,6 +3,7 @@
 PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
+	GeneratePaths();
 }
 
 vector<BezierSurfaceC0*> PathGenerator::GetModel()
@@ -132,7 +133,7 @@ void PathGenerator::GenerateHeightMap()
 	material->UpdateVertexBuffer();*/
 }
 
-float PathGenerator::GetZ(float cpx, float cpy)
+float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 {
 	float cutRadius = 8;
 	float rangeSq = cutRadius * cutRadius;
@@ -152,17 +153,21 @@ float PathGenerator::GetZ(float cpx, float cpy)
 			float y = currentPosition.y - pos.y;
 
 			float z = heightMap[i][j];
-			float distSq = x * x + y * y;
-			float zoff = cutRadius - sqrt(rangeSq - y * y);
 
-			result = max(result, z - zoff);
+			if (!flat) {
+				float distSq = x * x + y * y;
+				float zoff = cutRadius - sqrt(rangeSq - y * y);
+				z -= zoff;
+			}
+
+			result = max(result, z);
 		}
 	}
 
 	return result;
 }
 
-vector<Vector3> PathGenerator::GenerateFirstPath(float minZ)
+vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 {
 	vector<Vector3> path;
 
@@ -173,8 +178,7 @@ vector<Vector3> PathGenerator::GenerateFirstPath(float minZ)
 
 	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
-	Vector3 start = { -bound.x, -bound.y - yoff, safeZ };
-	path.push_back(start);
+	path.push_back({ -bound.x, -bound.y - yoff, safeZ });
 
 	float x, y;
 	bool reversed = false;
@@ -187,7 +191,7 @@ vector<Vector3> PathGenerator::GenerateFirstPath(float minZ)
 
 		for (y = -bound.y; y < bound.y + yoff; y += yoff)
 		{
-			float z = max(minZ, GetZ(x, y));
+			float z = max(minZ, GetZ(x, y, false));
 
 			if (prevZ == z)
 				continue;
@@ -214,8 +218,7 @@ vector<Vector3> PathGenerator::GenerateFirstPath(float minZ)
 		reversed = !reversed;
 	}
 
-	Vector3 end = { x, y, safeZ };
-	path.push_back(end);
+	path.push_back({ x, y, safeZ });
 
 
 	return path;
@@ -225,11 +228,60 @@ void PathGenerator::GeneratePaths()
 {
 	LoadElephant();
 
-	GenerateHeightMap();
-	vector<Vector3> moves = GenerateFirstPath(5);
-	vector<Vector3> moves2 = GenerateFirstPath(0);
+	//GenerateHeightMap();
+	//vector<Vector3> moves = GenerateFirstPathLayer(5);
+	//vector<Vector3> moves2 = GenerateFirstPathLayer(0);
+	//moves.insert(moves.end(), moves2.begin(), moves2.end());
+	//SavePath(moves, "Paths\\elephant\\1.k16");
 
+	vector<Vector3> moves = GenerateFlatLayer(0);
+	vector<Vector3> moves2 = GenerateFlatEnvelope(0);
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
+	SavePath(moves, "Paths\\elephant\\2.f10");
+}
 
-	SavePath(moves, "Paths\\elephant\\test1.k16");
+
+
+vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)
+{
+	return vector<Vector3>();
+}
+
+vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
+{
+	Vector3 s = material->size;
+	BezierSurfaceC0 plane(1, 1);
+	for (int w = 0; w < 4; w++)
+		for (int h = 0; h < 4; h++)
+			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 0);
+
+	BezierSurfaceC0 plane2(1, 1);
+	for (int w = 0; w < 4; w++)
+		for (int h = 0; h < 4; h++)
+			plane2.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 5.0f*(w - 1.5f));
+
+	vector<Vector3> result;
+	//for (int i = 0; i < model.size(); i++) {
+	//	BezierSurfaceC0* surf = model[i].get();
+	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, &plane2 }, { 0,75.0/2,0 }, 0.02);
+	if (curve != nullptr) {
+		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
+		delete curve;
+		//break;
+	}
+	//}
+
+	//vector<Vector3> result;
+	//for (int i = 0; i < model.size(); i++) {
+	//	BezierSurfaceC0* surf = model[i].get();
+	//	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ surf, &plane }, { s.x,s.y,minZ }, 0.001);
+	//	if (curve != nullptr) {
+	//		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
+	//		delete curve;
+	//		break;
+	//	}
+	//}
+
+
+	return result;
 }

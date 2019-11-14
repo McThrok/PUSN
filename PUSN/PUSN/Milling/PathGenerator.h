@@ -30,7 +30,6 @@ class PathGenerator
 {
 public:
 	MillingMaterial* material;
-	//XMMATRIX modelTransform;
 
 	vector<vector<float>> heightMap;
 
@@ -42,9 +41,15 @@ public:
 	void SavePath(vector<Vector3> moves, string filePath);
 
 	void LoadElephant();
-	void GenerateHeightMap();
-	vector<Vector3> GenerateFirstPath(float minZ);
 	void GeneratePaths();
-	float GetZ(float cpx, float cpy);
+
+	void GenerateHeightMap();
+	vector<Vector3> GenerateFirstPathLayer(float minZ);
+	float GetZ(float cpx, float cpy, bool flat);
+
+	vector<Vector3> GenerateFlatLayer(float minZ);
+	vector<Vector3> GenerateFlatEnvelope(float minZ);
+
+
 };
 

@@ -267,7 +267,7 @@ public:
 		Matrix mat = GetJacobi(obj0, obj1, uv0, uv1, uvNew0, uvNew1);
 		Vector4 vec = GetF(obj0, obj1, uv0, uv1, uvNew0, uvNew1, alpha);
 
-		return Vector4::Transform(vec, mat);
+		return Vector4::Transform(vec, mat.Transpose());
 	}
 	static Matrix GetJacobi(BezierSurfaceC0* obj0, BezierSurfaceC0* obj1, Vector2 uv0, Vector2 uv1, Vector2 uvNew0, Vector2 uvNew1)
 	{
