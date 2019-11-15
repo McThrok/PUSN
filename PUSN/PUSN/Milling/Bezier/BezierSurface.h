@@ -137,7 +137,7 @@ public:
 
 	Vector3 GetValue(int idxH, int idxW, float tu, float tv)
 	{
-		Vector3 point = { 0,0,0 };
+		Vector3 point = Vector3::Zero;
 		for (int h = 0; h < 4; h++)
 			for (int w = 0; w < 4; w++)
 				point += _controlVertices[3 * idxH + h][3 * idxW + w] * GetB(h, tu) * GetB(w, tv);

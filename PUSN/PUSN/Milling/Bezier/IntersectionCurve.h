@@ -111,12 +111,12 @@ public:
 		while (dist > _gradientEps)
 		{
 			if (++i > 10000) {
-				q1.push_back({ 150,150,0 });
+				q1.push_back({ 75,75,75 });
 				//q0.insert(q0.end(), q1.begin(), q1.end());
 				return new IntersectionCurve(q1, {}, {});
+				return nullptr;
 
 			}
-			//return nullptr;
 
 			try
 			{
@@ -138,12 +138,11 @@ public:
 				if (newDist > dist)
 				{
 					currAlpha /= 2;
-					currAlpha = max(currAlpha, 0.00001f);
+					currAlpha = max(currAlpha, 0.0001f);
 				}
 				else
 				{
 					currAlpha *= 2;
-					currAlpha = min(currAlpha, 0.01f);
 					dist = newDist;
 					p0 = pNew0;
 					p1 = pNew1;
@@ -174,9 +173,8 @@ public:
 		eval1u.Normalize();
 		eval1v.Normalize();
 
-
 		Vector2 grad0 = Vector2(diff.Dot(eval0u), diff.Dot(eval0v));
-		Vector2 grad1 = Vector2(-diff.Dot(eval1u), -diff.Dot(-eval1v));
+		Vector2 grad1 = Vector2((-diff).Dot(eval1u), (-diff).Dot(eval1v));
 
 		return vector<Vector2> { grad0, grad1 };
 	}
@@ -272,7 +270,8 @@ public:
 			uvList0.push_back(uv0);
 			uvList1.push_back(uv1);
 
-			if (loops > 1000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
+			//if (loops > 1000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
+			if (loops > 10000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
 			{
 				break;
 			}
@@ -328,7 +327,7 @@ public:
 		Vector3 dV1 = obj1->EvaluateDV(uv1);
 
 		Vector3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
-		float d = alpha;
+		float d = alpha * 10;
 
 		Vector3 tmp = P1 - Q;
 		return Vector4(tmp.x, tmp.y, tmp.z, (P1 - P0).Dot(normalT) - d);
