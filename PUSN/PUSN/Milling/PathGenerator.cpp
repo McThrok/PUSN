@@ -186,7 +186,6 @@ void PathGenerator::GeneratePaths()
 }
 
 
-
 vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)
 {
 	return vector<Vector3>();
@@ -200,38 +199,93 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 		for (int h = 0; h < 4; h++)
 			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 0);
 
-	/*BezierSurfaceC0 plane2(2, 2, true);
-	for (int h = 0; h < 7; h++)
-	{
-		plane2.GetVert(0, h) = Vector3(0, 25, (h - 1) * 10);
-		plane2.GetVert(1, h) = Vector3(25, 25, (h - 1) * 10);
-		plane2.GetVert(2, h) = Vector3(25, -25, (h - 1) * 10);
-		plane2.GetVert(3, h) = Vector3(0, -25, (h - 1) * 10);
-		plane2.GetVert(4, h) = Vector3(-25, -25, (h - 1) * 10);
-		plane2.GetVert(5, h) = Vector3(-25, 25, (h - 1) * 10);
-		plane2.GetVert(6, h) = Vector3(0, 25, (h - 1) * 10);
-	}*/
-
 	vector<Vector3> result;
-	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, model.GetTorso() }, { -25,-25,0 }, 0.03);
-	//IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ model[0].get(), model[1].get() }, { -2.916667f, - 5.333333f,0 }, 0.02);
-	if (curve != nullptr) {
-		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
-		delete curve;
-	}
 
-	//vector<Vector3> result;
-	//for (int i = 0; i < model.size(); i++) {
-	//	BezierSurfaceC0* surf = model[i].get();
-	//	//IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surf }, { 20,20,20 }, 0.01);
-	//	//IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surf }, { -100,-50,0 }, 0.01);
-	//	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surf }, { 75,-30,0 }, 0.01);
-	//	if (curve != nullptr) {
-	//		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
-	//		delete curve;
-	//	}
-	//}
+	vector<Vector3> tmp;
+
+	//tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
+	//result.insert(result.end(), tmp.begin(), tmp.end());
+	//tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
+	//result.insert(result.end(), tmp.begin(), tmp.end());
+
+	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,0 });
+	//result.insert(result.end(), tmp.begin(), tmp.end());
+	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,0 });
+	//result.insert(result.end(), tmp.begin(), tmp.end());
+
+
+	tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-60,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetHead(), { 0,0,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedPath(model.GetHead(), { 75,0,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetBox(), { 0,50,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	//result.push_back({ 100,100,0 });
 
 
 	return result;
+}
+
+BezierSurfaceC0 PathGenerator::GetPlane(float z)
+{
+	Vector3 s = material->size;
+	BezierSurfaceC0 plane(1, 1);
+	for (int w = 0; w < 4; w++)
+		for (int h = 0; h < 4; h++)
+			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, z);
+
+	return plane;
+}
+
+vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint)
+{
+	float toolRadius = 10.0f;
+	float filterDist = 1.0f;
+	vector<Vector3> result;
+	BezierSurfaceC0 plane = GetPlane(0);
+	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surface }, startingPoint, 0.03);
+
+	if (curve != nullptr) {
+		for (int i = 0; i < curve->_uv1.size(); i++)
+		{
+			Vector2 uv = curve->_uv1[i];
+			Vector3 position = surface->Evaluate(uv);
+			Vector3 normal = -surface->EvaluateNormal(uv);
+			normal.z = 0;
+			normal.Normalize();
+			position += toolRadius * normal;
+
+			if (i == 0 || i == (int)(curve->_uv1.size()) - 1
+				|| Vector3::Distance(result[result.size() - 1], position) > filterDist)
+				result.push_back(position);
+		}
+
+		delete curve;
+	}
+
+	return result;
+
+
+}
+
+vector<Vector3> PathGenerator::AddToPath(vector<Vector3>& path, vector<Vector3>& toAdd)
+{
+	return vector<Vector3>();
 }

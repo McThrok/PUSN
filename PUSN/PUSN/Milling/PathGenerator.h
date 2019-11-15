@@ -31,6 +31,7 @@ using namespace DirectX::SimpleMath;
 class PathGenerator
 {
 public:
+
 	Model model;
 	MillingMaterial* material;
 	vector<vector<float>> heightMap;
@@ -40,13 +41,17 @@ public:
 	void SavePath(vector<Vector3> moves, string filePath);
 
 	void GeneratePaths();
-
 	void GenerateHeightMap();
-	vector<Vector3> GenerateFirstPathLayer(float minZ);
 	float GetZ(float cpx, float cpy, bool flat);
 
-	vector<Vector3> GenerateFlatLayer(float minZ);
+	vector<Vector3> GenerateFirstPathLayer(float minZ);
+
 	vector<Vector3> GenerateFlatEnvelope(float minZ);
+	BezierSurfaceC0 GetPlane(float z);
+	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint);
+	vector<Vector3> AddToPath(vector<Vector3>& path, vector<Vector3>& toAdd);
+
+	vector<Vector3> GenerateFlatLayer(float minZ);
 
 };
 

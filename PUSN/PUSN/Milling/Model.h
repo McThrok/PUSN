@@ -17,9 +17,8 @@
 
 class Model
 {
-private:
-	vector<shared_ptr<BezierSurfaceC0>> model;
 public:
+	vector<shared_ptr<BezierSurfaceC0>> model;
 
 	vector<BezierSurfaceC0*> GetSurfaces();
 

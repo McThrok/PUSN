@@ -270,8 +270,7 @@ public:
 			uvList0.push_back(uv0);
 			uvList1.push_back(uv1);
 
-			//if (loops > 1000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
-			if (loops > 10000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
+			if (loops > 2000 || _finalEpsilon > Vector3::Distance(pStart, p1) && countForCylinder > 10)
 			{
 				break;
 			}
