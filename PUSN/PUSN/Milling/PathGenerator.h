@@ -1,8 +1,5 @@
 #pragma once
-#include "..\\Graphics\\Vertex.h"
-#include "..\\Graphics\\VertexBuffer.h"
-#include "..\\Graphics\\IndexBuffer.h"
-#include "..\\Graphics\\ConstantBuffer.h"
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <math.h>
@@ -16,6 +13,11 @@
 #include <SimpleMath.h>
 #include <memory>
 
+#include "..\\Graphics\\Vertex.h"
+#include "..\\Graphics\\VertexBuffer.h"
+#include "..\\Graphics\\IndexBuffer.h"
+#include "..\\Graphics\\ConstantBuffer.h"
+#include "Model.h"
 #include "..\\Graphics\\Shaders.h"
 #include "MillingMaterial.h"
 #include "Bezier/BezierSurface.h"
@@ -29,18 +31,14 @@ using namespace DirectX::SimpleMath;
 class PathGenerator
 {
 public:
+	Model model;
 	MillingMaterial* material;
-
 	vector<vector<float>> heightMap;
 
 	PathGenerator(MillingMaterial* _material);
-	vector<shared_ptr<BezierSurfaceC0>> model;
-	vector<BezierSurfaceC0*> GetModel();
-
 
 	void SavePath(vector<Vector3> moves, string filePath);
 
-	void LoadElephant();
 	void GeneratePaths();
 
 	void GenerateHeightMap();
@@ -49,7 +47,6 @@ public:
 
 	vector<Vector3> GenerateFlatLayer(float minZ);
 	vector<Vector3> GenerateFlatEnvelope(float minZ);
-
 
 };
 

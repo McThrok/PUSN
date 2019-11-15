@@ -191,6 +191,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="Keyboard\KeyboardEvent.cpp" />
     <ClCompile Include="Graphics\Mesh.cpp" />
     <ClCompile Include="Milling\MillingMaterial.cpp" />
+    <ClCompile Include="Milling\Model.cpp" />
     <ClCompile Include="Mouse\MouseClass.cpp" />
     <ClCompile Include="Mouse\MouseEvent.cpp" />
     <ClCompile Include="Graphics\Shaders.cpp" />
@@ -227,6 +228,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="Keyboard\KeyboardEvent.h" />
     <ClInclude Include="Graphics\Mesh.h" />
     <ClInclude Include="Milling\MillingMaterial.h" />
+    <ClInclude Include="Milling\Model.h" />
     <ClInclude Include="Mouse\MouseClass.h" />
     <ClInclude Include="Mouse\MouseEvent.h" />
     <ClInclude Include="Graphics\Shaders.h" />

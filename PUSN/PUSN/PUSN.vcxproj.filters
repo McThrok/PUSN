@@ -132,6 +132,9 @@
     <ClCompile Include="Milling\Bezier\IntersectionCurve.cpp">
       <Filter>Source Files\Milling\Bezier</Filter>
     </ClCompile>
+    <ClCompile Include="Milling\Model.cpp">
+      <Filter>Source Files\Milling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="Milling\Bezier\IntersectionCurve.h">
       <Filter>Header Files\Milling\Bezier</Filter>
+    </ClInclude>
+    <ClInclude Include="Milling\Model.h">
+      <Filter>Header Files\Milling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
