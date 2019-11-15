@@ -59,9 +59,13 @@ public:
 		Vector2 p0 = Vector2::Zero;
 		Vector2 p1 = Vector2::Zero;
 
-		int divCount = 13;
+
+		vector<Vector3> qwe;
+		int divCount = 13;//qwe
+		//int divCount = 5;
 		bool oneObject = objs[0]->GetId() == objs[1]->GetId();
 		float eps = 0.5f;
+
 
 		for (int i = 0; i < divCount; i++)
 			for (int j = 0; j < divCount; j++)
@@ -75,6 +79,8 @@ public:
 
 						Vector3 ev1 = objs[0]->Evaluate(Vector2(ii, jj));
 						Vector3 ev2 = objs[1]->Evaluate(Vector2(kk, mm));
+
+						qwe.push_back(ev2);
 						float dist = Vector3::Distance(ev1, cursorPos) + Vector3::Distance(ev2, cursorPos);
 						if (dist < maxDist && (!oneObject || (eps < abs(ii - kk) && eps < abs(jj - mm))))
 						{
@@ -84,6 +90,7 @@ public:
 						}
 					}
 
+		//return new IntersectionCurve(qwe, {}, {});
 		return Gradient(objs[0], objs[1], p0, p1, precision);
 	}
 
@@ -95,10 +102,21 @@ public:
 		int i = 0;
 		float currAlpha = _startGradientAlpha;
 		float dist = Vector3::Distance(p1, p0);
+
+		vector<Vector3> q0;//qwe
+		vector<Vector3> q1;//qwe
+		q0.push_back(p0);
+		q1.push_back(p1);
+
 		while (dist > _gradientEps)
 		{
-			if (++i > 10000)
-				return nullptr;
+			if (++i > 10000) {
+				q1.push_back({ 150,150,0 });
+				//q0.insert(q0.end(), q1.begin(), q1.end());
+				return new IntersectionCurve(q1, {}, {});
+
+			}
+			//return nullptr;
 
 			try
 			{
@@ -113,16 +131,19 @@ public:
 
 				Vector3 pNew0 = obj0->Evaluate(value0);
 				Vector3 pNew1 = obj1->Evaluate(value1);
+				q0.push_back(pNew0);
+				q1.push_back(pNew1);
 
 				float newDist = Vector3::Distance(pNew0, pNew1);
 				if (newDist > dist)
 				{
 					currAlpha /= 2;
-					currAlpha = max(currAlpha, 0.0001f);
+					currAlpha = max(currAlpha, 0.00001f);
 				}
 				else
 				{
 					currAlpha *= 2;
+					currAlpha = min(currAlpha, 0.01f);
 					dist = newDist;
 					p0 = pNew0;
 					p1 = pNew1;
@@ -196,6 +217,7 @@ public:
 
 				UpdateUVStruct upd0 = UpdateUV(obj0, uv0, uvDiff0, backed);
 				UpdateUVStruct upd1 = UpdateUV(obj1, uv1, ufDivv1, backed);
+
 				uv0 = upd0.UV;
 				uv1 = upd1.UV;
 
@@ -306,7 +328,7 @@ public:
 		Vector3 dV1 = obj1->EvaluateDV(uv1);
 
 		Vector3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
-		float d = alpha * 10;
+		float d = alpha;
 
 		Vector3 tmp = P1 - Q;
 		return Vector4(tmp.x, tmp.y, tmp.z, (P1 - P0).Dot(normalT) - d);
@@ -330,6 +352,7 @@ public:
 
 		float _uNew = uv.x - uvDiff.x;
 		float _vNew = uv.y - uvDiff.y;
+
 
 		if (_uNew < 0)
 		{

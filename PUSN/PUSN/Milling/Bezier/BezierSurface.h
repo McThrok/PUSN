@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3d11.h>
-#include <DirectXMath.h>
 #include <math.h>
 #include <vector>
 #include <math.h>
@@ -39,10 +38,10 @@ public:
 		int h = GetHeightVertexCount();
 		int w = GetWidthVertexCount();
 
-		_controlVertices = vector < vector<Vector3>>(w);
+		_controlVertices = vector < vector<Vector3>>(h);
 		for (int i = 0; i < h; i++)
 		{
-			_controlVertices[i] = vector<Vector3>(h);
+			_controlVertices[i] = vector<Vector3>(w);
 			for (int j = 0; j < w; j++) {
 				if (cylinder && j == w - 1)
 					_controlVertices[i][j] = _controlVertices[i][0];
@@ -81,6 +80,7 @@ public:
 				}
 			}
 		}
+
 	}
 
 	Vector3 StringToPosition(string data)
@@ -137,51 +137,30 @@ public:
 
 	Vector3 GetValue(int idxH, int idxW, float tu, float tv)
 	{
-		XMVECTOR point = { 0,0,0 };
+		Vector3 point = { 0,0,0 };
 		for (int h = 0; h < 4; h++)
-		{
 			for (int w = 0; w < 4; w++)
-			{
-				point += XMLoadFloat3(&_controlVertices[3 * idxH + h][3 * idxW + w]) * GetB(h, tu) * GetB(w, tv);
-			}
-		}
+				point += _controlVertices[3 * idxH + h][3 * idxW + w] * GetB(h, tu) * GetB(w, tv);
 
-		Vector3 result;
-		XMStoreFloat3(&result, point);
-
-		return result;
+		return point;
 	}
 	Vector3 GetValueDivH(int idxH, int idxW, float tu, float tv)
 	{
-		XMVECTOR point = { 0,0,0 };
+		Vector3 point = Vector3::Zero;
 		for (int h = 0; h < 4; h++)
-		{
 			for (int w = 0; w < 4; w++)
-			{
-				point += XMLoadFloat3(&_controlVertices[3 * idxH + h][3 * idxW + w]) * GetBDrv(h, tu) * GetB(w, tv);
-			}
-		}
+				point += _controlVertices[3 * idxH + h][3 * idxW + w] * GetBDrv(h, tu) * GetB(w, tv);
 
-		Vector3 result;
-		XMStoreFloat3(&result, point);
-
-		return result;
+		return point;
 	}
 	Vector3 GetValueDivW(int idxH, int idxW, float tu, float tv)
 	{
-		XMVECTOR point = { 0,0,0 };
+		Vector3 point = Vector3::Zero;
 		for (int h = 0; h < 4; h++)
-		{
 			for (int w = 0; w < 4; w++)
-			{
-				point += XMLoadFloat3(&_controlVertices[3 * idxH + h][3 * idxW + w]) * GetB(h, tu) * GetBDrv(w, tv);
-			}
-		}
+				point += _controlVertices[3 * idxH + h][3 * idxW + w] * GetB(h, tu) * GetBDrv(w, tv);
 
-		Vector3 result;
-		XMStoreFloat3(&result, point);
-
-		return result;
+		return point;
 	}
 
 	Vector3 Evaluate(Vector2 hw)
@@ -190,13 +169,13 @@ public:
 		float w = hw.y;
 
 		int phc = heightPatchCount;
-		int ph = (int)floorf(h * phc);
+		int ph = (int)floor(h * phc);
 		if (ph == phc)
 			ph = phc - 1;
 		float hh = h * phc - ph;
 
 		int pwc = widthPatchCount;
-		int pw = (int)floorf(w * pwc);
+		int pw = (int)floor(w * pwc);
 		if (pw == pwc)
 			pw = pwc - 1;
 		float ww = w * pwc - pw;
@@ -209,22 +188,18 @@ public:
 		float w = hw.y;
 
 		int phc = heightPatchCount;
-		int ph = (int)floorf(h * phc);
+		int ph = (int)floor(h * phc);
 		if (ph == phc)
 			ph = phc - 1;
 		float hh = h * phc - ph;
 
 		int pwc = widthPatchCount;
-		int pw = (int)floorf(w * pwc);
+		int pw = (int)floor(w * pwc);
 		if (pw == pwc)
 			pw = pwc - 1;
 		float ww = w * pwc - pw;
 
-		Vector3 div = GetValueDivH(ph, pw, hh, ww);
-		Vector3 result;
-		XMStoreFloat3(&result, XMLoadFloat3(&div) * heightPatchCount);
-
-		return result;
+		return GetValueDivH(ph, pw, hh, ww) * heightPatchCount;
 	}
 	Vector3 EvaluateDV(Vector2 hw)
 	{
@@ -232,33 +207,139 @@ public:
 		float w = hw.y;
 
 		int phc = heightPatchCount;
-		int ph = (int)floorf(h * phc);
+		int ph = (int)floor(h * phc);
 		if (ph == phc)
 			ph = phc - 1;
 		float hh = h * phc - ph;
 
 		int pwc = widthPatchCount;
-		int pw = (int)floorf(w * pwc);
+		int pw = (int)floor(w * pwc);
 		if (pw == pwc)
 			pw = pwc - 1;
 		float ww = w * pwc - pw;
 
-		Vector3 div = GetValueDivW(ph, pw, hh, ww);
-		Vector3 result;
-		XMStoreFloat3(&result, XMLoadFloat3(&div) * widthPatchCount);
-
-		return result;
+		return GetValueDivW(ph, pw, hh, ww) * widthPatchCount;
 	}
+
 	Vector3 EvaluateNormal(Vector2 hw) {
 		Vector3 du = EvaluateDU(hw);
 		Vector3 dv = EvaluateDV(hw);
 
-		XMVECTOR cross = XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&du), XMLoadFloat3(&dv)));
-		Vector3 result;
-		XMStoreFloat3(&result, cross);
+		Vector3 result = dv.Cross(du);
+		result.Normalize();
 
 		return result;
 	}
 
+	//Vector3 GetValue(vector<vector<Vector3>> verts, int idxH, int idxW, float tu, float tv)
+	//{
+	//	Vector3 point = Vector3::Zero;
+	//	for (int h = 0; h < 4; h++)
+	//	{
+	//		for (int w = 0; w < 4; w++)
+	//		{
+	//			point += verts[idxH + h][idxW + w] * GetB(h, tu) * GetB(w, tv);
+	//		}
+	//	}
 
+	//	return point;
+	//}
+	//Vector3 GetValueDivH(vector<vector<Vector3>> verts, int idxH, int idxW, float tu, float tv)
+	//{
+	//	Vector3 point = Vector3::Zero;
+	//	for (int h = 0; h < 4; h++)
+	//	{
+	//		for (int w = 0; w < 4; w++)
+	//		{
+	//			point += verts[idxH + h][idxW + w] * GetBDrv(h, tu) * GetB(w, tv);
+	//		}
+	//	}
+
+	//	return point;
+	//}
+	//Vector3 GetValueDivW(vector<vector<Vector3>> verts, int idxH, int idxW, float tu, float tv)
+	//{
+	//	Vector3 point = Vector3::Zero;
+	//	for (int h = 0; h < 4; h++)
+	//	{
+	//		for (int w = 0; w < 4; w++)
+	//		{
+	//			point += verts[idxH + h][idxW + w] * GetB(h, tu) * GetBDrv(w, tv);
+	//		}
+	//	}
+
+	//	return point;
+	//}
+
+	//vector<vector<Vector3>> GetPatchVerts(int h, int w)
+	//{
+	//	vector<vector<Vector3>>verts(4);
+	//	for (int i = 0; i < 4; i++)
+	//	{
+	//		verts.push_back(vector<Vector3>(4));
+	//		for (int j = 0; j < 4; j++)
+	//		{
+	//			verts[i].push_back(_controlVertices[3 * h + i][3 * w + j]);
+	//		}
+	//	}
+
+	//	return verts;
+	//}
+	//Vector3 Evaluate(Vector2 hw)
+	//{
+	//	float h = hw.x;
+	//	float w = hw.y;
+
+	//	int phc = heightPatchCount;
+	//	int ph = (int)floor(h * phc);
+	//	if (ph == phc)
+	//		ph = phc - 1;
+	//	float hh = h * phc - ph;
+
+	//	int pwc = widthPatchCount;
+	//	int pw = (int)floor(w * pwc);
+	//	if (pw == pwc)
+	//		pw = pwc - 1;
+	//	float ww = w * pwc - pw;
+
+	//	return GetValue(GetPatchVerts(ph, pw), 0, 0, hh, ww);
+	//}
+	//Vector3 EvaluateDU(Vector2 hw)
+	//{
+	//	float h = hw.x;
+	//	float w = hw.y;
+
+	//	int phc = heightPatchCount;
+	//	int ph = (int)floor(h * phc);
+	//	if (ph == phc)
+	//		ph = phc - 1;
+	//	float hh = h * phc - ph;
+
+	//	int pwc = widthPatchCount;
+	//	int pw = (int)floor(w * pwc);
+	//	if (pw == pwc)
+	//		pw = pwc - 1;
+	//	float ww = w * pwc - pw;
+
+	//	return GetValueDivH(GetPatchVerts(ph, pw), 0, 0, hh, ww) * heightPatchCount;
+	//}
+	//Vector3 EvaluateDV(Vector2 hw)
+	//{
+	//	float h = hw.x;
+	//	float w = hw.y;
+
+	//	int phc = heightPatchCount;
+	//	int ph = (int)floor(h * phc);
+	//	if (ph == phc)
+	//		ph = phc - 1;
+	//	float hh = h * phc - ph;
+
+	//	int pwc = widthPatchCount;
+	//	int pw = (int)floor(w * pwc);
+	//	if (pw == pwc)
+	//		pw = pwc - 1;
+	//	float ww = w * pwc - pw;
+
+	//	return GetValueDivW(GetPatchVerts(ph, pw), 0, 0, hh, ww) * widthPatchCount;
+	//}
 };

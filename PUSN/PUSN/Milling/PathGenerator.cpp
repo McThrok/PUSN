@@ -3,7 +3,7 @@
 PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
-	GeneratePaths();
+	GeneratePaths();//qwe
 }
 
 vector<BezierSurfaceC0*> PathGenerator::GetModel()
@@ -47,9 +47,12 @@ void PathGenerator::LoadElephant()
 			else if (elementName == "tubeC0")
 				model.push_back(make_shared<BezierSurfaceC0>(BezierSurfaceC0(line, true)));
 		}
+
+		if (model.size() > 0)//qwe
+			break;
 	}
 
-	XMMATRIX modelTransform = XMMatrixScaling(material->gridX / 35.0f, material->gridY / 35.0f, 5) * XMMatrixTranslation(material->gridX / 2.25f, material->gridY / 2.25f, -3);
+	XMMATRIX modelTransform = XMMatrixScaling(4.5f, 4.5f, 4.5f) * XMMatrixTranslation(-5, 0, -3);
 
 	for (int k = 0; k < model.size(); k++)
 	{
@@ -103,6 +106,8 @@ void PathGenerator::GenerateHeightMap()
 	for (int i = 0; i < material->gridX; i++)
 		heightMap[i] = vector<float>(material->gridY, 0);
 
+	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
+
 	for (int k = 0; k < model.size(); k++)
 	{
 		BezierSurfaceC0* surf = model[k].get();
@@ -114,6 +119,7 @@ void PathGenerator::GenerateHeightMap()
 				float v = 1.0f * j / material->gridY;
 				Vector3 point = surf->Evaluate(Vector2(u, v));
 
+				point = Vector3::Transform(point, highMapTransform);
 
 				int x = static_cast<int>(point.x);
 				int y = static_cast<int>(point.y);
@@ -121,16 +127,14 @@ void PathGenerator::GenerateHeightMap()
 				if (x < material->gridX && y < material->gridY && x >= 0 && y >= 0)
 					heightMap[x][y] = (max(heightMap[x][y], -point.z));
 			}
-
 		}
-
 	}
 
-	/*for (int i = 0; i < material->gridX; i++)
+	for (int i = 0; i < material->gridX; i++)
 		for (int j = 0; j < material->gridY; j++)
 			material->GetVert(i, j).pos.z = heightMap[i][j];
 
-	material->UpdateVertexBuffer();*/
+	material->UpdateVertexBuffer();
 }
 
 float PathGenerator::GetZ(float cpx, float cpy, bool flat)
@@ -228,7 +232,7 @@ void PathGenerator::GeneratePaths()
 {
 	LoadElephant();
 
-	//GenerateHeightMap();
+	GenerateHeightMap();
 	//vector<Vector3> moves = GenerateFirstPathLayer(5);
 	//vector<Vector3> moves2 = GenerateFirstPathLayer(0);
 	//moves.insert(moves.end(), moves2.begin(), moves2.end());
@@ -255,32 +259,34 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 		for (int h = 0; h < 4; h++)
 			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 0);
 
-	BezierSurfaceC0 plane2(1, 1);
-	for (int w = 0; w < 4; w++)
-		for (int h = 0; h < 4; h++)
-			plane2.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 5.0f*(w - 1.5f));
+	/*BezierSurfaceC0 plane2(2, 2, true);
+	for (int h = 0; h < 7; h++)
+	{
+		plane2.GetVert(0, h) = Vector3(0, 25, (h - 1) * 10);
+		plane2.GetVert(1, h) = Vector3(25, 25, (h - 1) * 10);
+		plane2.GetVert(2, h) = Vector3(25, -25, (h - 1) * 10);
+		plane2.GetVert(3, h) = Vector3(0, -25, (h - 1) * 10);
+		plane2.GetVert(4, h) = Vector3(-25, -25, (h - 1) * 10);
+		plane2.GetVert(5, h) = Vector3(-25, 25, (h - 1) * 10);
+		plane2.GetVert(6, h) = Vector3(0, 25, (h - 1) * 10);
+	}
 
 	vector<Vector3> result;
-	//for (int i = 0; i < model.size(); i++) {
-	//	BezierSurfaceC0* surf = model[i].get();
-	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, &plane2 }, { 0,75.0/2,0 }, 0.02);
+	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, &plane2 }, { 0,75.0 / 2,0 }, 0.02);
 	if (curve != nullptr) {
 		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
 		delete curve;
-		//break;
-	}
-	//}
+	}*/
 
-	//vector<Vector3> result;
-	//for (int i = 0; i < model.size(); i++) {
-	//	BezierSurfaceC0* surf = model[i].get();
-	//	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ surf, &plane }, { s.x,s.y,minZ }, 0.001);
-	//	if (curve != nullptr) {
-	//		result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
-	//		delete curve;
-	//		break;
-	//	}
-	//}
+	vector<Vector3> result;
+	for (int i = 0; i < model.size(); i++) {
+		BezierSurfaceC0* surf = model[i].get();
+		IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surf }, { 20,20,20 }, 0.01);
+		if (curve != nullptr) {
+			result.insert(result.end(), curve->Verts.begin(), curve->Verts.end());
+			delete curve;
+		}
+	}
 
 
 	return result;

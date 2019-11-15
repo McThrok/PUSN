@@ -20,6 +20,7 @@ public:
 
 	bool wireframe = true;
 	bool flatShading = false;
-	bool showPath = false;
+	//bool showPath = false;
+	bool showPath = true;//qwe
 };
 
