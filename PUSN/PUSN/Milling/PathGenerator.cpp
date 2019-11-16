@@ -203,18 +203,13 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 
 	vector<Vector3> tmp;
 
-	//tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
-	//result.insert(result.end(), tmp.begin(), tmp.end());
-	//tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
-	//result.insert(result.end(), tmp.begin(), tmp.end());
 
 	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,0 });
 	//result.insert(result.end(), tmp.begin(), tmp.end());
 	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,0 });
 	//result.insert(result.end(), tmp.begin(), tmp.end());
 
-
-	tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
+	/*tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
 	result.insert(result.end(), tmp.begin(), tmp.end());
 	tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
 	result.insert(result.end(), tmp.begin(), tmp.end());
@@ -235,7 +230,26 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
 	result.insert(result.end(), tmp.begin(), tmp.end());
 	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
+	result.insert(result.end(), tmp.begin(), tmp.end());*/
+
+	/*tmp = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false, 0);
 	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false, 0);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), false, 0);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 0);
+	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+
+	tmp = GenerateUnrestrictedCylinderPath(model.GetBox(), true, 0);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+	tmp = GenerateUnrestrictedCylinderPath(model.GetBox(), false, 0);
+	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+
+	tmp = GenerateUnrestrictedCylinderPath(model.GetTail(), false, 0);
+	result.insert(result.end(), tmp.begin(), tmp.end());*/
 
 	//result.push_back({ 100,100,0 });
 
@@ -267,7 +281,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 		{
 			Vector2 uv = curve->_uv1[i];
 			Vector3 position = surface->Evaluate(uv);
-			Vector3 normal = -surface->EvaluateNormal(uv);
+			Vector3 normal = surface->EvaluateNormal(uv);
 			normal.z = 0;
 			normal.Normalize();
 			position += toolRadius * normal;
@@ -281,11 +295,106 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 	}
 
 	return result;
+}
+vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float z)
+{
+	vector<Vector3> result;
+	if (!surface->isCylinder)
+		return result;
 
+	float u = top ? 1.0f : 0.0f;
+	float uBack = top ? 0.9f : 0.1f;
+	int probes_count = 100;
 
+	Vector2 uv1;
+	Vector2 uv2;
+	float dist = 0;
+	float toolRange = 5.0f;
+
+	for (int i = 0; i < probes_count; i++)
+	{
+		for (int j = i + 1; j < probes_count; j++) {
+			float v1 = i / 100.0f;
+			float v2 = j / 100.0f;
+
+			Vector3 vert1 = surface->Evaluate(Vector2(u, v1));
+			Vector3 vert2 = surface->Evaluate(Vector2(u, v2));
+			vert1.z = z;
+			vert2.z = z;
+
+			float new_dist = Vector3::Distance(vert1, vert2);
+			if (new_dist > dist) {
+				dist = new_dist;
+				uv1 = Vector2(u, v1);
+				uv2 = Vector2(u, v2);
+			}
+		}
+	}
+
+	Vector3 vert1 = surface->Evaluate(uv1);
+	Vector3 vert2 = surface->Evaluate(uv2);
+	Vector3 vert1Deep = surface->Evaluate(Vector2(uBack, uv1.y));
+	Vector3 vert2Deep = surface->Evaluate(Vector2(uBack, uv2.y));
+	vert1.z = 0;
+	vert2.z = 0;
+	vert1Deep.z = 0;
+	vert2Deep.z = 0;
+
+	Vector3 normal;
+	if (Vector3::Distance(vert2, vert1) > 0.0001f)
+		normal = (vert2 - vert1).Cross(Vector3(0, 0, 1));
+	else
+		normal = vert1Deep + vert2Deep;
+
+	normal.Normalize();
+
+	if (normal.Dot(vert1 - vert1Deep) < 0)
+		normal = -normal;
+
+	Vector3 normal1 = surface->EvaluateNormal(uv1);
+	Vector3 normal2 = surface->EvaluateNormal(uv2);
+	normal1.z = z;
+	normal2.z = z;
+	normal1.Normalize();
+	normal2.Normalize();
+
+	result.push_back(vert1 + toolRange * (normal1 + normal));
+	result.push_back(vert2 + toolRange * (normal2 + normal));
+
+	return result;
 }
 
 vector<Vector3> PathGenerator::AddToPath(vector<Vector3>& path, vector<Vector3>& toAdd)
 {
 	return vector<Vector3>();
 }
+
+// bool OnRectangle(Vector2 p1, Vector2 p2, Vector2 q)
+//{
+//	return min(p1.x, p2.x) <= q.x && q.x <=max(p1.x, p2.x) &&min(p1.y, p2.y) <= q.y && q.y <=max(p1.y, p2.y);
+//}
+//
+// bool Intersection(Segment s1, Segment s2)
+//{
+//	Vector2 s1s_s2 = s2.Direction(s1.ps);   // polozenie poczatku odcinka s1 wzgledem odcinka s2
+//	Vector2 s1e_s2 = s2.Direction(s1.pe);   // polozenie konca    odcinka s1 wzgledem odcinka s2
+//	Vector2 s2s_s1 = s1.Direction(s2.ps);   // polozenie poczatku odcinka s2 wzgledem odcinka s1
+//	Vector2 s2e_s1 = s1.Direction(s2.pe);   // polozenie konca    odcinka s2 wzgledem odcinka s1
+//
+//	int s12 = s1s_s2 * s1e_s2;   // polozenie odcinka s1 wzgledem odcinka s2
+//	int s21 = s2s_s1 * s2e_s1;   // polozenie odcinka s2 wzgledem odcinka s1
+//
+//	// konce jednego z odcinkow leza po tej samej stronie drugiego
+//	if (s12 > 0 || s21 > 0) return false;   // odcinki nie przecinaja sie
+//
+//	// konce zadnego z odcinkow nie leza po tej samej stronie drugiego
+//	// i konce jednego z odcinkow leza po przeciwnych stronach drugiego
+//	if (s12 < 0 || s21 < 0) return true;    // odcinki przecinaja sie
+//
+//	if (s1s_s2 == 0 && OnRectangle(s2.ps, s2.pe, s1.ps)) return true;
+//	if (s1e_s2 == 0 && OnRectangle(s2.ps, s2.pe, s1.pe)) return true;
+//	if (s2s_s1 == 0 && OnRectangle(s1.ps, s1.pe, s2.ps)) return true;
+//	if (s2e_s1 == 0 && OnRectangle(s1.ps, s1.pe, s2.pe)) return true;
+//
+//	return false;
+//}

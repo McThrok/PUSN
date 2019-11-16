@@ -49,6 +49,7 @@ public:
 	vector<Vector3> GenerateFlatEnvelope(float minZ);
 	BezierSurfaceC0 GetPlane(float z);
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint);
+	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float z);
 	vector<Vector3> AddToPath(vector<Vector3>& path, vector<Vector3>& toAdd);
 
 	vector<Vector3> GenerateFlatLayer(float minZ);

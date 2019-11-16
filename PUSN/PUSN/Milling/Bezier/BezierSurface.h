@@ -22,6 +22,7 @@ public:
 	int widthPatchCount;
 	int heightPatchCount;
 	bool WrappedV;
+	bool isCylinder;
 
 	int GetId() { return id; };
 	bool IsWrappedU() { return false; }
@@ -33,6 +34,7 @@ public:
 		count++;
 
 		WrappedV = cylinder;
+		isCylinder = cylinder;
 		heightPatchCount = ph;
 		widthPatchCount = pw;
 		int h = GetHeightVertexCount();
@@ -59,6 +61,7 @@ public:
 		StringHelper::Split(data, parts);
 
 		WrappedV = cylinder;
+		isCylinder = cylinder;
 		heightPatchCount = stoi(parts[1]);
 		widthPatchCount = stoi(parts[2]);
 		int h = GetHeightVertexCount();
@@ -225,7 +228,7 @@ public:
 		Vector3 du = EvaluateDU(hw);
 		Vector3 dv = EvaluateDV(hw);
 
-		Vector3 result = dv.Cross(du);
+		Vector3 result = du.Cross(dv);
 		result.Normalize();
 
 		return result;
