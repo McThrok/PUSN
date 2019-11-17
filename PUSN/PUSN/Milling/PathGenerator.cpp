@@ -193,66 +193,130 @@ vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)
 
 vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 {
-	Vector3 s = material->size;
-	BezierSurfaceC0 plane(1, 1);
-	for (int w = 0; w < 4; w++)
-		for (int h = 0; h < 4; h++)
-			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, 0);
-
 	vector<Vector3> result;
 
-	vector<Vector3> tmp;
+	vector<Vector3> legBack[3];
+	legBack[0] = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
+	legBack[1] = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false, 0);
+	legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
+
+	vector<Vector3> legFront[3];
+	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-60,0 });
+	legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false, 0);
+	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,0 });
+
+	vector<Vector3> torso[2];
+	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,0 });
+	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,0 });
+
+	vector<Vector3> head[4];
+	head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,0 });
+	head[1] = GenerateUnrestrictedCylinderPath(model.GetHead(), false, 0);
+	head[2] = GenerateUnrestrictedPath(model.GetHead(), { 75,0,0 });
+	head[3] = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 0);
+
+	vector<Vector3> box[3];
+	box[0] = GenerateUnrestrictedCylinderPath(model.GetBox(), true, 0);
+	box[1] = GenerateUnrestrictedPath(model.GetBox(), { 0,50,0 });
+	box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false, 0);
+
+	vector<Vector3> tail[3];
+	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
+	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false, 0);
+	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
 
 
-	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,0 });
-	//result.insert(result.end(), tmp.begin(), tmp.end());
-	//tmp = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,0 });
-	//result.insert(result.end(), tmp.begin(), tmp.end());
+	{
+		auto legBack_tmp = legBack[0];
+		TrimStart(torso[0], legBack_tmp);
+		result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
 
-	/*tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
+		result.insert(result.end(), legBack[1].begin(), legBack[1].end());
 
-	tmp = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-60,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
+		legBack_tmp = legBack[2];
+		TrimEnd(legBack_tmp, torso[0]);
+		result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
+	}
 
-	tmp = GenerateUnrestrictedPath(model.GetHead(), { 0,0,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedPath(model.GetHead(), { 75,0,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
+	{
+		auto torso_tmp = torso[0];
+		TrimStart(legBack[2], torso_tmp);
+		TrimEnd(torso_tmp, legFront[0]);
+		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	}
 
-	tmp = GenerateUnrestrictedPath(model.GetBox(), { 0,50,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
+	{
+		auto legFront_tmp = legFront[0];
+		TrimStart(torso[0], legFront_tmp);
+		result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
 
-	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
-	result.insert(result.end(), tmp.begin(), tmp.end());*/
+		result.insert(result.end(), legFront[1].begin(), legFront[1].end());
 
-	/*tmp = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false, 0);
-	result.insert(result.end(), tmp.begin(), tmp.end());
+		legFront_tmp = legFront[2];
+		TrimEnd(legFront_tmp, torso[0]);
+		result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
+	}
 
-	tmp = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false, 0);
-	result.insert(result.end(), tmp.begin(), tmp.end());
+	{
+		auto torso_tmp = torso[0];
+		TrimStart(legFront[2], torso_tmp);
+		TrimEnd(torso_tmp, head[0]);
+		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	}
 
-	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), false, 0);
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 0);
-	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+	{
+		auto head_tmp = head[0];
+		TrimStart(torso[0], head_tmp);
+		result.insert(result.end(), head_tmp.begin(), head_tmp.end());
 
-	tmp = GenerateUnrestrictedCylinderPath(model.GetBox(), true, 0);
-	result.insert(result.end(), tmp.begin(), tmp.end());
-	tmp = GenerateUnrestrictedCylinderPath(model.GetBox(), false, 0);
-	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+		result.insert(result.end(), head[1].begin(), head[1].end());
+		result.insert(result.end(), head[2].begin(), head[2].end());
+		//result.insert(result.end(), head[3].rbegin(), head[3].rend());
 
-	tmp = GenerateUnrestrictedCylinderPath(model.GetTail(), false, 0);
-	result.insert(result.end(), tmp.begin(), tmp.end());*/
+		head_tmp = head[3];
+		TrimStart(torso[1],head_tmp);
+		result.insert(result.end(), head_tmp.rbegin(), head_tmp.rend());
+	}
 
-	//result.push_back({ 100,100,0 });
+	////---
 
+	{
+		auto box_tmp = box[0];
+		TrimStart(torso[1], box_tmp);
+		result.insert(result.end(), box_tmp.begin(), box_tmp.end());
+
+		result.insert(result.end(), box[1].begin(), box[1].end());
+
+		box_tmp = box[2];
+		TrimStart(torso[1], box_tmp);
+		result.insert(result.end(), box_tmp.rbegin(), box_tmp.rend());
+	}
+
+	{
+		auto torso_tmp = torso[1];
+		TrimStart(box[2], torso_tmp);
+		TrimEnd(torso_tmp, tail[0]);
+		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	}
+
+	{
+		auto tail_tmp = tail[0];
+		TrimStart(torso[1], tail_tmp);
+		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+
+		result.insert(result.end(), tail[1].begin(), tail[1].end());
+
+		tail_tmp = tail[2];
+		TrimEnd(tail_tmp, torso[0]);
+		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+	}
+
+	{
+		auto torso_tmp = torso[0];
+		TrimStart(tail[2], torso_tmp);
+		TrimEnd(torso_tmp, legBack[0]);
+		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	}
 
 	return result;
 }
@@ -270,7 +334,7 @@ BezierSurfaceC0 PathGenerator::GetPlane(float z)
 
 vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint)
 {
-	float toolRadius = 10.0f;
+	float toolRadius = 5.0f;
 	float filterDist = 1.0f;
 	vector<Vector3> result;
 	BezierSurfaceC0 plane = GetPlane(0);
@@ -293,6 +357,8 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 
 		delete curve;
 	}
+
+	RemoveSelfIntersections(result);
 
 	return result;
 }
@@ -363,38 +429,103 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0*
 
 	return result;
 }
-
-vector<Vector3> PathGenerator::AddToPath(vector<Vector3>& path, vector<Vector3>& toAdd)
+bool PathGenerator::SegmentsIntersect(const Vector2& A, const Vector2& B, const Vector2& C, const Vector2& D, Vector2& out)
 {
-	return vector<Vector3>();
+	Vector2 CmP = C - A;
+	Vector2 r = B - A;
+	Vector2 s = D - C;
+
+	float CmPxr = CmP.x * r.y - CmP.y * r.x;
+	float CmPxs = CmP.x * s.y - CmP.y * s.x;
+	float rxs = r.x * s.y - r.y * s.x;
+
+	if (CmPxr == 0.0f)
+	{
+		return ((C.x - A.x < 0.0f) != (C.x - B.x < 0.0f)) || ((C.y - A.y < 0.0f) != (C.y - B.y < 0.0f));
+	}
+
+	if (rxs == 0.0f)
+		return false; // Lines are parallel.
+
+	float rxsr = 1.0f / rxs;
+	float t = CmPxs * rxsr;
+	float u = CmPxr * rxsr;
+
+	out = A + t * r;
+
+	return (t >= 0.0f) && (t <= 1.0f) && (u >= 0.0f) && (u <= 1.0f);
 }
 
-// bool OnRectangle(Vector2 p1, Vector2 p2, Vector2 q)
-//{
-//	return min(p1.x, p2.x) <= q.x && q.x <=max(p1.x, p2.x) &&min(p1.y, p2.y) <= q.y && q.y <=max(p1.y, p2.y);
-//}
-//
-// bool Intersection(Segment s1, Segment s2)
-//{
-//	Vector2 s1s_s2 = s2.Direction(s1.ps);   // polozenie poczatku odcinka s1 wzgledem odcinka s2
-//	Vector2 s1e_s2 = s2.Direction(s1.pe);   // polozenie konca    odcinka s1 wzgledem odcinka s2
-//	Vector2 s2s_s1 = s1.Direction(s2.ps);   // polozenie poczatku odcinka s2 wzgledem odcinka s1
-//	Vector2 s2e_s1 = s1.Direction(s2.pe);   // polozenie konca    odcinka s2 wzgledem odcinka s1
-//
-//	int s12 = s1s_s2 * s1e_s2;   // polozenie odcinka s1 wzgledem odcinka s2
-//	int s21 = s2s_s1 * s2e_s1;   // polozenie odcinka s2 wzgledem odcinka s1
-//
-//	// konce jednego z odcinkow leza po tej samej stronie drugiego
-//	if (s12 > 0 || s21 > 0) return false;   // odcinki nie przecinaja sie
-//
-//	// konce zadnego z odcinkow nie leza po tej samej stronie drugiego
-//	// i konce jednego z odcinkow leza po przeciwnych stronach drugiego
-//	if (s12 < 0 || s21 < 0) return true;    // odcinki przecinaja sie
-//
-//	if (s1s_s2 == 0 && OnRectangle(s2.ps, s2.pe, s1.ps)) return true;
-//	if (s1e_s2 == 0 && OnRectangle(s2.ps, s2.pe, s1.pe)) return true;
-//	if (s2s_s1 == 0 && OnRectangle(s1.ps, s1.pe, s2.ps)) return true;
-//	if (s2e_s1 == 0 && OnRectangle(s1.ps, s1.pe, s2.pe)) return true;
-//
-//	return false;
-//}
+void PathGenerator::RemoveSelfIntersections(vector<Vector3>& path)
+{
+	while (true) {
+		bool changed = false;
+
+		for (int offset = 2; offset < path.size() - 2; offset++)
+		{
+			for (int i = 0; i < path.size() - 2 - offset; i++)
+			{
+				Vector2 out;
+				Vector2 seg1_a = Vector2(path[i].x, path[i].y);
+				Vector2 seg1_b = Vector2(path[i + 1].x, path[i + 1].y);
+				Vector2 seg2_a = Vector2(path[i + offset].x, path[i + offset].y);
+				Vector2 seg2_b = Vector2(path[i + offset + 1].x, path[i + offset + 1].y);
+
+				if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+					path.erase(path.begin() + i + 1, path.begin() + i + offset + 1);
+					path.insert(path.begin() + i + 1, Vector3(out.x, out.y, minZ));
+					changed = true;
+					break;
+				}
+			}
+
+			if (changed)
+				break;
+		}
+
+		if (!changed)
+			break;
+	}
+}
+
+void PathGenerator::TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path)
+{
+	for (int i = 0; i < trimmer.size() - 1; i++)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i + 1].x, trimmer[i + 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin(), path.begin() + j);
+				path[0] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
+}
+
+void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	for (int i = trimmer.size() - 1; i > 0; i--)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i - 1].x, trimmer[i - 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin() + j + 1, path.end());
+				path[path.size() - 1] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
+}
