@@ -271,7 +271,6 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 
 		result.insert(result.end(), head[1].begin(), head[1].end());
 		result.insert(result.end(), head[2].begin(), head[2].end());
-		//result.insert(result.end(), head[3].rbegin(), head[3].rend());
 
 		head_tmp = head[3];
 		TrimStart(torso[1],head_tmp);
