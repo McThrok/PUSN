@@ -13,19 +13,18 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 
 	for (int i = 0; i < moves.size(); i++)
 	{
-		ss << "N9G01";
-
 		Vector3& point = moves[i];
+		bool x = i == 0 || point.x != moves[i - 1].x;
+		bool y = i == 0 || point.y != moves[i - 1].y;
+		bool z = i == 0 || point.z != moves[i - 1].z;
 
-		if (i == 0 || point.x != moves[i - 1].x)
-			ss << "X" << fixed << std::setprecision(3) << point.x;
+		if (!x && !y && !z)
+			continue;
 
-		if (i == 0 || point.y != moves[i - 1].y)
-			ss << "Y" << fixed << std::setprecision(3) << point.y;
-
-		if (i == 0 || point.z != moves[i - 1].z)
-			ss << "Z" << fixed << std::setprecision(3) << point.z;
-
+		ss << "N9G01";
+		if (x) ss << "X" << fixed << std::setprecision(3) << point.x;
+		if (y) ss << "Y" << fixed << std::setprecision(3) << point.y;
+		if (z) ss << "Z" << fixed << std::setprecision(3) << point.z;
 		ss << endl;
 	}
 
@@ -185,7 +184,6 @@ void PathGenerator::GeneratePaths()
 	SavePath(moves, "Paths\\elephant\\2.f10");
 }
 
-
 vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)
 {
 	return vector<Vector3>();
@@ -201,7 +199,7 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 	legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
 
 	vector<Vector3> legFront[3];
-	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-60,0 });
+	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-61,0 });
 	legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false, 0);
 	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,0 });
 
@@ -273,7 +271,7 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 		result.insert(result.end(), head[2].begin(), head[2].end());
 
 		head_tmp = head[3];
-		TrimStart(torso[1],head_tmp);
+		TrimStart(torso[1], head_tmp);
 		result.insert(result.end(), head_tmp.rbegin(), head_tmp.rend());
 	}
 
@@ -319,7 +317,6 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 
 	return result;
 }
-
 BezierSurfaceC0 PathGenerator::GetPlane(float z)
 {
 	Vector3 s = material->size;
@@ -454,7 +451,6 @@ bool PathGenerator::SegmentsIntersect(const Vector2& A, const Vector2& B, const 
 
 	return (t >= 0.0f) && (t <= 1.0f) && (u >= 0.0f) && (u <= 1.0f);
 }
-
 void PathGenerator::RemoveSelfIntersections(vector<Vector3>& path)
 {
 	while (true) {
@@ -486,7 +482,6 @@ void PathGenerator::RemoveSelfIntersections(vector<Vector3>& path)
 			break;
 	}
 }
-
 void PathGenerator::TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path)
 {
 	for (int i = 0; i < trimmer.size() - 1; i++)
@@ -507,7 +502,6 @@ void PathGenerator::TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path)
 		}
 	}
 }
-
 void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
 {
 	for (int i = trimmer.size() - 1; i > 0; i--)
