@@ -201,19 +201,13 @@ void MillingMachine::Update(float dt, MillingMaterial* material)
 
 Vector3 MillingMachine::Move()
 {
-	XMVECTOR a = XMLoadFloat3(&currentPosition);
-	XMVECTOR b = XMLoadFloat3(&moves[currentMove]);
-	XMVECTOR toEndMove = b - a;
+	Vector3 toEndMove = moves[currentMove] - currentPosition;
 
-	XMVECTOR dir = XMVector3Normalize(toEndMove);
-	XMVECTOR movement = dir * stepSize;
+	Vector3 dir = XMVector3Normalize(toEndMove);
+	Vector3 movement = dir * stepSize;
 
-	Vector3 moveLen, toEndLen;
-	XMStoreFloat3(&moveLen, XMVector3Length(movement));
-	XMStoreFloat3(&toEndLen, XMVector3Length(toEndMove));
-
-	if (moveLen.x < toEndLen.x) {
-		XMStoreFloat3(&currentPosition, XMLoadFloat3(&currentPosition) + movement);
+	if (movement.Length() < toEndMove.Length()) {
+		currentPosition += movement;
 	}
 	else {
 		currentPosition = moves[currentMove];
@@ -224,15 +218,12 @@ Vector3 MillingMachine::Move()
 			finished = true;
 	}
 
-	Vector3 dirFloat;
-	XMStoreFloat3(&dirFloat, dir);
-
-	return dirFloat;
+	return dir;
 }
 
 void MillingMachine::Cut(Vector3 dir, MillingMaterial* material)
 {
-	float eps = 0.0000001;
+	float eps = 0.001;
 	bool millingDanger = flatCut && dir.z < -eps;
 
 	float rangeSq = cutRadius * cutRadius;

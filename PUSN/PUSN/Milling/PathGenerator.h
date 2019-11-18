@@ -36,6 +36,7 @@ public:
 	MillingMaterial* material;
 	vector<vector<float>> heightMap;
 	float minZ;
+	float safeZ;
 
 	PathGenerator(MillingMaterial* _material);
 
@@ -46,6 +47,7 @@ public:
 	void GenerateHeightMap();
 	float GetZ(float cpx, float cpy, bool flat);
 
+	void EnsureInit();
 	vector<Vector3> GenerateFirstPathLayer(float minZ);
 	vector<Vector3> GenerateFlatEnvelope();
 	BezierSurfaceC0 GetPlane();

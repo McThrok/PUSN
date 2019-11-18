@@ -4,8 +4,9 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
 	minZ = 15;
+	safeZ = material->size.z + 20;
 
-	GenerateSecondPath();
+	//GenerateSecondPath();
 }
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
@@ -39,6 +40,13 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 	}
 }
 
+void PathGenerator::EnsureInit() {
+	if (model.model.empty())
+	{
+		model.LoadElephant(minZ);
+		GenerateHeightMap();
+	}
+}
 void PathGenerator::GenerateHeightMap()
 {
 	heightMap.resize(material->gridX);
@@ -77,6 +85,15 @@ void PathGenerator::GenerateHeightMap()
 	material->UpdateVertexBuffer();
 }
 
+
+void PathGenerator::GenerateFirstPath()
+{
+	EnsureInit();
+	vector<Vector3> moves = GenerateFirstPathLayer((material->size.z + minZ) / 2);
+	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ + 0.1);
+	moves.insert(moves.end(), moves2.begin(), moves2.end());
+	SavePath(moves, "Paths\\elephant\\1.k16");
+}
 float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 {
 	float cutRadius = 8;
@@ -110,7 +127,6 @@ float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 
 	return result;
 }
-
 vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 {
 	vector<Vector3> path;
@@ -118,7 +134,6 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 	//k16
 	float xoff = 4;
 	float yoff = 8;
-	float safeZ = material->size.z + 20;
 
 	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
@@ -168,27 +183,10 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 	return path;
 }
 
-void PathGenerator::GenerateFirstPath()
-{
-	if (model.model.empty())
-	{
-		model.LoadElephant(minZ);
-		GenerateHeightMap();
-	}
 
-	vector<Vector3> moves = GenerateFirstPathLayer((material->size.z + minZ) / 2);
-	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ + 0.1);
-	moves.insert(moves.end(), moves2.begin(), moves2.end());
-	SavePath(moves, "Paths\\elephant\\1.k16");
-}
 void PathGenerator::GenerateSecondPath()
 {
-	if (model.model.empty())
-	{
-		model.LoadElephant(minZ);
-		GenerateHeightMap();
-	}
-
+	EnsureInit();
 	vector<Vector3> moves = GenerateFlatLayer();
 	vector<Vector3> moves2 = GenerateFlatEnvelope();
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
@@ -234,6 +232,25 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false);
 	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,minZ });
 
+
+	{
+		auto tail_tmp = tail[0];
+		TrimStart(torso[1], tail_tmp);
+		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+
+		result.insert(result.end(), tail[1].begin(), tail[1].end());
+
+		tail_tmp = tail[2];
+		TrimEnd(tail_tmp, torso[0]);
+		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+	}
+
+	{
+		auto torso_tmp = torso[0];
+		TrimStart(tail[2], torso_tmp);
+		TrimEnd(torso_tmp, legBack[0]);
+		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	}
 
 	{
 		auto legBack_tmp = legBack[0];
@@ -307,24 +324,16 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
 	}
 
-	{
-		auto tail_tmp = tail[0];
-		TrimStart(torso[1], tail_tmp);
-		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+	Vector3 start1 = result[0];
+	start1.y = material->size.y / 2 + 20;
 
-		result.insert(result.end(), tail[1].begin(), tail[1].end());
+	Vector3 start2 = start1;
+	start2.z = safeZ;
 
-		tail_tmp = tail[2];
-		TrimEnd(tail_tmp, torso[0]);
-		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
-	}
-
-	{
-		auto torso_tmp = torso[0];
-		TrimStart(tail[2], torso_tmp);
-		TrimEnd(torso_tmp, legBack[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	result.insert(result.begin(), start1);
+	result.insert(result.begin(), start2);
+	result.push_back(start1);
+	result.push_back(start2);
 
 	return result;
 }
@@ -338,14 +347,13 @@ BezierSurfaceC0 PathGenerator::GetPlane()
 
 	return plane;
 }
-
 vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint)
 {
 	float toolRadius = 5.0f;
 	float filterDist = 1.0f;
 	vector<Vector3> result;
 	BezierSurfaceC0 plane = GetPlane();
-	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surface }, startingPoint, 0.03);
+	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surface }, startingPoint, 0.0001);
 
 	if (curve != nullptr) {
 		for (int i = 0; i < curve->_uv1.size(); i++)
@@ -353,6 +361,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 			Vector2 uv = curve->_uv1[i];
 			Vector3 position = surface->Evaluate(uv);
 			Vector3 normal = surface->EvaluateNormal(uv);
+			position.z = minZ;
 			normal.z = 0;
 			normal.Normalize();
 			position += toolRadius * normal;
@@ -419,6 +428,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0*
 	else
 		normal = vert1Deep + vert2Deep;
 
+	normal.z = 0;
 	normal.Normalize();
 
 	if (normal.Dot(vert1 - vert1Deep) < 0)
