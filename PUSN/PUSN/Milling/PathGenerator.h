@@ -45,7 +45,7 @@ public:
 	void GenerateFirstPath();
 	void GenerateSecondPath();
 	void GenerateHeightMap();
-	float GetZ(float cpx, float cpy, bool flat);
+	float GetZ(float cpx, float cpy, bool flat, float toolRadius);
 
 	void EnsureInit();
 	vector<Vector3> GenerateFirstPathLayer(float minZ);

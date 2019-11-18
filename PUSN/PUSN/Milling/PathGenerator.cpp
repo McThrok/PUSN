@@ -42,10 +42,9 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 
 void PathGenerator::EnsureInit() {
 	if (model.model.empty())
-	{
 		model.LoadElephant(minZ);
-		GenerateHeightMap();
-	}
+
+	GenerateHeightMap();
 }
 void PathGenerator::GenerateHeightMap()
 {
@@ -69,8 +68,8 @@ void PathGenerator::GenerateHeightMap()
 
 				point = Vector3::Transform(point, highMapTransform);
 
-				int x = static_cast<int>(point.x);
-				int y = static_cast<int>(point.y);
+				int x = static_cast<int>(roundf(point.x));
+				int y = static_cast<int>(roundf(point.y));
 
 				if (x < material->gridX && y < material->gridY && x >= 0 && y >= 0)
 					heightMap[x][y] = (max(heightMap[x][y], point.z));
@@ -94,14 +93,13 @@ void PathGenerator::GenerateFirstPath()
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
 	SavePath(moves, "Paths\\elephant\\1.k16");
 }
-float PathGenerator::GetZ(float cpx, float cpy, bool flat)
+float PathGenerator::GetZ(float cpx, float cpy, bool flat, float toolRadius)
 {
-	float cutRadius = 8;
-	float rangeSq = cutRadius * cutRadius;
+	float rangeSq = toolRadius * toolRadius;
 	Vector3 currentPosition{ cpx, cpy, 0 };
 
 	int left, right, top, down;
-	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
+	material->GetIndicesOfArea(currentPosition, toolRadius, left, right, top, down);
 
 	float result = minZ;
 
@@ -109,15 +107,15 @@ float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 	{
 		for (int j = down; j < top + 1; j++)
 		{
-			Vector3 pos = material->GetVert(i, j).pos;
-			float x = currentPosition.x - pos.x;
-			float y = currentPosition.y - pos.y;
-
 			float z = heightMap[i][j];
 
 			if (!flat) {
+				Vector3 pos = material->GetVert(i, j).pos;
+				float x = currentPosition.x - pos.x;
+				float y = currentPosition.y - pos.y;
+
 				float distSq = x * x + y * y;
-				float zoff = cutRadius - sqrt(rangeSq - y * y);
+				float zoff = toolRadius - sqrt(rangeSq - y * y);
 				z -= zoff;
 			}
 
@@ -127,7 +125,7 @@ float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 
 	return result;
 }
-vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
+vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 {
 	vector<Vector3> path;
 
@@ -145,12 +143,12 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 	{
 		vector<Vector3> subPath;
 
-		float prevZ = minZ;
-		subPath.push_back({ x, -bound.y - yoff, minZ });
+		float prevZ = layerZ;
+		subPath.push_back({ x, -bound.y - yoff, layerZ });
 
 		for (y = -bound.y; y < bound.y + yoff; y += yoff)
 		{
-			float z = max(minZ, GetZ(x, y, false));
+			float z = max(layerZ, GetZ(x, y, false, 8));
 
 			if (prevZ == z)
 				continue;
@@ -167,7 +165,7 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 			prevZ = z;
 		}
 
-		subPath.push_back({ x, y, minZ });
+		subPath.push_back({ x, y, layerZ });
 
 		if (reversed)
 			path.insert(path.end(), subPath.rbegin(), subPath.rend());
@@ -195,8 +193,95 @@ void PathGenerator::GenerateSecondPath()
 
 vector<Vector3> PathGenerator::GenerateFlatLayer()
 {
-	return vector<Vector3>();
+	vector<Vector3> path;
+
+	//f10
+	float xoff = 3;
+	float yoff = 2;
+	float safeY = 8;
+
+	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
+
+	path.push_back(Vector3(-bound.x, -bound.y - safeY, safeZ));
+	path.push_back(Vector3(-bound.x, -bound.y - safeY, minZ));
+
+	bool reversed = false;
+	float x, y;
+	for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	{
+		for (y = -bound.y; y < bound.y + yoff; y += yoff)
+		{
+			float z = GetZ(x, y, true, 5);
+			if (z != minZ)
+				break;
+		}
+		y -= xoff;
+
+		if (reversed)
+		{
+			Vector3 prev = path[path.size() - 1];
+			Vector3 vert(x, y, minZ);
+
+			if (prev.y > vert.y)
+				path.push_back(Vector3(prev.x, y, minZ));
+			else
+				path.push_back(Vector3(x, prev.y, minZ));
+
+			path.push_back(Vector3(x, y, minZ));
+			path.push_back(Vector3(x, -bound.y - safeY, minZ));
+		}
+		else
+		{
+			path.push_back(Vector3(x, -bound.y - safeY, minZ));
+			path.push_back(Vector3(x, y, minZ));
+		}
+
+		reversed = !reversed;
+
+	}
+
+	path.push_back({ x, y, safeZ });
+	path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
+	path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
+
+	reversed = false;
+	for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	{
+		for (y = bound.y; y > -bound.y - yoff; y -= yoff)
+		{
+			float z = GetZ(x, y, true, 5);
+			if (z != minZ)
+				break;
+		}
+		y += xoff;
+
+		if (reversed)
+		{
+			Vector3 prev = path[path.size() - 1];
+			Vector3 vert(x, y, minZ);
+
+			if (prev.y < vert.y)
+				path.push_back(Vector3(prev.x, y, minZ));
+			else
+				path.push_back(Vector3(x, prev.y, minZ));
+
+			path.push_back(Vector3(x, y, minZ));
+			path.push_back(Vector3(x, bound.y + safeY, minZ));
+		}
+		else
+		{
+			path.push_back(Vector3(x, bound.y + safeY, minZ));
+			path.push_back(Vector3(x, y, minZ));
+		}
+
+		reversed = !reversed;
+	}
+
+	path.push_back({ x, y, safeZ });
+
+	return path;
 }
+
 
 vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 {
@@ -213,8 +298,8 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,minZ });
 
 	vector<Vector3> torso[2];
-	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,minZ });
-	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,minZ });
+	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 50,-25,minZ });
+	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 50,25,minZ });
 
 	vector<Vector3> head[4];
 	head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,minZ });
