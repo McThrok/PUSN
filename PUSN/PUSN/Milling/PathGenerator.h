@@ -41,22 +41,22 @@ public:
 
 	void SavePath(vector<Vector3> moves, string filePath);
 
-	void GeneratePaths();
+	void GenerateFirstPath();
+	void GenerateSecondPath();
 	void GenerateHeightMap();
 	float GetZ(float cpx, float cpy, bool flat);
 
 	vector<Vector3> GenerateFirstPathLayer(float minZ);
-
-	vector<Vector3> GenerateFlatEnvelope(float minZ);
-	BezierSurfaceC0 GetPlane(float z);
+	vector<Vector3> GenerateFlatEnvelope();
+	BezierSurfaceC0 GetPlane();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint);
-	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float z);
+	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top);
 	bool SegmentsIntersect(const Vector2& A, const Vector2& B, const Vector2& C, const Vector2& D, Vector2& out);
-	void TrimStart(vector<Vector3>& trimmer, vector<Vector3> & path);
-	void TrimEnd(vector<Vector3> & path, vector<Vector3> & trimmer);
+	void TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path);
+	void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void RemoveSelfIntersections(vector<Vector3>& path);
 
-	vector<Vector3> GenerateFlatLayer(float minZ);
+	vector<Vector3> GenerateFlatLayer();
 
 };
 

@@ -4,9 +4,9 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
 	minZ = 15;
-	GeneratePaths();//qwe
-}
 
+	GenerateSecondPath();
+}
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 {
@@ -45,8 +45,7 @@ void PathGenerator::GenerateHeightMap()
 	for (int i = 0; i < material->gridX; i++)
 		heightMap[i] = vector<float>(material->gridY, minZ);
 
-	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, minZ) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
-
+	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
 
 	vector<BezierSurfaceC0*> surfaces = model.GetSurfaces();
 	for (int k = 0; k < surfaces.size(); k++)
@@ -87,7 +86,7 @@ float PathGenerator::GetZ(float cpx, float cpy, bool flat)
 	int left, right, top, down;
 	material->GetIndicesOfArea(currentPosition, cutRadius, left, right, top, down);
 
-	float result = 0;
+	float result = minZ;
 
 	for (int i = left; i < right + 1; i++)
 	{
@@ -169,60 +168,71 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 	return path;
 }
 
-void PathGenerator::GeneratePaths()
+void PathGenerator::GenerateFirstPath()
 {
-	model.LoadElephant();
+	if (model.model.empty())
+	{
+		model.LoadElephant(minZ);
+		GenerateHeightMap();
+	}
 
-	GenerateHeightMap();
 	vector<Vector3> moves = GenerateFirstPathLayer((material->size.z + minZ) / 2);
-	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ+0.1);
+	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ + 0.1);
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
 	SavePath(moves, "Paths\\elephant\\1.k16");
+}
+void PathGenerator::GenerateSecondPath()
+{
+	if (model.model.empty())
+	{
+		model.LoadElephant(minZ);
+		GenerateHeightMap();
+	}
 
-	//vector<Vector3> moves = GenerateFlatLayer(0);
-	//vector<Vector3> moves2 = GenerateFlatEnvelope(0);
-	//moves.insert(moves.end(), moves2.begin(), moves2.end());
-	//SavePath(moves, "Paths\\elephant\\2.f10");
+	vector<Vector3> moves = GenerateFlatLayer();
+	vector<Vector3> moves2 = GenerateFlatEnvelope();
+	moves.insert(moves.end(), moves2.begin(), moves2.end());
+	SavePath(moves, "Paths\\elephant\\2.f10");
 }
 
-vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)
+vector<Vector3> PathGenerator::GenerateFlatLayer()
 {
 	return vector<Vector3>();
 }
 
-vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
+vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 {
 	vector<Vector3> result;
 
 	vector<Vector3> legBack[3];
-	legBack[0] = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,0 });
-	legBack[1] = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false, 0);
-	legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,0 });
+	legBack[0] = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,minZ });
+	legBack[1] = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false);
+	legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,minZ });
 
 	vector<Vector3> legFront[3];
-	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-61,0 });
-	legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false, 0);
-	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,0 });
+	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-61,minZ });
+	legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false);
+	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,minZ });
 
 	vector<Vector3> torso[2];
-	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,0 });
-	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,0 });
+	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 0,-25,minZ });
+	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 0,25,minZ });
 
 	vector<Vector3> head[4];
-	head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,0 });
-	head[1] = GenerateUnrestrictedCylinderPath(model.GetHead(), false, 0);
-	head[2] = GenerateUnrestrictedPath(model.GetHead(), { 75,0,0 });
-	head[3] = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 0);
+	head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,minZ });
+	head[1] = GenerateUnrestrictedCylinderPath(model.GetHead(), false);
+	head[2] = GenerateUnrestrictedPath(model.GetHead(), { 75,0,minZ });
+	head[3] = GenerateUnrestrictedCylinderPath(model.GetHead(), true);
 
 	vector<Vector3> box[3];
-	box[0] = GenerateUnrestrictedCylinderPath(model.GetBox(), true, 0);
-	box[1] = GenerateUnrestrictedPath(model.GetBox(), { 0,50,0 });
-	box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false, 0);
+	box[0] = GenerateUnrestrictedCylinderPath(model.GetBox(), true);
+	box[1] = GenerateUnrestrictedPath(model.GetBox(), { 0,50,minZ });
+	box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false);
 
 	vector<Vector3> tail[3];
-	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,0 });
-	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false, 0);
-	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,0 });
+	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,minZ });
+	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false);
+	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,minZ });
 
 
 	{
@@ -318,13 +328,13 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope(float minZ)
 
 	return result;
 }
-BezierSurfaceC0 PathGenerator::GetPlane(float z)
+BezierSurfaceC0 PathGenerator::GetPlane()
 {
 	Vector3 s = material->size;
 	BezierSurfaceC0 plane(1, 1);
 	for (int w = 0; w < 4; w++)
 		for (int h = 0; h < 4; h++)
-			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, z);
+			plane.GetVert(w, h) = Vector3(s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2, minZ);
 
 	return plane;
 }
@@ -334,7 +344,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 	float toolRadius = 5.0f;
 	float filterDist = 1.0f;
 	vector<Vector3> result;
-	BezierSurfaceC0 plane = GetPlane(0);
+	BezierSurfaceC0 plane = GetPlane();
 	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, surface }, startingPoint, 0.03);
 
 	if (curve != nullptr) {
@@ -359,7 +369,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 
 	return result;
 }
-vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float z)
+vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top)
 {
 	vector<Vector3> result;
 	if (!surface->isCylinder)
@@ -382,8 +392,8 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0*
 
 			Vector3 vert1 = surface->Evaluate(Vector2(u, v1));
 			Vector3 vert2 = surface->Evaluate(Vector2(u, v2));
-			vert1.z = z;
-			vert2.z = z;
+			vert1.z = minZ;
+			vert2.z = minZ;
 
 			float new_dist = Vector3::Distance(vert1, vert2);
 			if (new_dist > dist) {
@@ -398,10 +408,10 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0*
 	Vector3 vert2 = surface->Evaluate(uv2);
 	Vector3 vert1Deep = surface->Evaluate(Vector2(uBack, uv1.y));
 	Vector3 vert2Deep = surface->Evaluate(Vector2(uBack, uv2.y));
-	vert1.z = 0;
-	vert2.z = 0;
-	vert1Deep.z = 0;
-	vert2Deep.z = 0;
+	vert1.z = minZ;
+	vert2.z = minZ;
+	vert1Deep.z = minZ;
+	vert2Deep.z = minZ;
 
 	Vector3 normal;
 	if (Vector3::Distance(vert2, vert1) > 0.0001f)
@@ -416,8 +426,8 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedCylinderPath(BezierSurfaceC0*
 
 	Vector3 normal1 = surface->EvaluateNormal(uv1);
 	Vector3 normal2 = surface->EvaluateNormal(uv2);
-	normal1.z = z;
-	normal2.z = z;
+	normal1.z = 0;
+	normal2.z = 0;
 	normal1.Normalize();
 	normal2.Normalize();
 

@@ -1,7 +1,7 @@
 #include "Model.h"
 
 
-void Model::LoadElephant()
+void Model::LoadElephant(float minZ)
 {
 	model.clear();
 
@@ -35,8 +35,7 @@ void Model::LoadElephant()
 
 	}
 
-	//XMMATRIX modelTransform = XMMatrixScaling(4.5f, 4.5f, 4.5f) * XMMatrixTranslation(-5, 0, -3);
-	Matrix modelTransform = XMMatrixScaling(4.5f, 4.5f, 9.0f) * XMMatrixTranslation(-5, 0, 0);
+	Matrix modelTransform = XMMatrixScaling(4.5f, 4.5f, 9.0f) * XMMatrixTranslation(-5, 0, minZ);
 
 	for (int k = 0; k < model.size(); k++)
 	{

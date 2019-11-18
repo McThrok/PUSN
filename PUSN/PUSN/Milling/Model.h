@@ -22,7 +22,7 @@ public:
 
 	vector<BezierSurfaceC0*> GetSurfaces();
 
-	void LoadElephant();
+	void LoadElephant(float minZ);
 
 	BezierSurfaceC0* GetTorso();
 	BezierSurfaceC0* GetLegFront();
