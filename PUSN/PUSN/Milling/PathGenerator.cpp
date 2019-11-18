@@ -3,6 +3,7 @@
 PathGenerator::PathGenerator(MillingMaterial* _material)
 {
 	material = _material;
+	minZ = 15;
 	GeneratePaths();//qwe
 }
 
@@ -42,9 +43,9 @@ void PathGenerator::GenerateHeightMap()
 {
 	heightMap.resize(material->gridX);
 	for (int i = 0; i < material->gridX; i++)
-		heightMap[i] = vector<float>(material->gridY, 0);
+		heightMap[i] = vector<float>(material->gridY, minZ);
 
-	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
+	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, minZ) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
 
 
 	vector<BezierSurfaceC0*> surfaces = model.GetSurfaces();
@@ -130,7 +131,7 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float minZ)
 	{
 		vector<Vector3> subPath;
 
-		float prevZ = 0;
+		float prevZ = minZ;
 		subPath.push_back({ x, -bound.y - yoff, minZ });
 
 		for (y = -bound.y; y < bound.y + yoff; y += yoff)
@@ -173,15 +174,15 @@ void PathGenerator::GeneratePaths()
 	model.LoadElephant();
 
 	GenerateHeightMap();
-	//vector<Vector3> moves = GenerateFirstPathLayer(5);
-	//vector<Vector3> moves2 = GenerateFirstPathLayer(0);
-	//moves.insert(moves.end(), moves2.begin(), moves2.end());
-	//SavePath(moves, "Paths\\elephant\\1.k16");
-
-	vector<Vector3> moves = GenerateFlatLayer(0);
-	vector<Vector3> moves2 = GenerateFlatEnvelope(0);
+	vector<Vector3> moves = GenerateFirstPathLayer((material->size.z + minZ) / 2);
+	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ+0.1);
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
-	SavePath(moves, "Paths\\elephant\\2.f10");
+	SavePath(moves, "Paths\\elephant\\1.k16");
+
+	//vector<Vector3> moves = GenerateFlatLayer(0);
+	//vector<Vector3> moves2 = GenerateFlatEnvelope(0);
+	//moves.insert(moves.end(), moves2.begin(), moves2.end());
+	//SavePath(moves, "Paths\\elephant\\2.f10");
 }
 
 vector<Vector3> PathGenerator::GenerateFlatLayer(float minZ)

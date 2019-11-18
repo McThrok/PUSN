@@ -35,7 +35,7 @@ public:
 	Model model;
 	MillingMaterial* material;
 	vector<vector<float>> heightMap;
-	float minZ = 0;
+	float minZ;
 
 	PathGenerator(MillingMaterial* _material);
 
