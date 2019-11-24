@@ -62,13 +62,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> defaultDepthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> defaultRasterizerState;
 
-	VertexShader vertexshader_2d;
+	//VertexShader vertexshader_2d;
 	VertexShader vertexshader;
-	PixelShader pixelshader_2d;
-	PixelShader pixelshader_2d_discard;
+	//PixelShader pixelshader_2d;
+	//PixelShader pixelshader_2d_discard;
 
 	PixelShader pixelshader;
-	PixelShader pixelshader_nolight;
+	//PixelShader pixelshader_nolight;
 	ConstantBuffer<CB_VS_vertexshader_2d> cb_vs_vertexshader_2d;
 	ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
 	ConstantBuffer<CB_PS_color> cb_ps_color;

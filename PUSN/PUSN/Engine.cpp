@@ -406,15 +406,6 @@ bool Engine::InitializeShaders()
 
 	UINT numElements2D = ARRAYSIZE(layout2D);
 
-	if (!vertexshader_2d.Initialize(this->device, L"vertexshader_2d.cso", layout2D, numElements2D))
-		return false;
-
-	if (!pixelshader_2d.Initialize(this->device, L"pixelshader_2d.cso"))
-		return false;
-
-	if (!pixelshader_2d_discard.Initialize(this->device, L"pixelshader_2d_discard.cso"))
-		return false;
-
 	//3d shaders
 	D3D11_INPUT_ELEMENT_DESC layout3D[] =
 	{
@@ -429,9 +420,6 @@ bool Engine::InitializeShaders()
 		return false;
 
 	if (!pixelshader.Initialize(this->device, L"pixelshader.cso"))
-		return false;
-
-	if (!pixelshader_nolight.Initialize(this->device, L"pixelshader_nolight.cso"))
 		return false;
 
 	//-------
