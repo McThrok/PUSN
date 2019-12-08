@@ -32,7 +32,7 @@ class PathGenerator
 {
 public:
 
-	Model model;
+	Model elephant;
 	MillingMaterial* material;
 	vector<vector<float>> heightMap;
 	float minZ;

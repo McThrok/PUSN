@@ -28,6 +28,7 @@ public:
 	bool IsWrappedU() { return false; }
 	bool IsWrappedV() { return WrappedV; }
 
+
 	BezierSurfaceC0(int ph, int pw, bool cylinder = false)
 	{
 		id = count;
@@ -166,6 +167,13 @@ public:
 		return point;
 	}
 
+	Vector2 GetVertParametrization(int w, int h)
+	{
+		int wcount = GetWidthVertexCount();
+		int hcount = GetHeightVertexCount();
+
+		return Vector2(1.0f * h / (hcount - 1), 1.0f * w / (wcount - 1));
+	}
 	Vector3 Evaluate(Vector2 hw)
 	{
 		float h = hw.x;

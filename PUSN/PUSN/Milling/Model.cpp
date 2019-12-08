@@ -3,7 +3,7 @@
 
 void Model::LoadElephant(float minZ)
 {
-	model.clear();
+	model0.surfaces.clear();
 
 	char cCurrentPath[FILENAME_MAX];
 	_getcwd(cCurrentPath, sizeof(cCurrentPath));
@@ -28,18 +28,24 @@ void Model::LoadElephant(float minZ)
 			getline(file, line);
 
 			if (elementName == "surfaceC0")
-				model.push_back(make_shared<BezierSurfaceC0>(BezierSurfaceC0(line)));
+				model0.surfaces.push_back(make_shared<BezierSurfaceC0>(line));
 			else if (elementName == "tubeC0")
-				model.push_back(make_shared<BezierSurfaceC0>(BezierSurfaceC0(line, true)));
+				model0.surfaces.push_back(make_shared<BezierSurfaceC0>(line, true));
 		}
-
 	}
 
+	Rescale(minZ);
+	AdjustEar();
+	AddRescaledModelVersion();
+}
+
+void Model::Rescale(float minZ)
+{
 	Matrix modelTransform = XMMatrixScaling(4.5f, 4.5f, 9.0f) * XMMatrixTranslation(-5, 0, minZ);
 
-	for (int k = 0; k < model.size(); k++)
+	for (int k = 0; k < model0.surfaces.size(); k++)
 	{
-		BezierSurfaceC0* surf = model[k].get();
+		BezierSurfaceC0* surf = model0.surfaces[k].get();
 		for (int i = 0; i < surf->GetWidthVertexCount(); i++)
 		{
 			for (int j = 0; j < surf->GetHeightVertexCount(); j++)
@@ -48,39 +54,85 @@ void Model::LoadElephant(float minZ)
 			}
 		}
 	}
-
 }
-vector<BezierSurfaceC0*> Model::GetSurfaces()
+void Model::AdjustEar()
+{
+}
+void Model::AddRescaledModelVersion()
+{
+	model8 = ModelVersion(model0);
+	ChangeSizeAlongNormals(model8, 8);
+
+	model10 = ModelVersion(model0);
+	ChangeSizeAlongNormals(model10, 10);
+
+	model12 = ModelVersion(model0);
+	ChangeSizeAlongNormals(model12, 12);
+
+	model16 = ModelVersion(model0);
+	ChangeSizeAlongNormals(model16, 16);
+}
+
+void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
+{
+	auto surfaces = model.GetSurfaces();
+
+	for (int i = 0; i < surfaces.size(); i++)
+	{
+		BezierSurfaceC0& bs = *surfaces[i];
+		int wc = bs.GetWidthVertexCount();
+		int hc = bs.GetHeightVertexCount();
+		vector<Vector3> tmp(wc * hc);
+
+		for (int w = 0; w < wc; w++)
+			for (int h = 0; h < hc; h++)
+			{
+				Vector3 vert = bs.GetVert(w, h);
+				Vector3 change = bs.EvaluateNormal(bs.GetVertParametrization(w, h));
+				tmp[w * hc + h] = bs.GetVert(w, h) + length * bs.EvaluateNormal(bs.GetVertParametrization(w, h));
+			}
+
+		for (int w = 0; w < wc; w++)
+			for (int h = 0; h < hc; h++)
+				bs.GetVert(w, h) = tmp[w * hc + h];
+
+	/*	if (bs.isCylinder)
+		{
+			for (int h = 0; h < hc; h++)
+			{
+				Vector3 avg = (bs.GetVert(0, h) + bs.GetVert(bs.GetWidthVertexCount() - 1, h)) / 2;
+				bs.GetVert(0, h) = avg;
+				bs.GetVert(bs.GetWidthVertexCount() - 1, h) = avg;
+			}
+
+		}*/
+	}
+}
+
+vector<BezierSurfaceC0*> ModelVersion::GetSurfaces()
 {
 	vector<BezierSurfaceC0*> result(8);
 
-	for (int i = 0; i < model.size(); i++)
-		result[i] = model[i].get();
+	for (int i = 0; i < surfaces.size(); i++)
+		result[i] = surfaces[i].get();
 
 	return result;
 }
 
-BezierSurfaceC0* Model::GetTorso() {
-	return model[0].get();
+ModelVersion::ModelVersion(const ModelVersion& mv)
+{
+	for (int i = 0; i < mv.surfaces.size(); i++)
+	{
+		BezierSurfaceC0 bs = *mv.surfaces[i].get();
+		surfaces.push_back(make_shared<BezierSurfaceC0>(bs));
+	}
 }
-BezierSurfaceC0* Model::GetLegFront() {
-	return model[2].get();
-}
-BezierSurfaceC0* Model::GetLegBack() {
-	return model[3].get();
-}
-BezierSurfaceC0* Model::GetTail() {
-	return model[1].get();
-}
-BezierSurfaceC0* Model::GetHead() {
-	return model[4].get();
-}
-BezierSurfaceC0* Model::GetRightEar() {
-	return model[5].get();
-}
-BezierSurfaceC0* Model::GetLeftEar() {
-	return model[6].get();
-}
-BezierSurfaceC0* Model::GetBox() {
-	return model[7].get();
-}
+
+BezierSurfaceC0* ModelVersion::GetTorso() { return surfaces[0].get(); }
+BezierSurfaceC0* ModelVersion::GetLegFront() { return surfaces[2].get(); }
+BezierSurfaceC0* ModelVersion::GetLegBack() { return surfaces[3].get(); }
+BezierSurfaceC0* ModelVersion::GetTail() { return surfaces[1].get(); }
+BezierSurfaceC0* ModelVersion::GetHead() { return surfaces[4].get(); }
+BezierSurfaceC0* ModelVersion::GetRightEar() { return surfaces[5].get(); }
+BezierSurfaceC0* ModelVersion::GetLeftEar() { return surfaces[6].get(); }
+BezierSurfaceC0* ModelVersion::GetBox() { return surfaces[7].get(); }

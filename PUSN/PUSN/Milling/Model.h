@@ -15,14 +15,12 @@
 #include "Bezier/IntersectionCurve.h"
 #include "../StringHelper.h"
 
-class Model
+class ModelVersion
 {
 public:
-	vector<shared_ptr<BezierSurfaceC0>> model;
+	vector<shared_ptr<BezierSurfaceC0>> surfaces;
 
 	vector<BezierSurfaceC0*> GetSurfaces();
-
-	void LoadElephant(float minZ);
 
 	BezierSurfaceC0* GetTorso();
 	BezierSurfaceC0* GetLegFront();
@@ -33,5 +31,24 @@ public:
 	BezierSurfaceC0* GetLeftEar();
 	BezierSurfaceC0* GetBox();
 
+	ModelVersion() {}
+	ModelVersion(const ModelVersion& mv);
+};
+
+class Model
+{
+public:
+	ModelVersion model0;
+	ModelVersion model8;
+	ModelVersion model10;
+	ModelVersion model12;
+	ModelVersion model16;
+
+
+	void LoadElephant(float minZ);
+	void Rescale(float minZ);
+	void AdjustEar();
+	void AddRescaledModelVersion();
+	void ChangeSizeAlongNormals(ModelVersion& model, float length);
 };
 

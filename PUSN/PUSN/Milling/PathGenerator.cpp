@@ -41,8 +41,8 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 }
 
 void PathGenerator::EnsureInit() {
-	if (model.model.empty())
-		model.LoadElephant(minZ);
+	if (elephant.model0.surfaces.empty())
+		elephant.LoadElephant(minZ);
 
 	GenerateHeightMap();
 }
@@ -54,7 +54,7 @@ void PathGenerator::GenerateHeightMap()
 
 	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
 
-	vector<BezierSurfaceC0*> surfaces = model.GetSurfaces();
+	vector<BezierSurfaceC0*> surfaces = elephant.model0.GetSurfaces();
 	for (int k = 0; k < surfaces.size(); k++)
 	{
 		BezierSurfaceC0* surf = surfaces[k];
@@ -286,139 +286,140 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 {
 	vector<Vector3> result;
+	ModelVersion& model = this->elephant.model0;
 
-	vector<Vector3> legBack[3];
-	legBack[0] = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,minZ });
-	legBack[1] = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false);
-	legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,minZ });
+	//vector<Vector3> legBack[3];
+	//legBack[0] = GenerateUnrestrictedPath(model.GetLegBack(), { -75,0,minZ });
+	//legBack[1] = GenerateUnrestrictedCylinderPath(model.GetLegBack(), false);
+	//legBack[2] = GenerateUnrestrictedPath(model.GetLegBack(), { -20,-60,minZ });
 
-	vector<Vector3> legFront[3];
-	legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-61,minZ });
-	legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false);
-	legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,minZ });
+	//vector<Vector3> legFront[3];
+	//legFront[0] = GenerateUnrestrictedPath(model.GetLegFront(), { -20,-61,minZ });
+	//legFront[1] = GenerateUnrestrictedCylinderPath(model.GetLegFront(), false);
+	//legFront[2] = GenerateUnrestrictedPath(model.GetLegFront(), { 30,-60,minZ });
 
-	vector<Vector3> torso[2];
-	torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 50,-25,minZ });
-	torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 50,25,minZ });
+	//vector<Vector3> torso[2];
+	//torso[0] = GenerateUnrestrictedPath(model.GetTorso(), { 50,-25,minZ });
+	//torso[1] = GenerateUnrestrictedPath(model.GetTorso(), { 50,25,minZ });
 
-	vector<Vector3> head[4];
-	head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,minZ });
-	head[1] = GenerateUnrestrictedCylinderPath(model.GetHead(), false);
-	head[2] = GenerateUnrestrictedPath(model.GetHead(), { 75,0,minZ });
-	head[3] = GenerateUnrestrictedCylinderPath(model.GetHead(), true);
+	//vector<Vector3> head[4];
+	//head[0] = GenerateUnrestrictedPath(model.GetHead(), { 0,0,minZ });
+	//head[1] = GenerateUnrestrictedCylinderPath(model.GetHead(), false);
+	//head[2] = GenerateUnrestrictedPath(model.GetHead(), { 75,0,minZ });
+	//head[3] = GenerateUnrestrictedCylinderPath(model.GetHead(), true);
 
-	vector<Vector3> box[3];
-	box[0] = GenerateUnrestrictedCylinderPath(model.GetBox(), true);
-	box[1] = GenerateUnrestrictedPath(model.GetBox(), { 0,50,minZ });
-	box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false);
+	//vector<Vector3> box[3];
+	//box[0] = GenerateUnrestrictedCylinderPath(model.GetBox(), true);
+	//box[1] = GenerateUnrestrictedPath(model.GetBox(), { 0,50,minZ });
+	//box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false);
 
-	vector<Vector3> tail[3];
-	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,minZ });
-	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false);
-	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,minZ });
+	//vector<Vector3> tail[3];
+	//tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,minZ });
+	//tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false);
+	//tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,minZ });
 
 
-	{
-		auto tail_tmp = tail[0];
-		TrimStart(torso[1], tail_tmp);
-		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+	//{
+	//	auto tail_tmp = tail[0];
+	//	TrimStart(torso[1], tail_tmp);
+	//	result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
 
-		result.insert(result.end(), tail[1].begin(), tail[1].end());
+	//	result.insert(result.end(), tail[1].begin(), tail[1].end());
 
-		tail_tmp = tail[2];
-		TrimEnd(tail_tmp, torso[0]);
-		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
-	}
+	//	tail_tmp = tail[2];
+	//	TrimEnd(tail_tmp, torso[0]);
+	//	result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
+	//}
 
-	{
-		auto torso_tmp = torso[0];
-		TrimStart(tail[2], torso_tmp);
-		TrimEnd(torso_tmp, legBack[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	//{
+	//	auto torso_tmp = torso[0];
+	//	TrimStart(tail[2], torso_tmp);
+	//	TrimEnd(torso_tmp, legBack[0]);
+	//	result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	//}
 
-	{
-		auto legBack_tmp = legBack[0];
-		TrimStart(torso[0], legBack_tmp);
-		result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
+	//{
+	//	auto legBack_tmp = legBack[0];
+	//	TrimStart(torso[0], legBack_tmp);
+	//	result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
 
-		result.insert(result.end(), legBack[1].begin(), legBack[1].end());
+	//	result.insert(result.end(), legBack[1].begin(), legBack[1].end());
 
-		legBack_tmp = legBack[2];
-		TrimEnd(legBack_tmp, torso[0]);
-		result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
-	}
+	//	legBack_tmp = legBack[2];
+	//	TrimEnd(legBack_tmp, torso[0]);
+	//	result.insert(result.end(), legBack_tmp.begin(), legBack_tmp.end());
+	//}
 
-	{
-		auto torso_tmp = torso[0];
-		TrimStart(legBack[2], torso_tmp);
-		TrimEnd(torso_tmp, legFront[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	//{
+	//	auto torso_tmp = torso[0];
+	//	TrimStart(legBack[2], torso_tmp);
+	//	TrimEnd(torso_tmp, legFront[0]);
+	//	result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	//}
 
-	{
-		auto legFront_tmp = legFront[0];
-		TrimStart(torso[0], legFront_tmp);
-		result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
+	//{
+	//	auto legFront_tmp = legFront[0];
+	//	TrimStart(torso[0], legFront_tmp);
+	//	result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
 
-		result.insert(result.end(), legFront[1].begin(), legFront[1].end());
+	//	result.insert(result.end(), legFront[1].begin(), legFront[1].end());
 
-		legFront_tmp = legFront[2];
-		TrimEnd(legFront_tmp, torso[0]);
-		result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
-	}
+	//	legFront_tmp = legFront[2];
+	//	TrimEnd(legFront_tmp, torso[0]);
+	//	result.insert(result.end(), legFront_tmp.begin(), legFront_tmp.end());
+	//}
 
-	{
-		auto torso_tmp = torso[0];
-		TrimStart(legFront[2], torso_tmp);
-		TrimEnd(torso_tmp, head[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	//{
+	//	auto torso_tmp = torso[0];
+	//	TrimStart(legFront[2], torso_tmp);
+	//	TrimEnd(torso_tmp, head[0]);
+	//	result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	//}
 
-	{
-		auto head_tmp = head[0];
-		TrimStart(torso[0], head_tmp);
-		result.insert(result.end(), head_tmp.begin(), head_tmp.end());
+	//{
+	//	auto head_tmp = head[0];
+	//	TrimStart(torso[0], head_tmp);
+	//	result.insert(result.end(), head_tmp.begin(), head_tmp.end());
 
-		result.insert(result.end(), head[1].begin(), head[1].end());
-		result.insert(result.end(), head[2].begin(), head[2].end());
+	//	result.insert(result.end(), head[1].begin(), head[1].end());
+	//	result.insert(result.end(), head[2].begin(), head[2].end());
 
-		head_tmp = head[3];
-		TrimStart(torso[1], head_tmp);
-		result.insert(result.end(), head_tmp.rbegin(), head_tmp.rend());
-	}
+	//	head_tmp = head[3];
+	//	TrimStart(torso[1], head_tmp);
+	//	result.insert(result.end(), head_tmp.rbegin(), head_tmp.rend());
+	//}
 
-	////---
+	//////---
 
-	{
-		auto box_tmp = box[0];
-		TrimStart(torso[1], box_tmp);
-		result.insert(result.end(), box_tmp.begin(), box_tmp.end());
+	//{
+	//	auto box_tmp = box[0];
+	//	TrimStart(torso[1], box_tmp);
+	//	result.insert(result.end(), box_tmp.begin(), box_tmp.end());
 
-		result.insert(result.end(), box[1].begin(), box[1].end());
+	//	result.insert(result.end(), box[1].begin(), box[1].end());
 
-		box_tmp = box[2];
-		TrimStart(torso[1], box_tmp);
-		result.insert(result.end(), box_tmp.rbegin(), box_tmp.rend());
-	}
+	//	box_tmp = box[2];
+	//	TrimStart(torso[1], box_tmp);
+	//	result.insert(result.end(), box_tmp.rbegin(), box_tmp.rend());
+	//}
 
-	{
-		auto torso_tmp = torso[1];
-		TrimStart(box[2], torso_tmp);
-		TrimEnd(torso_tmp, tail[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	//{
+	//	auto torso_tmp = torso[1];
+	//	TrimStart(box[2], torso_tmp);
+	//	TrimEnd(torso_tmp, tail[0]);
+	//	result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
+	//}
 
-	Vector3 start1 = result[0];
-	start1.y = material->size.y / 2 + 20;
+	//Vector3 start1 = result[0];
+	//start1.y = material->size.y / 2 + 20;
 
-	Vector3 start2 = start1;
-	start2.z = safeZ;
+	//Vector3 start2 = start1;
+	//start2.z = safeZ;
 
-	result.insert(result.begin(), start1);
-	result.insert(result.begin(), start2);
-	result.push_back(start1);
-	result.push_back(start2);
+	//result.insert(result.begin(), start1);
+	//result.insert(result.begin(), start2);
+	//result.push_back(start1);
+	//result.push_back(start2);
 
 	return result;
 }
