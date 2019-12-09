@@ -34,8 +34,8 @@ void Model::LoadElephant(float minZ)
 		}
 	}
 
-	Rescale(minZ);
 	AdjustEar();
+	Rescale(minZ);
 	AddRescaledModelVersion();
 }
 
@@ -57,6 +57,21 @@ void Model::Rescale(float minZ)
 }
 void Model::AdjustEar()
 {
+	Matrix modelTransform = XMMatrixScaling(1.0f, 1.0f, 0.5f) * XMMatrixTranslation(0, 0, 1);
+
+	BezierSurfaceC0* surfaces[2] = { model0.GetLeftEar(),model0.GetRightEar() };
+	for (int k = 0; k < 2; k++)
+	{
+		BezierSurfaceC0* surf = surfaces[k];
+		for (int i = 0; i < surf->GetWidthVertexCount(); i++)
+		{
+			for (int j = 0; j < surf->GetHeightVertexCount(); j++)
+			{
+				XMStoreFloat3(&surf->GetVert(i, j), XMVector3TransformCoord(XMLoadFloat3(&surf->GetVert(i, j)), modelTransform));
+			}
+		}
+	}
+
 }
 void Model::AddRescaledModelVersion()
 {

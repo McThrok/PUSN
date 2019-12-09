@@ -44,6 +44,7 @@ public:
 
 	void GenerateFirstPath();
 	void GenerateSecondPath();
+	void GenerateThirdPath();
 	void GenerateHeightMap();
 	float GetZ(float cpx, float cpy, bool flat, float toolRadius);
 
@@ -57,8 +58,11 @@ public:
 	void TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path);
 	void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void RemoveSelfIntersections(vector<Vector3>& path);
-
 	vector<Vector3> GenerateFlatLayer();
+
+	vector<Vector3> GenerateSurfaceIntersectionPaths();
+	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
+	vector<Vector3> GenerateSurfacePaths();
 
 };
 

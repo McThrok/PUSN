@@ -190,7 +190,8 @@ void Engine::RenderGui() {
 
 	const int buffSize = 256;
 	//static char buf[buffSize] = "t1.k16";
-	static char buf[buffSize] = "elephant\\2.f10";
+	//static char buf[buffSize] = "elephant\\2.f10";
+	static char buf[buffSize] = "elephant\\3.k08";
 	ImGui::InputText("path", buf, buffSize);
 	if (ImGui::Button("Load configuration")) {
 		millingMachine->LoadDataFromFile(path +string(buf));
