@@ -80,7 +80,7 @@ public:
 						Vector3 ev1 = objs[0]->Evaluate(Vector2(ii, jj));
 						Vector3 ev2 = objs[1]->Evaluate(Vector2(kk, mm));
 
-						qwe.push_back(ev2);
+						//qwe.push_back(ev1);
 						float dist = Vector3::Distance(ev1, cursorPos) + Vector3::Distance(ev2, cursorPos);
 						if (dist < maxDist && (!oneObject || (eps < abs(ii - kk) && eps < abs(jj - mm))))
 						{
@@ -100,7 +100,7 @@ public:
 		Vector3 p1 = obj1->Evaluate(value1);
 
 		int i = 0;
-		float currAlpha = _startGradientAlpha;
+		float currAlpha = _startGradientAlpha/10;
 		float dist = Vector3::Distance(p1, p0);
 
 		vector<Vector3> q0;//qwe
@@ -112,8 +112,8 @@ public:
 		{
 			if (++i > 10000) {
 				q1.push_back({ 75,75,75 });
-				//q0.insert(q0.end(), q1.begin(), q1.end());
-				return new IntersectionCurve(q1, {}, {});
+					//q0.insert(q0.end(), q1.begin(), q1.end());
+				//return new IntersectionCurve(q1, {}, {});
 				return nullptr;
 
 			}
@@ -142,10 +142,14 @@ public:
 				}
 				else
 				{
-					currAlpha *= 2;
+					currAlpha *= 2.0f;
+					//currAlpha *= 1.5f;
 					dist = newDist;
 					p0 = pNew0;
 					p1 = pNew1;
+
+					//new
+					//currAlpha = min(currAlpha, 0.1f);
 				}
 			}
 			catch (...)

@@ -63,6 +63,7 @@ public:
 	vector<Vector3> GenerateSurfaceIntersectionPaths();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
 	vector<Vector3> GenerateSurfacePaths();
+	void AddSafe(vector<Vector3>& path);
 
 };
 

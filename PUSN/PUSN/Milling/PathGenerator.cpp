@@ -636,11 +636,45 @@ void PathGenerator::GenerateThirdPath()
 }
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 {
-	vector<Vector3> result;
-	ModelVersion& model = elephant.model0;
+	vector<Vector3> result, tmp, tmp2;
+	ModelVersion& model = elephant.model8;
 
-	vector<Vector3> leg = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-40, -40, minZ));
-	result.insert(result.end(), leg.begin(), leg.end());
+	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-10, 20, minZ + 10));
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, 10, minZ));
+	tmp.erase(tmp.end() - 2, tmp.end());
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+
+	tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, 20, minZ + 10));
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+	
+	tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(60, -20, minZ));
+	tmp.erase(tmp.end() - 137, tmp.end());
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.rbegin(), tmp.rend());
+
+	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ+10));
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.begin(), tmp.end());
+
+	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
+
+	tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(50, 20, minZ + 10));
+	tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
+
+	tmp2 = GenerateUnrestrictedPath(model.GetTorso(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
+	tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
+
+	AddSafe(tmp);
+	result.insert(result.end(), tmp.begin(), tmp.end());
 
 	return result;
 }
@@ -652,19 +686,37 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ surface1, surface2 }, startingPoint, 0.0001);
 
 	if (curve != nullptr) {
-		for (int i = 0; i < curve->_uv1.size(); i++)
+		for (int i = 0; i < curve->Verts.size(); i++)
 		{
-			Vector3 position = surface1->Evaluate(curve->_uv1[i]);
+			Vector3 position = curve->Verts[i];
 
-			if (i == 0 || i == (int)(curve->_uv1.size()) - 1
-				|| Vector3::Distance(result[result.size() - 1], position) > filterDist)
-				result.push_back(position);
+			bool add = false;
+			if (position.z > minZ)
+			{
+				add = true;
+			}
+			else if (i > 0 && curve->Verts[i - 1].z > minZ || i<curve->Verts.size() - 1 && curve->Verts[i + 1].z > minZ)
+			{
+				position.z = minZ;
+				add = true;
+			}
+
+			if (add)
+				if (result.size() == 0 || Vector3::Distance(result[result.size() - 1], position) > filterDist)
+					result.push_back(position);
 		}
-
 		delete curve;
 	}
 
 	return result;
+}
+void PathGenerator::AddSafe(vector<Vector3>& path)
+{
+	path.insert(path.begin(), path[0]);
+	path[0].z = safeZ;
+	path.push_back(*path.rbegin());
+	path.rbegin()->z = safeZ;
+
 }
 vector<Vector3> PathGenerator::GenerateSurfacePaths()
 {
