@@ -657,7 +657,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	result.insert(result.end(), tmp.rbegin(), tmp.rend());
 	
 	tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(60, -20, minZ));
-	tmp.erase(tmp.end() - 137, tmp.end());
+	tmp.erase(tmp.end() - 127, tmp.end());
 	AddSafe(tmp);
 	result.insert(result.end(), tmp.rbegin(), tmp.rend());
 
@@ -689,6 +689,7 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 		for (int i = 0; i < curve->Verts.size(); i++)
 		{
 			Vector3 position = curve->Verts[i];
+			position.z -= toolRadius;
 
 			bool add = false;
 			if (position.z > minZ)
