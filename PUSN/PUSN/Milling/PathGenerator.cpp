@@ -6,7 +6,8 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 	minZ = 15;
 	safeZ = material->size.z + 20;
 
-	GenerateThirdPath();
+	//GenerateThirdPath();
+	GenerateSecondPath();
 }
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
@@ -54,8 +55,8 @@ void PathGenerator::GenerateHeightMap()
 
 	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
 
-	//vector<BezierSurfaceC0*> surfaces = elephant.model0.GetSurfaces();
-	vector<BezierSurfaceC0*> surfaces = elephant.model8.GetSurfaces();
+	vector<BezierSurfaceC0*> surfaces = elephant.model0.GetSurfaces();
+	//vector<BezierSurfaceC0*> surfaces = elephant.model8.GetSurfaces();
 	for (int k = 0; k < surfaces.size(); k++)
 	{
 		BezierSurfaceC0* surf = surfaces[k];
@@ -310,20 +311,20 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 	box[2] = GenerateUnrestrictedCylinderPath(model.GetBox(), false);
 
 	vector<Vector3> tail[3];
-	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { 0,-25,minZ });
+	tail[0] = GenerateUnrestrictedPath(model.GetTail(), { -50,-25,minZ });
 	tail[1] = GenerateUnrestrictedCylinderPath(model.GetTail(), false);
-	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { 0,25,minZ });
+	tail[2] = GenerateUnrestrictedPath(model.GetTail(), { -50,25,minZ });
 
 
 	{
-		auto tail_tmp = tail[0];
+		auto tail_tmp = tail[2];
 		TrimStart(torso[1], tail_tmp);
 		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
 
 		result.insert(result.end(), tail[1].begin(), tail[1].end());
 
-		tail_tmp = tail[2];
-		TrimEnd(tail_tmp, torso[0]);
+		 tail_tmp = tail[0];
+		TrimEnd(tail_tmp, torso[1]);
 		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
 	}
 
@@ -399,12 +400,12 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 		result.insert(result.end(), box_tmp.rbegin(), box_tmp.rend());
 	}
 
-	{
+	/*{
 		auto torso_tmp = torso[1];
 		TrimStart(box[2], torso_tmp);
 		TrimEnd(torso_tmp, tail[0]);
 		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}
+	}*/
 
 	Vector3 start1 = result[0];
 	start1.y = material->size.y / 2 + 20;
@@ -639,7 +640,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	vector<Vector3> result, tmp, tmp2;
 	ModelVersion& model = elephant.model8;
 
-	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
+	/*tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
 	AddSafe(tmp);
 	result.insert(result.end(), tmp.begin(), tmp.end());
 
@@ -674,7 +675,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
 
 	AddSafe(tmp);
-	result.insert(result.end(), tmp.begin(), tmp.end());
+	result.insert(result.end(), tmp.begin(), tmp.end());*/
 
 	return result;
 }
