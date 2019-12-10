@@ -244,12 +244,16 @@ void Engine::RenderGui() {
 	}
 
 
-	if (ImGui::Button("GenerateFirstPath")) {
+	if (ImGui::Button("Generate First Path")) {
 		pathGenerator->GenerateFirstPath();
 	}
 
-	if (ImGui::Button("GenerateSecondPath")) {
+	if (ImGui::Button("Generate Second Path")) {
 		pathGenerator->GenerateSecondPath();
+	}
+
+	if (ImGui::Button("Generate Third Path")) {
+		pathGenerator->GenerateThirdPath();
 	}
 
 	ImGui::Separator();

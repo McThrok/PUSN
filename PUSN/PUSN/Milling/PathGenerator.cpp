@@ -637,10 +637,10 @@ void PathGenerator::GenerateThirdPath()
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 {
 	vector<Vector3> result;
-	ModelVersion& model = elephant.model8;
+	ModelVersion& model = elephant.model0;
 
-	vector<Vector3> tail = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-75, -0, minZ));
-	result.insert(result.end(), tail.rbegin(), tail.rend());
+	vector<Vector3> leg = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-40, -40, minZ));
+	result.insert(result.end(), leg.begin(), leg.end());
 
 	return result;
 }

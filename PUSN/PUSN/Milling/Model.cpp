@@ -111,7 +111,8 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 			for (int h = 0; h < hc; h++)
 				bs.GetVert(w, h) = tmp[w * hc + h];
 
-	/*	if (bs.isCylinder)
+
+		if (bs.isCylinder)
 		{
 			for (int h = 0; h < hc; h++)
 			{
@@ -119,8 +120,35 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 				bs.GetVert(0, h) = avg;
 				bs.GetVert(bs.GetWidthVertexCount() - 1, h) = avg;
 			}
+		}
+	}
 
-		}*/
+	BezierSurfaceC0* ears[2] = { model.GetLeftEar(),model.GetRightEar() };
+	for (int k = 0; k < 2; k++)
+	{
+		BezierSurfaceC0* surf = ears[k];
+		int wc = surf->GetWidthVertexCount();
+		int hc = surf->GetHeightVertexCount();
+
+
+		for (int i = 0; i <= wc / 2; i++)
+		{
+			{
+				Vector3& v1 = surf->GetVert(i, 0);
+				Vector3& v2 = surf->GetVert(wc - 1 - i, 0);
+				Vector3 avg = (v1 + v2) / 2;
+				v1 = avg;
+				v2 = avg;
+			}
+
+			{
+				Vector3& v1 = surf->GetVert(i, hc - 1);
+				Vector3& v2 = surf->GetVert(wc - 1 - i, hc - 1);
+				Vector3 avg = (v1 + v2) / 2;
+				v1 = avg;
+				v2 = avg;
+			}
+		}
 	}
 }
 
