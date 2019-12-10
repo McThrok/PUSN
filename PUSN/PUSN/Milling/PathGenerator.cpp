@@ -194,89 +194,89 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 {
 	vector<Vector3> path;
 
-	//f10
-	float xoff = 3;
-	float yoff = 2;
-	float safeY = 8;
+	////f10
+	//float xoff = 3;
+	//float yoff = 2;
+	//float safeY = 8;
 
-	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
+	//Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
-	path.push_back(Vector3(-bound.x, -bound.y - safeY, safeZ));
-	path.push_back(Vector3(-bound.x, -bound.y - safeY, minZ));
+	//path.push_back(Vector3(-bound.x, -bound.y - safeY, safeZ));
+	//path.push_back(Vector3(-bound.x, -bound.y - safeY, minZ));
 
-	bool reversed = false;
-	float x, y;
-	for (x = -bound.x; x < bound.x + xoff; x += xoff)
-	{
-		for (y = -bound.y; y < bound.y + yoff; y += yoff)
-		{
-			float z = GetZ(x, y, true, 5);
-			if (z != minZ)
-				break;
-		}
-		y -= xoff;
+	//bool reversed = false;
+	//float x, y;
+	//for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	//{
+	//	for (y = -bound.y; y < bound.y + yoff; y += yoff)
+	//	{
+	//		float z = GetZ(x, y, true, 5);
+	//		if (z != minZ)
+	//			break;
+	//	}
+	//	y -= xoff;
 
-		if (reversed)
-		{
-			Vector3 prev = path[path.size() - 1];
-			Vector3 vert(x, y, minZ);
+	//	if (reversed)
+	//	{
+	//		Vector3 prev = path[path.size() - 1];
+	//		Vector3 vert(x, y, minZ);
 
-			if (prev.y > vert.y)
-				path.push_back(Vector3(prev.x, y, minZ));
-			else
-				path.push_back(Vector3(x, prev.y, minZ));
+	//		if (prev.y > vert.y)
+	//			path.push_back(Vector3(prev.x, y, minZ));
+	//		else
+	//			path.push_back(Vector3(x, prev.y, minZ));
 
-			path.push_back(Vector3(x, y, minZ));
-			path.push_back(Vector3(x, -bound.y - safeY, minZ));
-		}
-		else
-		{
-			path.push_back(Vector3(x, -bound.y - safeY, minZ));
-			path.push_back(Vector3(x, y, minZ));
-		}
+	//		path.push_back(Vector3(x, y, minZ));
+	//		path.push_back(Vector3(x, -bound.y - safeY, minZ));
+	//	}
+	//	else
+	//	{
+	//		path.push_back(Vector3(x, -bound.y - safeY, minZ));
+	//		path.push_back(Vector3(x, y, minZ));
+	//	}
 
-		reversed = !reversed;
+	//	reversed = !reversed;
 
-	}
+	//}
 
-	path.push_back({ x, y, safeZ });
-	path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
-	path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
+	//path.push_back({ x, y, safeZ });
+	//path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
+	//path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
 
-	reversed = false;
-	for (x = -bound.x; x < bound.x + xoff; x += xoff)
-	{
-		for (y = bound.y; y > -bound.y - yoff; y -= yoff)
-		{
-			float z = GetZ(x, y, true, 5);
-			if (z != minZ)
-				break;
-		}
-		y += xoff;
+	//reversed = false;
+	//for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	//{
+	//	for (y = bound.y; y > -bound.y - yoff; y -= yoff)
+	//	{
+	//		float z = GetZ(x, y, true, 5);
+	//		if (z != minZ)
+	//			break;
+	//	}
+	//	y += xoff;
 
-		if (reversed)
-		{
-			Vector3 prev = path[path.size() - 1];
-			Vector3 vert(x, y, minZ);
+	//	if (reversed)
+	//	{
+	//		Vector3 prev = path[path.size() - 1];
+	//		Vector3 vert(x, y, minZ);
 
-			if (prev.y < vert.y)
-				path.push_back(Vector3(prev.x, y, minZ));
-			else
-				path.push_back(Vector3(x, prev.y, minZ));
+	//		if (prev.y < vert.y)
+	//			path.push_back(Vector3(prev.x, y, minZ));
+	//		else
+	//			path.push_back(Vector3(x, prev.y, minZ));
 
-			path.push_back(Vector3(x, y, minZ));
-			path.push_back(Vector3(x, bound.y + safeY, minZ));
-		}
-		else
-		{
-			path.push_back(Vector3(x, bound.y + safeY, minZ));
-			path.push_back(Vector3(x, y, minZ));
-		}
+	//		path.push_back(Vector3(x, y, minZ));
+	//		path.push_back(Vector3(x, bound.y + safeY, minZ));
+	//	}
+	//	else
+	//	{
+	//		path.push_back(Vector3(x, bound.y + safeY, minZ));
+	//		path.push_back(Vector3(x, y, minZ));
+	//	}
 
-		reversed = !reversed;
-	}
+	//	reversed = !reversed;
+	//}
 
-	path.push_back({ x, y, safeZ });
+	//path.push_back({ x, y, safeZ });
 
 	return path;
 }
@@ -368,8 +368,8 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 
 	{
 		auto torso_tmp = torso[0];
-		TrimStart(legFront[2], torso_tmp);
 		TrimEnd(torso_tmp, head[0]);
+		TrimStart(legFront[2], torso_tmp);
 		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
 	}
 
@@ -386,7 +386,7 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 		result.insert(result.end(), head_tmp.rbegin(), head_tmp.rend());
 	}
 
-	////---
+	//---
 
 	{
 		auto box_tmp = box[0];
@@ -399,13 +399,6 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 		TrimStart(torso[1], box_tmp);
 		result.insert(result.end(), box_tmp.rbegin(), box_tmp.rend());
 	}
-
-	/*{
-		auto torso_tmp = torso[1];
-		TrimStart(box[2], torso_tmp);
-		TrimEnd(torso_tmp, tail[0]);
-		result.insert(result.end(), torso_tmp.begin(), torso_tmp.end());
-	}*/
 
 	Vector3 start1 = result[0];
 	start1.y = material->size.y / 2 + 20;
