@@ -64,6 +64,15 @@ public:
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
 	vector<Vector3> GenerateSurfacePaths();
 	void AddSafe(vector<Vector3>& path);
+	void AddSafe(vector<Vector3>& path, float safeH);
+	void AddSafeStart(vector<Vector3>& path);
+	void AddSafeStart(vector<Vector3>& path, float safeH);
+	void AddSafeEnd(vector<Vector3>& path);
+	void AddSafeEnd(vector<Vector3>& path, float safeH);
+	vector<vector<Vector3>> AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero);
+
+	void TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path);
+	void TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer);
 
 };
 

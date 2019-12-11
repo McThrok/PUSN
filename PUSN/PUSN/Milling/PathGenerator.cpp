@@ -6,8 +6,7 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 	minZ = 15;
 	safeZ = material->size.z + 20;
 
-	//GenerateThirdPath();
-	GenerateSecondPath();
+	GenerateThirdPath();
 }
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
@@ -194,89 +193,89 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 {
 	vector<Vector3> path;
 
-	////f10
-	//float xoff = 3;
-	//float yoff = 2;
-	//float safeY = 8;
+	//f10
+	float xoff = 3;
+	float yoff = 2;
+	float safeY = 8;
 
-	//Vector2 bound = { material->size.x / 2, material->size.y / 2 };
+	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
-	//path.push_back(Vector3(-bound.x, -bound.y - safeY, safeZ));
-	//path.push_back(Vector3(-bound.x, -bound.y - safeY, minZ));
+	path.push_back(Vector3(-bound.x, -bound.y - safeY, safeZ));
+	path.push_back(Vector3(-bound.x, -bound.y - safeY, minZ));
 
-	//bool reversed = false;
-	//float x, y;
-	//for (x = -bound.x; x < bound.x + xoff; x += xoff)
-	//{
-	//	for (y = -bound.y; y < bound.y + yoff; y += yoff)
-	//	{
-	//		float z = GetZ(x, y, true, 5);
-	//		if (z != minZ)
-	//			break;
-	//	}
-	//	y -= xoff;
+	bool reversed = false;
+	float x, y;
+	for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	{
+		for (y = -bound.y; y < bound.y + yoff; y += yoff)
+		{
+			float z = GetZ(x, y, true, 5);
+			if (z != minZ)
+				break;
+		}
+		y -= xoff;
 
-	//	if (reversed)
-	//	{
-	//		Vector3 prev = path[path.size() - 1];
-	//		Vector3 vert(x, y, minZ);
+		if (reversed)
+		{
+			Vector3 prev = path[path.size() - 1];
+			Vector3 vert(x, y, minZ);
 
-	//		if (prev.y > vert.y)
-	//			path.push_back(Vector3(prev.x, y, minZ));
-	//		else
-	//			path.push_back(Vector3(x, prev.y, minZ));
+			if (prev.y > vert.y)
+				path.push_back(Vector3(prev.x, y, minZ));
+			else
+				path.push_back(Vector3(x, prev.y, minZ));
 
-	//		path.push_back(Vector3(x, y, minZ));
-	//		path.push_back(Vector3(x, -bound.y - safeY, minZ));
-	//	}
-	//	else
-	//	{
-	//		path.push_back(Vector3(x, -bound.y - safeY, minZ));
-	//		path.push_back(Vector3(x, y, minZ));
-	//	}
+			path.push_back(Vector3(x, y, minZ));
+			path.push_back(Vector3(x, -bound.y - safeY, minZ));
+		}
+		else
+		{
+			path.push_back(Vector3(x, -bound.y - safeY, minZ));
+			path.push_back(Vector3(x, y, minZ));
+		}
 
-	//	reversed = !reversed;
+		reversed = !reversed;
 
-	//}
+	}
 
-	//path.push_back({ x, y, safeZ });
-	//path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
-	//path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
+	path.push_back({ x, y, safeZ });
+	path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
+	path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
 
-	//reversed = false;
-	//for (x = -bound.x; x < bound.x + xoff; x += xoff)
-	//{
-	//	for (y = bound.y; y > -bound.y - yoff; y -= yoff)
-	//	{
-	//		float z = GetZ(x, y, true, 5);
-	//		if (z != minZ)
-	//			break;
-	//	}
-	//	y += xoff;
+	reversed = false;
+	for (x = -bound.x; x < bound.x + xoff; x += xoff)
+	{
+		for (y = bound.y; y > -bound.y - yoff; y -= yoff)
+		{
+			float z = GetZ(x, y, true, 5);
+			if (z != minZ)
+				break;
+		}
+		y += xoff;
 
-	//	if (reversed)
-	//	{
-	//		Vector3 prev = path[path.size() - 1];
-	//		Vector3 vert(x, y, minZ);
+		if (reversed)
+		{
+			Vector3 prev = path[path.size() - 1];
+			Vector3 vert(x, y, minZ);
 
-	//		if (prev.y < vert.y)
-	//			path.push_back(Vector3(prev.x, y, minZ));
-	//		else
-	//			path.push_back(Vector3(x, prev.y, minZ));
+			if (prev.y < vert.y)
+				path.push_back(Vector3(prev.x, y, minZ));
+			else
+				path.push_back(Vector3(x, prev.y, minZ));
 
-	//		path.push_back(Vector3(x, y, minZ));
-	//		path.push_back(Vector3(x, bound.y + safeY, minZ));
-	//	}
-	//	else
-	//	{
-	//		path.push_back(Vector3(x, bound.y + safeY, minZ));
-	//		path.push_back(Vector3(x, y, minZ));
-	//	}
+			path.push_back(Vector3(x, y, minZ));
+			path.push_back(Vector3(x, bound.y + safeY, minZ));
+		}
+		else
+		{
+			path.push_back(Vector3(x, bound.y + safeY, minZ));
+			path.push_back(Vector3(x, y, minZ));
+		}
 
-	//	reversed = !reversed;
-	//}
+		reversed = !reversed;
+	}
 
-	//path.push_back({ x, y, safeZ });
+	path.push_back({ x, y, safeZ });
 
 	return path;
 }
@@ -323,7 +322,7 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 
 		result.insert(result.end(), tail[1].begin(), tail[1].end());
 
-		 tail_tmp = tail[0];
+		tail_tmp = tail[0];
 		TrimEnd(tail_tmp, torso[1]);
 		result.insert(result.end(), tail_tmp.begin(), tail_tmp.end());
 	}
@@ -649,7 +648,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, 20, minZ + 10));
 	AddSafe(tmp);
 	result.insert(result.end(), tmp.rbegin(), tmp.rend());
-	
+
 	tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(60, -20, minZ));
 	tmp.erase(tmp.end() - 127, tmp.end());
 	AddSafe(tmp);
@@ -707,13 +706,173 @@ vector<Vector3> PathGenerator::GenerateUnrestrictedPath(BezierSurfaceC0* surface
 }
 void PathGenerator::AddSafe(vector<Vector3>& path)
 {
+	AddSafe(path, safeZ);
+}
+void PathGenerator::AddSafe(vector<Vector3>& path, float safeH)
+{
+	AddSafeStart(path, safeH);
+	AddSafeEnd(path, safeH);
+}
+void PathGenerator::AddSafeStart(vector<Vector3>& path)
+{
+	AddSafeStart(path, safeZ);
+}
+void PathGenerator::AddSafeStart(vector<Vector3>& path, float safeH)
+{
 	path.insert(path.begin(), path[0]);
-	path[0].z = safeZ;
+	path[0].z = safeH;
+
+}
+void PathGenerator::AddSafeEnd(vector<Vector3>& path)
+{
+	AddSafeEnd(path, safeZ);
+}
+void PathGenerator::AddSafeEnd(vector<Vector3>& path, float safeH)
+{
 	path.push_back(*path.rbegin());
-	path.rbegin()->z = safeZ;
+	path.rbegin()->z = safeH;
 
 }
 vector<Vector3> PathGenerator::GenerateSurfacePaths()
 {
-	return vector<Vector3>();
+	vector<Vector3> result, tmp, tmp2;
+	vector<vector<Vector3>> tmp3;
+	ModelVersion& model = elephant.model8;
+
+	/*tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(60, -20, minZ));
+	tmp.erase(tmp.end() - 127, tmp.end());
+	tmp3 = AddParametrizationLine(model.GetLegFront(), true);
+	for (int i = 0; i < tmp3.size(); i++)
+	{
+		auto& p = tmp3[i];
+		TrimEnd2(p, tmp);
+		AddSafe(p, 30);
+		if (i == 0) AddSafeStart(p);
+		if (i == tmp3.size() - 1) AddSafeEnd(p);
+		result.insert(result.begin(), p.begin(), p.end());
+	}
+
+	tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, 20, minZ + 10));
+	tmp3 = AddParametrizationLine(model.GetLegBack(), true);
+	for (int i = 0; i < tmp3.size(); i++)
+	{
+		auto& p = tmp3[i];
+		TrimEnd2(p, tmp);
+		AddSafe(p, 30);
+		if (i == 0) AddSafeStart(p);
+		if (i == tmp3.size() - 1) AddSafeEnd(p);
+		result.insert(result.begin(), p.begin(), p.end());
+	}*/
+
+
+	//tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, 10, minZ));
+	//tmp.erase(tmp.end() - 2, tmp.end());
+	//tmp[0].y -= 10;
+	//tmp[tmp.size() - 1].y += 10;
+	//tmp3 = AddParametrizationLine(model.GetTail(), true);
+	//for (int i = 0; i < tmp3.size(); i++)
+	//{
+	//	auto& p = tmp3[i];
+	//	TrimEnd2(p, tmp);
+	//	AddSafe(p, 30);
+	//	if (i == 0) AddSafeStart(p);
+	//	if (i == tmp3.size() - 1) AddSafeEnd(p);
+	//	result.insert(result.begin(), p.begin(), p.end());
+	//}
+
+	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
+	tmp2 = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-10, 20, minZ + 10));
+	tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
+	tmp3 = AddParametrizationLine(model.GetBox(), false,true);
+	for (int i = 0; i < tmp3.size(); i++)
+	{
+		auto& p = tmp3[i];
+		TrimStart2(tmp, p);
+		AddSafe(p, 40);
+		if (i == 0) AddSafeStart(p);
+		if (i == tmp3.size() - 1) AddSafeEnd(p);
+		result.insert(result.begin(), p.begin(), p.end());
+	}
+
+	return result;
+}
+vector<vector<Vector3>> PathGenerator::AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero)
+{
+	vector<vector<Vector3>> result;
+	float toolRadius = 4.0f;
+	float probesCount = 50;
+
+	for (int i = 0; i < probesCount; i++)
+	{
+		float ti = 1.0f * i / probesCount;
+		vector<Vector3 > path;
+
+		bool anyZ = false;
+		for (int j = 0; j < probesCount; j++)
+		{
+			float tj = 1.0f * j / probesCount;
+
+			Vector2 hw = wdir ? Vector2(tj, ti) : Vector2(ti, tj);
+			Vector3 pos = surface->Evaluate(hw);
+			pos.z -= toolRadius;
+
+			if (pos.z >= minZ)
+			{
+				anyZ = true;
+			}
+			else
+			{
+				pos.z = minZ;
+			}
+
+			if (!notZero || pos.z > minZ)
+				path.push_back(pos);
+		}
+
+		if (anyZ)
+			result.push_back(path);
+	}
+
+	return result;
+}
+
+void PathGenerator::TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path)
+{
+	for (int i = 0; i < trimmer.size() - 1; i++)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i + 1].x, trimmer[i + 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin(), path.begin() + j);
+				//path[0] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
+}
+void PathGenerator::TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	for (int i = trimmer.size() - 1; i > 0; i--)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i - 1].x, trimmer[i - 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin() + j + 1, path.end());
+				//path[path.size() - 1] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
 }
