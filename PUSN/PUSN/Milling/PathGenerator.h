@@ -67,8 +67,6 @@ public:
 
 	void Append(vector<Vector3>& path, vector<vector<Vector3>>& toAppend);
 	void Append(vector<Vector3>& path, vector<Vector3>& toAppend);
-	void TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path);
-	void TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer);
 
 	void RemoveEmpty(vector<vector<Vector3>>& paths);
 	void AddSafe(vector<Vector3>& path);
