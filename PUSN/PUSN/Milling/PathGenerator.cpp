@@ -887,6 +887,8 @@ void PathGenerator::TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer)
 		}
 	}
 }
+
+
 void PathGenerator::AddOuterSafe(vector<vector<Vector3>>& paths)
 {
 	if (paths.empty()) return;
@@ -999,4 +1001,71 @@ bool PathGenerator::FindIntersectionLast(vector<Vector3>& path, vector<Vector3>&
 		}
 	}
 	return false;
+}
+
+
+void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint)
+{
+	int from = FindIntersectionLast(path, trimmer) + 1;
+	path.erase(path.begin() + from, path.end());
+}
+void PathGenerator::TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint)
+{
+	for (int i = 0; i < trimmer.size() - 1; i++)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i + 1].x, trimmer[i + 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin(), path.begin() + j);
+				path[0] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
+}
+void PathGenerator::TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path)
+{
+	for (int i = 0; i < trimmer.size() - 1; i++)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i + 1].x, trimmer[i + 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin(), path.begin() + j);
+				path[0] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
+}
+void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	for (int i = trimmer.size() - 1; i > 0; i--)
+	{
+		for (int j = 0; j < path.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
+			Vector2 seg1_b = Vector2(trimmer[i - 1].x, trimmer[i - 1].y);
+			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
+			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				path.erase(path.begin() + j + 1, path.end());
+				path[path.size() - 1] = Vector3(out.x, out.y, minZ);
+				break;
+			}
+		}
+	}
 }

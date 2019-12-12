@@ -88,5 +88,7 @@ public:
 	bool FindIntersection(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 	bool FindIntersectionLast(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 
+	void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint);
+	void TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint);
 };
 
