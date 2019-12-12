@@ -63,17 +63,20 @@ public:
 	vector<Vector3> GenerateSurfaceIntersectionPaths();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
 	vector<Vector3> GenerateSurfacePaths();
+	vector<vector<Vector3>> AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero);
+
+	void Append(vector<Vector3>& path, vector<vector<Vector3>>& toAppend);
+	void Append(vector<Vector3>& path, vector<Vector3>& toAppend);
+	void TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path);
+	void TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer);
+
+	void CleanEmpty(vector<vector<Vector3>>& paths);
 	void AddSafe(vector<Vector3>& path);
 	void AddSafe(vector<Vector3>& path, float safeH);
 	void AddSafeStart(vector<Vector3>& path);
 	void AddSafeStart(vector<Vector3>& path, float safeH);
 	void AddSafeEnd(vector<Vector3>& path);
 	void AddSafeEnd(vector<Vector3>& path, float safeH);
-	vector<vector<Vector3>> AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero);
-
-	void TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path);
-	void TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer);
-
 
 	void TrimEnd3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
 	void TrimStart3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
@@ -82,7 +85,7 @@ public:
 	void AddInnerSafe(vector<vector<Vector3>>& path, float height);
 	void TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void TrimStart3(vector<Vector3>& path, vector<Vector3>& trimmer);
-	void TrimCenter(vector<Vector3>& path, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
+	void TrimCenter(vector<Vector3>& path, vector<Vector3>& pathOut, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
 	int FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer);
 	int FindIntersectionLast(vector<Vector3>& path, vector<Vector3>& trimmer);
 	bool FindIntersection(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
