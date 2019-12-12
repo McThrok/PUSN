@@ -887,6 +887,43 @@ void PathGenerator::TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer)
 		}
 	}
 }
+void PathGenerator::AddOuterSafe(vector<vector<Vector3>>& paths)
+{
+	if (paths.empty()) return;
+
+	AddSafeStart(paths[0]);
+	AddSafeEnd(paths[paths.size()-1]);
+}
+void PathGenerator::AddInnerSafe(vector<vector<Vector3>>& paths, float height)
+{
+	for (int i = 0; i < paths.size(); i++)
+	{
+		auto& p = paths[i];
+		if (p.empty()) continue;
+
+		if (i > 0)
+			AddSafeStart(p, height);
+
+		if (i < paths.size() - 1)
+			AddSafeEnd(p, height);
+	}
+
+}
+void PathGenerator::TrimEnd3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+{
+	for (auto& p : paths)
+		TrimEnd3(p, trimmer);
+}
+void PathGenerator::TrimStart3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+{
+	for (auto& p : paths)
+		TrimStart3(p, trimmer);
+}
+void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo)
+{
+	for (auto& p : paths)
+		TrimCenter(p, trimmerFrom, trimmerTo);
+}
 void PathGenerator::TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer)
 {
 	int from = FindIntersectionLast(path, trimmer) + 1;
@@ -901,7 +938,6 @@ void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& trimmerFr
 {
 	int from = FindIntersection(path, trimmerFrom) + 1;
 	int to = FindIntersection(path, trimmerTo) + 1;
-
 	path.erase(path.begin() + from, path.begin() + to);
 }
 int PathGenerator::FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer)
@@ -909,6 +945,15 @@ int PathGenerator::FindIntersection(vector<Vector3>& path, vector<Vector3>& trim
 	int idx1, int idx2;
 
 	if (FindIntersection(path, trimmer, idx1, idx2))
+		return idx1;
+	else
+		return -1;
+}
+int PathGenerator::FindIntersectionLast(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int idx1, int idx2;
+
+	if (FindIntersectionLast(path, trimmer, idx1, idx2))
 		return idx1;
 	else
 		return -1;

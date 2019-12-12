@@ -74,10 +74,17 @@ public:
 	void TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path);
 	void TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer);
 
+
+	void TrimEnd3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimStart3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
+	void AddOuterSafe(vector<vector<Vector3>>& path);
+	void AddInnerSafe(vector<vector<Vector3>>& path, float height);
 	void TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void TrimStart3(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void TrimCenter(vector<Vector3>& path, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
 	int FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer);
+	int FindIntersectionLast(vector<Vector3>& path, vector<Vector3>& trimmer);
 	bool FindIntersection(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 	bool FindIntersectionLast(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 
