@@ -54,8 +54,8 @@ void PathGenerator::GenerateHeightMap()
 
 	Matrix highMapTransform = XMMatrixTranslation(material->size.x / 2, material->size.y / 2, 0) * XMMatrixScaling(material->gridX / material->size.x, material->gridY / material->size.y, 1);
 
-	vector<BezierSurfaceC0*> surfaces = elephant.model0.GetSurfaces();
-	//vector<BezierSurfaceC0*> surfaces = elephant.model8.GetSurfaces();
+	//vector<BezierSurfaceC0*> surfaces = elephant.model0.GetSurfaces();
+	vector<BezierSurfaceC0*> surfaces = elephant.model8.GetSurfaces();
 	for (int k = 0; k < surfaces.size(); k++)
 	{
 		BezierSurfaceC0* surf = surfaces[k];
@@ -780,19 +780,32 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	//	result.insert(result.begin(), p.begin(), p.end());
 	//}
 
-	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
-	tmp2 = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-10, 20, minZ + 10));
-	tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
-	tmp3 = AddParametrizationLine(model.GetBox(), false,true);
+	//tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
+	//tmp2 = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-10, 20, minZ + 10));
+	//tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
+	//tmp3 = AddParametrizationLine(model.GetBox(), false,true);
+	//for (int i = 0; i < tmp3.size(); i++)
+	//{
+	//	auto& p = tmp3[i];
+	//	TrimStart2(tmp, p);
+	//	AddSafe(p, 40);
+	//	if (i == 0) AddSafeStart(p);
+	//	if (i == tmp3.size() - 1) AddSafeEnd(p);
+	//	result.insert(result.begin(), p.begin(), p.end());
+	//}
+
+
+	/*tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, 20, minZ + 10));
+	tmp3 = AddParametrizationLine(model.GetLegBack(), true);
 	for (int i = 0; i < tmp3.size(); i++)
 	{
 		auto& p = tmp3[i];
-		TrimStart2(tmp, p);
-		AddSafe(p, 40);
+		TrimEnd2(p, tmp);
+		AddSafe(p, 30);
 		if (i == 0) AddSafeStart(p);
 		if (i == tmp3.size() - 1) AddSafeEnd(p);
 		result.insert(result.begin(), p.begin(), p.end());
-	}
+	}*/
 
 	return result;
 }
@@ -850,7 +863,6 @@ void PathGenerator::TrimStart2(vector<Vector3>& trimmer, vector<Vector3>& path)
 
 			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
 				path.erase(path.begin(), path.begin() + j);
-				//path[0] = Vector3(out.x, out.y, minZ);
 				break;
 			}
 		}
@@ -870,9 +882,76 @@ void PathGenerator::TrimEnd2(vector<Vector3>& path, vector<Vector3>& trimmer)
 
 			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
 				path.erase(path.begin() + j + 1, path.end());
-				//path[path.size() - 1] = Vector3(out.x, out.y, minZ);
 				break;
 			}
 		}
 	}
+}
+void PathGenerator::TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int from = FindIntersectionLast(path, trimmer) + 1;
+	path.erase(path.begin() + from, path.end());
+}
+void PathGenerator::TrimStart3(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int to = FindIntersection(path, trimmer) + 1;
+	path.erase(path.begin(), path.end() + to);
+}
+void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo)
+{
+	int from = FindIntersection(path, trimmerFrom) + 1;
+	int to = FindIntersection(path, trimmerTo) + 1;
+
+	path.erase(path.begin() + from, path.begin() + to);
+}
+int PathGenerator::FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int idx1, int idx2;
+
+	if (FindIntersection(path, trimmer, idx1, idx2))
+		return idx1;
+	else
+		return -1;
+}
+bool PathGenerator::FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer, int& idx1, int& idx2)
+{
+	for (int i = 0; i < path.size() - 1; i++)
+	{
+		for (int j = 0; j < trimmer.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(path[i].x, path[i].y);
+			Vector2 seg1_b = Vector2(path[i + 1].x, path[i + 1].y);
+			Vector2 seg2_a = Vector2(trimmer[j].x, trimmer[j].y);
+			Vector2 seg2_b = Vector2(trimmer[j + 1].x, trimmer[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				idx1 = i;
+				idx2 = j;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+bool PathGenerator::FindIntersectionLast(vector<Vector3>& path, vector<Vector3>& trimmer, int& idx1, int& idx2)
+{
+	for (int i = path.size() - 1; i > 0; i--)
+	{
+		for (int j = 0; j < trimmer.size() - 1; j++)
+		{
+			Vector2 out;
+			Vector2 seg1_a = Vector2(path[i].x, path[i].y);
+			Vector2 seg1_b = Vector2(path[i - 1].x, path[i - 1].y);
+			Vector2 seg2_a = Vector2(trimmer[j].x, trimmer[j].y);
+			Vector2 seg2_b = Vector2(trimmer[j + 1].x, trimmer[j + 1].y);
+
+			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
+				idx1 = i - 1;
+				idx2 = j;
+				return true;
+			}
+		}
+	}
+	return false;
 }
