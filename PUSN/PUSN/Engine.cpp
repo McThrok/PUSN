@@ -190,8 +190,8 @@ void Engine::RenderGui() {
 
 	const int buffSize = 256;
 	//static char buf[buffSize] = "t1.k16";
-	//static char buf[buffSize] = "elephant\\2.f10";
-	static char buf[buffSize] = "elephant\\3.k08";
+	static char buf[buffSize] = "elephant\\2.f10";
+	//static char buf[buffSize] = "elephant\\3.k08";
 	ImGui::InputText("path", buf, buffSize);
 	if (ImGui::Button("Load configuration")) {
 		millingMachine->LoadDataFromFile(path +string(buf));
@@ -503,8 +503,8 @@ void Engine::InitMilling()
 	millingMaterial->Initialize(guiData->size, guiData->gridX, guiData->gridY);
 	millingMachine =shared_ptr<MillingMachine>(new MillingMachine(device.Get(), deviceContext.Get()));
 	//millingMachine->LoadDataFromFile(path + "\\t1.k16");
-	//millingMachine->LoadDataFromFile(path + "elephant\\2.f10");
-	millingMachine->LoadDataFromFile(path + "elephant\\3.k08");
+	millingMachine->LoadDataFromFile(path + "elephant\\2.f10");
+	//millingMachine->LoadDataFromFile(path + "elephant\\3.k08");
 
 	guiData->toolRadius = millingMachine->cutRadius;
 	guiData->flat = millingMachine->flatCut;
