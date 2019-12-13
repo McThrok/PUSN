@@ -236,7 +236,24 @@ public:
 		Vector3 du = EvaluateDU(hw);
 		Vector3 dv = EvaluateDV(hw);
 
-		Vector3 result = du.Cross(dv);
+		Vector3 result;
+		if (du.LengthSquared() < 0.1)
+		{
+			Vector2 hw2 = Vector2(0.5 - hw.x, hw.y);
+			if (hw2.x < 0)hw2.x += 1;
+			result = -(EvaluateDV(hw) + EvaluateDV(hw2)) / 2;
+		}
+		else if (dv.LengthSquared() < 0.1)
+		{
+			Vector2 hw2 = Vector2(hw.x, 0.5 - hw.y);
+			if (hw2.y < 0)hw2.y += 1;
+			result = -(EvaluateDU(hw) + EvaluateDU(hw2)) / 2;
+		}
+		else
+		{
+
+			result = du.Cross(dv);
+		}
 		result.Normalize();
 
 		return result;

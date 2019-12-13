@@ -76,16 +76,16 @@ void Model::AdjustEar()
 void Model::AddRescaledModelVersion()
 {
 	model8 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model8, 8);
+	ChangeSizeAlongNormals(model8, 4);
 
 	model10 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model10, 10);
+	ChangeSizeAlongNormals(model10, 5);
 
 	model12 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model12, 12);
+	ChangeSizeAlongNormals(model12, 6);
 
 	model16 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model16, 16);
+	ChangeSizeAlongNormals(model16, 8);
 }
 
 void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
@@ -103,8 +103,10 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 			for (int h = 0; h < hc; h++)
 			{
 				Vector3 vert = bs.GetVert(w, h);
-				Vector3 change = bs.EvaluateNormal(bs.GetVertParametrization(w, h));
-				tmp[w * hc + h] = bs.GetVert(w, h) + length * bs.EvaluateNormal(bs.GetVertParametrization(w, h));
+				Vector2 hw = bs.GetVertParametrization(w, h);
+				Vector3 change = bs.EvaluateNormal(hw);
+				//change = Vector3(0, 0, 1);
+				tmp[w * hc + h] = bs.GetVert(w, h) + length * change;
 			}
 
 		for (int w = 0; w < wc; w++)
@@ -121,6 +123,14 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 				bs.GetVert(bs.GetWidthVertexCount() - 1, h) = avg;
 			}
 		}
+	}
+
+	BezierSurfaceC0* surf = model.GetTorso();
+	for (int w = 0; w < surf->GetHeightVertexCount(); w++)
+	{
+		surf->GetVert(w, 0).x += length;
+		surf->GetVert(w, surf->GetHeightVertexCount() - 1).x -= length;
+
 	}
 
 	BezierSurfaceC0* ears[2] = { model.GetLeftEar(),model.GetRightEar() };

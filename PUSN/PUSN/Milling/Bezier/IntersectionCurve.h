@@ -111,11 +111,7 @@ public:
 		while (dist > _gradientEps)
 		{
 			if (++i > 10000) {
-				q1.push_back({ 75,75,75 });
-					//q0.insert(q0.end(), q1.begin(), q1.end());
-				//return new IntersectionCurve(q1, {}, {});
 				return nullptr;
-
 			}
 
 			try
@@ -143,13 +139,10 @@ public:
 				else
 				{
 					currAlpha *= 2.0f;
-					//currAlpha *= 1.5f;
 					dist = newDist;
 					p0 = pNew0;
 					p1 = pNew1;
 
-					//new
-					//currAlpha = min(currAlpha, 0.1f);
 				}
 			}
 			catch (...)
@@ -330,6 +323,7 @@ public:
 		Vector3 dV1 = obj1->EvaluateDV(uv1);
 
 		Vector3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
+		//float d = alpha;
 		float d = alpha * 10;
 
 		Vector3 tmp = P1 - Q;
