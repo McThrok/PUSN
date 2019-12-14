@@ -53,7 +53,7 @@ public:
 	vector<Vector3> GenerateFlatEnvelope();
 	BezierSurfaceC0 GetPlane();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint);
-	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top);
+	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float toolRange = 5.0f);
 	bool SegmentsIntersect(const Vector2& A, const Vector2& B, const Vector2& C, const Vector2& D, Vector2& out);
 	//void TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path);
 	//void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer);
