@@ -79,25 +79,23 @@ public:
 	void AddSafeEnd(vector<Vector3>& path);
 	void AddSafeEnd(vector<Vector3>& path, float safeH);
 
-	void TrimEnd3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
-	void TrimStart3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
-	void TrimEndLast3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
-	void TrimStartLast3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimEnd(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimStart(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimEndLast(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
+	void TrimStartLast(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
 	void Finalize(vector<vector<Vector3>>& path, float interHeight);
 	void TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
 	void AddOuterSafe(vector<vector<Vector3>>& path);
 	void AddInnerSafe(vector<vector<Vector3>>& path, float height);
-	void TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer);
-	void TrimStart3(vector<Vector3>& path, vector<Vector3>& trimmer);
-	void TrimEndLast3(vector<Vector3>& path, vector<Vector3>& trimmer);
-	void TrimStartLast3(vector<Vector3>& path, vector<Vector3>& trimmer);
+	void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer);
+	void TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer);
+	void TrimEndLast(vector<Vector3>& path, vector<Vector3>& trimmer);
+	void TrimStartLast(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void TrimCenter(vector<Vector3>& path, vector<Vector3>& pathOut, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo);
 	int FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer);
 	int FindIntersectionLast(vector<Vector3>& path, vector<Vector3>& trimmer);
 	bool FindIntersection(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 	bool FindIntersectionLast(vector<Vector3>& path1, vector<Vector3>& path2, int& idx1, int& idx2);
 
-	void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint);
-	void TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint);
 };
 

@@ -315,98 +315,98 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 
 	{
 		tmp = torso[3];
-		TrimEnd3(tmp, tail[0]);
+		TrimEnd(tmp, tail[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = tail[0];
-		TrimStart3(tmp, torso[3]);
+		TrimStart(tmp, torso[3]);
 		Append(result, tmp);
 
 		Append(result, tail[1]);
 
 		tmp = tail[2];
-		TrimEnd3(tmp, torso[0]);
+		TrimEnd(tmp, torso[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = torso[0];
-		TrimStart3(tmp, tail[2]);
-		TrimEnd3(tmp, legBack[0]);
+		TrimStart(tmp, tail[2]);
+		TrimEnd(tmp, legBack[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = legBack[0];
-		TrimStart3(tmp, torso[0]);
+		TrimStart(tmp, torso[0]);
 		Append(result, tmp);
 
 		Append(result, legBack[1]);
 
 		tmp = legBack[2];
-		TrimEnd3(tmp, torso[0]);
+		TrimEnd(tmp, torso[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = torso[0];
-		TrimStart3(tmp, legBack[2]);
-		TrimEnd3(tmp, legFront[0]);
+		TrimStart(tmp, legBack[2]);
+		TrimEnd(tmp, legFront[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = legFront[0];
-		TrimStart3(tmp, torso[0]);
+		TrimStart(tmp, torso[0]);
 		Append(result, tmp);
 
 		Append(result, legFront[1]);
 
 		tmp = legFront[2];
-		TrimEnd3(tmp, torso[0]);
+		TrimEnd(tmp, torso[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = torso[0];
-		TrimStart3(tmp, legFront[2]);
+		TrimStart(tmp, legFront[2]);
 		Append(result, tmp);
 
 		tmp = torso[1];
-		TrimEnd3(tmp, head[0]);
+		TrimEnd(tmp, head[0]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = head[0];
-		TrimStart3(tmp, torso[1]);
+		TrimStart(tmp, torso[1]);
 		Append(result, tmp);
 
 		Append(result, head[1]);
 		Append(result, head[2]);
 
 		tmp = head[3];
-		TrimEnd3(tmp, torso[2]);
+		TrimEnd(tmp, torso[2]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = box[0];
-		TrimStart3(tmp, torso[2]);
+		TrimStart(tmp, torso[2]);
 		Append(result, tmp);
 
 		Append(result, box[1]);
 
 		tmp = box[2];
-		TrimEnd3(tmp, torso[2]);
+		TrimEnd(tmp, torso[2]);
 		Append(result, tmp);
 	}
 
 	{
 		tmp = torso[2];
-		TrimStart3(tmp, box[2]);
+		TrimStart(tmp, box[2]);
 		Append(result, tmp);
 	}
 
@@ -698,7 +698,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp.erase(tmp.begin(), tmp.begin() + 405);
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	Finalize(tmp3, 30);
 	Append(result, tmp3);
 
@@ -707,16 +707,16 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp.erase(tmp.end() - 201, tmp.end());
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	Finalize(tmp3, 30);
 	Append(result, tmp3);
 
 	//tail
 	tmp3 = AddParametrizationLine(model.GetTail(), true, false);
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	Finalize(tmp3, 30);
 	Append(result, tmp3);
 
@@ -725,11 +725,11 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-15, 20, minZ + 10));
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
-	TrimStart3(tmp3, tmp);
+	TrimStart(tmp3, tmp);
 	Finalize(tmp3, 40);
 	Append(result, tmp3);
 
@@ -739,7 +739,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp2.erase(tmp2.begin(), tmp2.begin() + tmp2.size() / 2);
 	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
 	Append(tmp, tmp2);
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(50, 20, minZ + 10));
 	tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
 	Append(tmp, tmp2);
@@ -751,9 +751,9 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	//ear
 	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false);
 	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(50, 20, minZ + 10));
-	TrimStart3(tmp3, tmp);
+	TrimStart(tmp3, tmp);
 	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 	Finalize(tmp3, 60);
 	Append(result, tmp3);
 
@@ -763,7 +763,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp.erase(tmp.begin(), tmp.begin() + tmp.size() / 2);
 	tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
 	Append(tmp, tmp2);
-	TrimStart3(tmp3, tmp);
+	TrimStart(tmp3, tmp);
 
 
 	tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, -20, minZ + 10));
@@ -788,7 +788,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(50, -25, minZ));
 	tmp[0].y -= 10;
 	tmp[0].x += 10;
-	TrimEnd3(tmp3, tmp);
+	TrimEnd(tmp3, tmp);
 
 	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
 	tmp[0].x += 5;
@@ -848,15 +848,17 @@ vector<vector<Vector3>> PathGenerator::AddParametrizationLine(BezierSurfaceC0* s
 	return result;
 }
 
+void PathGenerator::RemoveEmpty(vector<vector<Vector3>>& paths)
+{
+	auto new_end = std::remove_if(paths.begin(), paths.end(),
+		[](const vector<Vector3>& path)
+		{ return path.size() == 0; });
+
+	paths.erase(new_end, paths.end());
+}
 void PathGenerator::Reverse(vector<Vector3>& path)
 {
 	reverse(path.begin(), path.end());
-}
-void PathGenerator::Finalize(vector<vector<Vector3>>& path, float interHeight)
-{
-	RemoveEmpty(path);
-	AddInnerSafe(path, interHeight);
-	AddOuterSafe(path);
 }
 bool  PathGenerator::DuplicateFirst(vector<Vector3>& path)
 {
@@ -885,6 +887,13 @@ void PathGenerator::Append(vector<Vector3>& path, vector<Vector3>& toAppend)
 {
 	path.insert(path.end(), toAppend.begin(), toAppend.end());
 }
+void PathGenerator::Finalize(vector<vector<Vector3>>& path, float interHeight)
+{
+	RemoveEmpty(path);
+	AddInnerSafe(path, interHeight);
+	AddOuterSafe(path);
+}
+
 void PathGenerator::AddSafe(vector<Vector3>& path)
 {
 	AddSafe(path, safeZ);
@@ -911,43 +920,7 @@ void PathGenerator::AddSafeEnd(vector<Vector3>& path, float safeH)
 {
 	if (DuplicateLast(path))
 		path.rbegin()->z = safeH;
-
 }
-void PathGenerator::RemoveEmpty(vector<vector<Vector3>>& paths)
-{
-	auto new_end = std::remove_if(paths.begin(), paths.end(),
-		[](const vector<Vector3>& path)
-		{ return path.size() == 0; });
-
-	paths.erase(new_end, paths.end());
-}
-
-
-void PathGenerator::TrimEndLast3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
-{
-	for (auto& p : paths)
-		TrimEndLast3(p, trimmer);
-
-}
-void PathGenerator::TrimStartLast3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
-{
-	for (auto& p : paths)
-		TrimStartLast3(p, trimmer);
-
-}
-void PathGenerator::TrimEndLast3(vector<Vector3>& path, vector<Vector3>& trimmer)
-{
-	int from = FindIntersection(path, trimmer);
-	if (from >= 0)
-		path.erase(path.begin() + from + 1, path.end());
-}
-void PathGenerator::TrimStartLast3(vector<Vector3>& path, vector<Vector3>& trimmer)
-{
-	int to = FindIntersectionLast(path, trimmer);
-	if (to >= 0)
-		path.erase(path.begin(), path.begin() + to + 1);
-}
-
 void PathGenerator::AddOuterSafe(vector<vector<Vector3>>& paths)
 {
 	if (paths.empty()) return;
@@ -970,15 +943,41 @@ void PathGenerator::AddInnerSafe(vector<vector<Vector3>>& paths, float height)
 	}
 
 }
-void PathGenerator::TrimEnd3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+
+void PathGenerator::TrimEndLast(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
 {
 	for (auto& p : paths)
-		TrimEnd3(p, trimmer);
+		TrimEndLast(p, trimmer);
+
 }
-void PathGenerator::TrimStart3(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+void PathGenerator::TrimStartLast(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
 {
 	for (auto& p : paths)
-		TrimStart3(p, trimmer);
+		TrimStartLast(p, trimmer);
+
+}
+void PathGenerator::TrimEndLast(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int from = FindIntersection(path, trimmer);
+	if (from >= 0)
+		path.erase(path.begin() + from + 1, path.end());
+}
+void PathGenerator::TrimStartLast(vector<Vector3>& path, vector<Vector3>& trimmer)
+{
+	int to = FindIntersectionLast(path, trimmer);
+	if (to >= 0)
+		path.erase(path.begin(), path.begin() + to + 1);
+}
+
+void PathGenerator::TrimEnd(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+{
+	for (auto& p : paths)
+		TrimEnd(p, trimmer);
+}
+void PathGenerator::TrimStart(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
+{
+	for (auto& p : paths)
+		TrimStart(p, trimmer);
 }
 void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo)
 {
@@ -994,31 +993,16 @@ void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& 
 
 		if (!out.empty())
 			result.push_back(out);
-
-		/*if (!paths[i].empty() && !out.empty())
-		{
-			paths[i].insert(paths[i].begin(), out.begin(), out.end());
-		}
-		else if (paths[i].empty())
-		{
-			paths.erase(paths.begin() + i);
-			i--;
-		}
-		else if (!out.empty())
-		{
-			paths.insert(paths.begin() + i + 1, out);
-			i++;
-		}*/
 	}
 	paths = result;
 }
-void PathGenerator::TrimEnd3(vector<Vector3>& path, vector<Vector3>& trimmer)
+void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
 {
 	int from = FindIntersectionLast(path, trimmer);
 	if (from >= 0)
 		path.erase(path.begin() + from + 1, path.end());
 }
-void PathGenerator::TrimStart3(vector<Vector3>& path, vector<Vector3>& trimmer)
+void PathGenerator::TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer)
 {
 	int to = FindIntersection(path, trimmer);
 	if (to >= 0)
@@ -1045,6 +1029,7 @@ void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& pathOut, 
 		path.erase(path.begin() + from + 1, path.end());
 	}
 }
+
 int PathGenerator::FindIntersection(vector<Vector3>& path, vector<Vector3>& trimmer)
 {
 	int idx1, idx2;
@@ -1104,45 +1089,4 @@ bool PathGenerator::FindIntersectionLast(vector<Vector3>& path, vector<Vector3>&
 		}
 	}
 	return false;
-}
-
-void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint)
-{
-	for (int i = trimmer.size() - 1; i > 0; i--)
-	{
-		for (int j = 0; j < path.size() - 1; j++)
-		{
-			Vector2 out;
-			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
-			Vector2 seg1_b = Vector2(trimmer[i - 1].x, trimmer[i - 1].y);
-			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
-			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
-
-			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
-				path.erase(path.begin() + j + 1, path.end());
-				path[path.size() - 1] = Vector3(out.x, out.y, innerPoint);
-				break;
-			}
-		}
-	}
-}
-void PathGenerator::TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer, float innerPoint)
-{
-	for (int i = 0; i < trimmer.size() - 1; i++)
-	{
-		for (int j = 0; j < path.size() - 1; j++)
-		{
-			Vector2 out;
-			Vector2 seg1_a = Vector2(trimmer[i].x, trimmer[i].y);
-			Vector2 seg1_b = Vector2(trimmer[i + 1].x, trimmer[i + 1].y);
-			Vector2 seg2_a = Vector2(path[j].x, path[j].y);
-			Vector2 seg2_b = Vector2(path[j + 1].x, path[j + 1].y);
-
-			if (SegmentsIntersect(seg1_a, seg1_b, seg2_a, seg2_b, out)) {
-				path.erase(path.begin(), path.begin() + j);
-				path[0] = Vector3(out.x, out.y, innerPoint);
-				break;
-			}
-		}
-	}
 }
