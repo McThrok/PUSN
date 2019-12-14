@@ -60,6 +60,7 @@ public:
 
 	bool DuplicateFirst(vector<Vector3>& path);
 	bool DuplicateLast(vector<Vector3>& path);
+	void Reverse(vector<Vector3>& path);
 
 	vector<Vector3> GenerateSurfaceIntersectionPaths();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
