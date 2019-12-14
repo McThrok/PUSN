@@ -606,16 +606,6 @@ void PathGenerator::GenerateThirdPath()
 	//Append(moves, moves2);
 	SavePath(moves, "Paths\\elephant\\3.k08");
 }
-vector<Vector3> PathGenerator::Test()
-{
-	vector<Vector3> result, tmp, tmp2;
-	vector<vector<Vector3>> tmp3;
-	ModelVersion& model = elephant.model8;
-	tmp3 = AddParametrizationLine(model.GetLegFront(), false, false);
-	Append(result, tmp3);
-
-	return result;
-}
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 {
 	vector<Vector3> result, tmp, tmp2;
@@ -804,9 +794,8 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp.rbegin()->y += 10;
 	TrimCenter(tmp3, tmp, tmp);
 
-	Finalize(tmp3, 50);
+	Finalize(tmp3, 65);
 	Append(result, tmp3);
-
 
 	return result;
 }
@@ -936,12 +925,11 @@ void PathGenerator::AddInnerSafe(vector<vector<Vector3>>& paths, float height)
 		if (p.empty()) continue;
 
 		if (i > 0)
-			AddSafeStart(p, 10 + height);
+			AddSafeStart(p, height);
 
 		if (i < paths.size() - 1)
 			AddSafeEnd(p, height);
 	}
-
 }
 
 void PathGenerator::TrimEndLast(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer)
