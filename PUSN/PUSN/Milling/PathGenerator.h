@@ -46,7 +46,7 @@ public:
 	void GenerateSecondPath();
 	void GenerateThirdPath();
 	void GenerateHeightMap();
-	float GetZ(float cpx, float cpy, bool flat, float toolRadius);
+	float GetZ(float cpx, float cpy, float toolRadius);
 
 	void EnsureInit();
 	vector<Vector3> GenerateFirstPathLayer(float minZ);
@@ -55,10 +55,11 @@ public:
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface, Vector3 startingPoint);
 	vector<Vector3> GenerateUnrestrictedCylinderPath(BezierSurfaceC0* surface, bool top, float toolRange = 5.0f);
 	bool SegmentsIntersect(const Vector2& A, const Vector2& B, const Vector2& C, const Vector2& D, Vector2& out);
-	//void TrimStart(vector<Vector3>& trimmer, vector<Vector3>& path);
-	//void TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer);
 	void RemoveSelfIntersections(vector<Vector3>& path);
 	vector<Vector3> GenerateFlatLayer();
+
+	bool DuplicateFirst(vector<Vector3>& path);
+	bool DuplicateLast(vector<Vector3>& path);
 
 	vector<Vector3> GenerateSurfaceIntersectionPaths();
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
