@@ -187,8 +187,8 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 	vector<Vector3> path;
 
 	//f10
-	float xoff = 3;
-	float yoff = 2;
+	float xoff = 8;
+	float yoff = 1;
 	float safeY = 8;
 
 	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
@@ -206,7 +206,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 			if (z != minZ)
 				break;
 		}
-		y -= xoff;
+		y -= yoff;
 
 		if (reversed)
 		{
@@ -244,7 +244,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 			if (z != minZ)
 				break;
 		}
-		y += xoff;
+		y += yoff;
 
 		if (reversed)
 		{
@@ -609,7 +609,6 @@ void PathGenerator::GenerateThirdPath()
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 {
 	vector<Vector3> result, tmp, tmp2;
-	vector<vector<Vector3>> tmp3;
 	ModelVersion& model = elephant.model8;
 
 	tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
