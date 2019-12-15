@@ -102,10 +102,8 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 		for (int w = 0; w < wc; w++)
 			for (int h = 0; h < hc; h++)
 			{
-				Vector3 vert = bs.GetVert(w, h);
 				Vector2 hw = bs.GetVertParametrization(w, h);
 				Vector3 change = bs.EvaluateNormal(hw);
-				//change = Vector3(0, 0, 1);
 				tmp[w * hc + h] = bs.GetVert(w, h) + length * change;
 			}
 
