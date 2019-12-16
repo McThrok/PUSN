@@ -245,6 +245,9 @@
     <ClInclude Include="Milling\Model.h">
       <Filter>Header Files\Milling</Filter>
     </ClInclude>
+    <ClInclude Include="Milling\IntersectionCollection.h">
+      <Filter>Header Files\Milling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="my_vs.hlsl">

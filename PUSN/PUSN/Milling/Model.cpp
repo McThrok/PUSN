@@ -95,7 +95,7 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 	for (int i = 0; i < surfaces.size(); i++)
 	{
 		BezierSurfaceC0& bs = *surfaces[i];
-		int wc = bs.GetWidthVertexCount();
+		int wc = bs.GetWidthVertexCount();	
 		int hc = bs.GetHeightVertexCount();
 		vector<Vector3> tmp(wc * hc);
 
@@ -104,11 +104,10 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 			{
 				Vector2 hw = bs.GetVertParametrization(w, h);
 				Vector3 change = bs.EvaluateNormal(hw);
-				float dist = length;
-				if (w % 3 != 0 && h % 3 != 0)
+				float dist = length/0.85;
+				if (w % 3 != 0 )
 					dist *= 1.3;
-				//if (&bs == model.GetTail())
-				//	dist += 1;
+
 				tmp[w * hc + h] = bs.GetVert(w, h) + dist * change;
 			}
 
@@ -129,23 +128,23 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 		}
 	}
 
-	{
-		BezierSurfaceC0* surf = model.GetTail();
-		int wc = surf->GetWidthVertexCount();
-		int hc = surf->GetHeightVertexCount();
+	//{
+	//	BezierSurfaceC0* surf = model.GetTail();
+	//	int wc = surf->GetWidthVertexCount();
+	//	int hc = surf->GetHeightVertexCount();
 
-		for (int h = 0; h < hc; h++)
-		{
-			vector<Vector3> tmp(wc);
-			for (int w = 0; w < wc; w++)
-				tmp[w] = surf->GetVert(w, h);
+	//	for (int h = 0; h < hc; h++)
+	//	{
+	//		vector<Vector3> tmp(wc);
+	//		for (int w = 0; w < wc; w++)
+	//			tmp[w] = surf->GetVert(w, h);
 
-			for (int w = 0; w < wc; w++)
-				surf->GetVert(w, h) = tmp[(w + 3) % 6];
+	//		for (int w = 0; w < wc; w++)
+	//			surf->GetVert(w, h) = tmp[(w + 3) % 6];
 
-			surf->GetVert(3, h).z -= 1;
-		}
-	}
+	//		surf->GetVert(3, h).z -= 1;
+	//	}
+	//}
 
 
 	BezierSurfaceC0* surf = model.GetTorso();

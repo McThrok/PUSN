@@ -246,8 +246,6 @@ void Engine::RenderGui() {
 
 	if (ImGui::Button("Generate First Path")) {
 		pathGenerator->GenerateFirstPath();
-		pathGenerator->GenerateSecondPath();
-		pathGenerator->GenerateThirdPath();
 	}
 
 	if (ImGui::Button("Generate Second Path")) {

@@ -18,8 +18,8 @@ public:
 	float toolRadius = 6;
 	bool flat = true;
 
-	bool wireframe = true;
-	bool flatShading = false;
+	bool wireframe = false;
+	bool flatShading = true;
 	//bool showPath = false;
 	bool showPath = true;//qwe
 };

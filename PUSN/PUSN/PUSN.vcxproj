@@ -221,6 +221,7 @@ copy "$(ProjectDir)Dlls\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="Graphics\ImGui\imstb_truetype.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="GuiData.h" />
+    <ClInclude Include="Milling\IntersectionCollection.h" />
     <ClInclude Include="Milling\Bezier\BezierSurface.h" />
     <ClInclude Include="Milling\Bezier\IntersectionCurve.h" />
     <ClInclude Include="Milling\MillingMachine.h" />

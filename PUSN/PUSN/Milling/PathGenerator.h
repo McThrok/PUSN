@@ -22,6 +22,7 @@
 #include "MillingMaterial.h"
 #include "Bezier/BezierSurface.h"
 #include "Bezier/IntersectionCurve.h"
+#include "IntersectionCollection.h"
 #include "../StringHelper.h"
 
 using namespace std;
@@ -34,6 +35,7 @@ public:
 
 	Model elephant;
 	MillingMaterial* material;
+	IntersectionCollection ic;
 	vector<vector<float>> heightMap;
 	float minZ;
 	float safeZ;
@@ -48,7 +50,6 @@ public:
 	void GenerateHeightMap();
 	float GetZ(float cpx, float cpy, float toolRadius);
 
-	void EnsureInit();
 	vector<Vector3> GenerateFirstPathLayer(float minZ);
 	vector<Vector3> GenerateFlatEnvelope();
 	BezierSurfaceC0 GetPlane();
@@ -79,6 +80,9 @@ public:
 	void AddSafeStart(vector<Vector3>& path, float safeH);
 	void AddSafeEnd(vector<Vector3>& path);
 	void AddSafeEnd(vector<Vector3>& path, float safeH);
+
+	void Translate(vector<vector<Vector3>>& paths, Vector3 offset);
+	void Translate(vector<Vector3>& path, Vector3& offset);
 
 	void TrimEnd(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
 	void TrimStart(vector<vector<Vector3>>& paths, vector<Vector3>& trimmer);
