@@ -66,7 +66,8 @@ public:
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint);
 	vector<Vector3> GenerateSurfacePaths();
 	vector<Vector3> GenerateClosedSpacePaths();
-	vector<vector<Vector3>> AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero);
+	vector<Vector3> GenerateTailRosoIntersection();
+	vector<vector<Vector3>> AddParametrizationLine(BezierSurfaceC0* surface, bool wdir, bool notZero, int density);
 
 	void Append(vector<Vector3>& path, vector<vector<Vector3>>& toAppend);
 	void Append(vector<Vector3>& path, vector<Vector3>& toAppend);

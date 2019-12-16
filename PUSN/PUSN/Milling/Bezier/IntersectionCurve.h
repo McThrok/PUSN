@@ -100,7 +100,7 @@ public:
 		Vector3 p1 = obj1->Evaluate(value1);
 
 		int i = 0;
-		float currAlpha = _startGradientAlpha/10;
+		float currAlpha = _startGradientAlpha / 10;
 		float dist = Vector3::Distance(p1, p0);
 
 		vector<Vector3> q0;//qwe
@@ -323,8 +323,7 @@ public:
 		Vector3 dV1 = obj1->EvaluateDV(uv1);
 
 		Vector3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
-		//float d = alpha;
-		float d = alpha * 10;
+		float d = alpha / 3;
 
 		Vector3 tmp = P1 - Q;
 		return Vector4(tmp.x, tmp.y, tmp.z, (P1 - P0).Dot(normalT) - d);
