@@ -248,8 +248,11 @@ public:
 				if (precision > dst)
 					break;
 
-				if (++innerLoops > 30)
+				if (++innerLoops > 200)
+				{
+					return new IntersectionCurve(pointsList, uvList0, uvList1);
 					return nullptr;
+				}
 			}
 
 			uvPrev0 = uv0;
@@ -323,7 +326,7 @@ public:
 		Vector3 dV1 = obj1->EvaluateDV(uv1);
 
 		Vector3 normalT = GetTNormal(dU0, dU1, dV0, dV1);
-		float d = alpha / 3;
+		float d = alpha/3 ;
 
 		Vector3 tmp = P1 - Q;
 		return Vector4(tmp.x, tmp.y, tmp.z, (P1 - P0).Dot(normalT) - d);

@@ -606,10 +606,10 @@ void PathGenerator::GenerateThirdPath()
 	vector<Vector3> moves;// = GenerateSurfaceIntersectionPaths();
 	vector<Vector3> moves2 = GenerateSurfacePaths();
 	//vector<Vector3> moves3 = GenerateClosedSpacePaths();
-	//vector<Vector3> moves4 = GenerateTailRosoIntersection();
+	vector<Vector3> moves4 = GenerateTailRosoIntersection();
 	Append(moves, moves2);
 	//Append(moves, moves3);
-	//Append(moves, moves4);
+	Append(moves, moves4);
 	SavePath(moves, "Paths\\elephant\\3.k08");
 }
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
@@ -692,14 +692,18 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	//Finalize(tmp3, 30);
 	//Append(result, tmp3);
 
-	////tail
-	//tmp3 = AddParametrizationLine(model.GetTail(), true, false,100);
-	////tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
-	////TrimEnd(tmp3, tmp);
-	//tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
-	//TrimEnd(tmp3, tmp);
-	//Finalize(tmp3, 30);
-	//Append(result, tmp3);
+	//tail
+	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 100);
+	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
+	tmp[0].x += 10;
+	tmp.rbegin()->x -= 2;
+	DuplicateLast(tmp);
+	tmp.rbegin()->y += 10;
+	TrimEnd(tmp3, tmp);
+	tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
+	TrimEnd(tmp3, tmp);
+	Finalize(tmp3, 30);
+	Append(result, tmp3);
 
 	////box
 	//tmp3 = AddParametrizationLine(model.GetBox(), true, false, 100);
@@ -714,100 +718,97 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	//Finalize(tmp3, 40);
 	//Append(result, tmp3);
 
-	//head
-	tmp3 = AddParametrizationLine(model.GetHead(), true, false,75);
-	tmp2 = GenerateUnrestrictedCylinderPath(model.GetTorso(), false, 0);
-	tmp2.erase(tmp2.begin(), tmp2.begin() + tmp2.size() / 2);
-	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
-	Append(tmp, tmp2);
-	TrimEnd(tmp3, tmp);
-	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(50, 20, minZ + 10));
-	tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
-	Append(tmp, tmp2);
-	tmp.push_back(tmp[0]);
-	TrimCenter(tmp3, tmp, tmp);
-	Finalize(tmp3, 52);
-	Append(result, tmp3);
-
-	//ear
-	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 25);
-	tmp = ic.GetHeadEarRight8();
-	tmp2 = ic.GetHeadEarLeft8();
-	tmp2.insert(tmp2.begin(), *tmp.rbegin());
-	tmp.insert(tmp.begin(), *tmp2.rbegin());
-	tmp[0].x -= 10;
-	tmp.rbegin()->x -= 10;
-	tmp2[0].x += 10;
-	tmp2.rbegin()->x += 10;
-	Translate(tmp3, { 0,0,-2 });
-	TrimEnd(tmp3, tmp2);
-	TrimStart(tmp3, tmp);
-	Translate(tmp3, { 0,0,6 });
-	Finalize(tmp3, 60);
-	Append(result, tmp3);
-
-	////torso
-	//tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 100);
-	//tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
-	//tmp.erase(tmp.begin(), tmp.begin() + 30);
-	//Reverse(tmp);
-	//tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
+	////head
+	//tmp3 = AddParametrizationLine(model.GetHead(), true, false,75);
+	//tmp2 = GenerateUnrestrictedCylinderPath(model.GetTorso(), false, 0);
+	//tmp2.erase(tmp2.begin(), tmp2.begin() + tmp2.size() / 2);
+	//tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
 	//Append(tmp, tmp2);
+	//TrimEnd(tmp3, tmp);
+	//tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(50, 20, minZ + 10));
+	//tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
+	//Append(tmp, tmp2);
+	//tmp.push_back(tmp[0]);
+	//TrimCenter(tmp3, tmp, tmp);
+	//Finalize(tmp3, 52);
+	//Append(result, tmp3);
+
+	////ear
+	//tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 25);
+	//tmp = ic.GetHeadEarRight8();
+	//tmp2 = ic.GetHeadEarLeft8();
+	//tmp2.insert(tmp2.begin(), *tmp.rbegin());
+	//tmp.insert(tmp.begin(), *tmp2.rbegin());
+	//tmp[0].x -= 10;
+	//tmp.rbegin()->x -= 10;
+	//tmp2[0].x += 10;
+	//tmp2.rbegin()->x += 10;
+	//Translate(tmp3, { 0,0,-2 });
+	//TrimEnd(tmp3, tmp2);
 	//TrimStart(tmp3, tmp);
-
-
-	//tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, -20, minZ - 10));
-	//tmp[0].y -= 10;
-	//tmp.rbegin()->y -= 10;
-	//TrimCenter(tmp3, tmp, tmp);
-
-	//tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(20, -20, minZ - 20));
-	//tmp[0].y -= 10;
-	//tmp.rbegin()->y -= 10;
-	//TrimCenter(tmp3, tmp, tmp);
-
-	//tmp = GenerateUnrestrictedPath(model.GetLegBack(), model.GetTorso(), Vector3(-50, -20, minZ - 10));
-	//TrimCenter(tmp3, tmp, tmp);
-	//tmp = GenerateUnrestrictedPath(model.GetLegFront(), model.GetTorso(), Vector3(20, -20, minZ - 20));
-	//TrimCenter(tmp3, tmp, tmp);
-
-	////tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(50, -25, minZ));
-	////tmp[0].y -= 10;
-	////tmp[0].x += 10;
-	////TrimEnd(tmp3, tmp);
-
-	//tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-5, 20, minZ + 10));
-	//tmp[0].x += 5;
-	//DuplicateFirst(tmp);
-	//tmp[0].y += 10;
-	//tmp.rbegin()->y += 10;
-	//TrimCenter(tmp3, tmp, tmp);
-
-	//tmp = GenerateUnrestrictedPath(model.GetTorso(), model.GetBox(), Vector3(-15, 20, minZ + 10));
-	//tmp[0].y += 10;
-	//tmp.rbegin()->x -= 5;
-	//DuplicateLast(tmp);
-	//tmp.rbegin()->y += 10;
-	//TrimCenter(tmp3, tmp, tmp);
-
+	//Translate(tmp3, { 0,0,6 });
 	//Finalize(tmp3, 60);
 	//Append(result, tmp3);
+
+	//torso
+	tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 100);
+	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
+	tmp.erase(tmp.begin(), tmp.begin() + 30);
+	Reverse(tmp);
+	tmp2 = ic.GetTorsoHead8();
+	Append(tmp, tmp2);
+	TrimStart(tmp3, tmp);
+
+
+	tmp = ic.GetTorsoLegBack8();
+	tmp[0].y -= 10;
+	tmp.rbegin()->y -= 10;
+	TrimCenter(tmp3, tmp, tmp);
+
+	tmp = ic.GetTorsoLegFront8();
+	tmp[0].y -= 10;
+	tmp.rbegin()->y -= 10;
+	TrimCenter(tmp3, tmp, tmp);
+
+	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, -10, minZ + 10));
+	tmp[0].y -= 10;
+	tmp[0].x += 10;
+	tmp.erase(tmp.end() - 1);
+	tmp.rbegin()->y += 10;
+	tmp.rbegin()->x -= 10;
+	TrimEnd(tmp3, tmp);
+
+	tmp = ic.GetTorsoBoxRight8();
+	tmp[0].x += 5;
+	DuplicateFirst(tmp);
+	tmp[0].y += 10;
+	tmp.rbegin()->y += 10;
+	TrimCenter(tmp3, tmp, tmp);
+
+	tmp = ic.GetTorsoBoxLeft8();
+	tmp[0].y += 10;
+	tmp.rbegin()->x -= 5;
+	DuplicateLast(tmp);
+	tmp.rbegin()->y += 10;
+	TrimCenter(tmp3, tmp, tmp);
+
+	Finalize(tmp3, 60);
+	Append(result, tmp3);
 
 	return result;
 }
 vector<Vector3> PathGenerator::GenerateTailRosoIntersection()
 {
 	BezierSurfaceC0* tail = elephant.model8.GetTail();
-	float toolRadius = 5.0f;
 	float filterDist = 1.0f;
 	vector<Vector3> result;
-	Vector3 startingPoint = Vector3(-55, 0.5, minZ);
+	Vector3 startingPoint = Vector3(-55, 0, minZ - 10);
 
 	Vector3 s = material->size;
 	BezierSurfaceC0 plane(1, 1);
 	for (int w = 0; w < 4; w++)
 		for (int h = 0; h < 4; h++)
-			plane.GetVert(w, h) = Vector3(-54, s.x * w / 3 - s.x / 2, s.y * h / 3 - s.y / 2);
+			plane.GetVert(w, h) = Vector3(-54, 30 * w / 3 - 15, 20 * h / 3 + 10);
 
 	IntersectionCurve* curve = IntersectionCurve::FindIntersectionCurve({ &plane, tail }, startingPoint, 0.0001);
 
@@ -819,18 +820,17 @@ vector<Vector3> PathGenerator::GenerateTailRosoIntersection()
 			position.z -= 1.0f;
 
 
-			if (position.z > minZ)
+			if (position.z > minZ + 2.5)
 				result.push_back(position);
 		}
 
 		delete curve;
 	}
 
-	//result.erase(result.begin(), result.end() - 9);
-	//DuplicateFirst(result);
-	//result[0].y += 5;
-	//result[3].z -= 0.8;
-	//result[4].z -= 0.4;
+	DuplicateLast(result);
+	result.rbegin()->y -= 10;
+	Vector3 offset = { 0,0,-2.5 };
+	Translate(result, offset);
 
 	AddSafe(result);
 
