@@ -603,19 +603,19 @@ void PathGenerator::RemoveSelfIntersections(vector<Vector3>& path)
 
 void PathGenerator::GenerateThirdPath()
 {
-	vector<Vector3> moves = GenerateSurfaceIntersectionPaths();
-	vector<Vector3> moves2 = GenerateSurfacePaths();
-	Append(moves, moves2);
-	SavePath(moves, "Paths\\elephant\\3.k08");
-
 	//vector<Vector3> moves = GenerateSurfaceIntersectionPaths();
 	//vector<Vector3> moves2 = GenerateSurfacePaths();
-	//vector<Vector3> moves3 = GenerateClosedSpacePaths();
-	//vector<Vector3> moves4 = GenerateTailRosoIntersection();
 	//Append(moves, moves2);
-	//Append(moves, moves3);
-	//Append(moves, moves4);
 	//SavePath(moves, "Paths\\elephant\\3.k08");
+
+	vector<Vector3> moves = GenerateSurfaceIntersectionPaths();
+	vector<Vector3> moves2 = GenerateSurfacePaths();
+	vector<Vector3> moves3 = GenerateClosedSpacePaths();
+	vector<Vector3> moves4 = GenerateTailRosoIntersection();
+	Append(moves, moves2);
+	Append(moves, moves3);
+	Append(moves, moves4);
+	SavePath(moves, "Paths\\elephant\\3.k08");
 }
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 {
@@ -642,6 +642,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	tmp = ic.GetTorsoHead8();
 	AddSafe(tmp);
 	Append(result, tmp);
+
 
 	tmp = ic.GetHeadEarLeft8();
 	tmp2 = ic.GetHeadEarRight8();
@@ -680,48 +681,49 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	vector<vector<Vector3>> tmp3;
 	ModelVersion& model = elephant.model8;
 
-	////legs
-	//tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 75);
-	//tmp = ic.GetTorsoLegFront8();
-	//tmp[0].x -= 10;
-	//tmp.rbegin()->x += 10;
-	//TrimEnd(tmp3, tmp);
-	//Finalize(tmp3, 30);
-	//Append(result, tmp3);
+	//legs
+	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 75);
+	tmp = ic.GetTorsoLegFront8();
+	tmp.erase(tmp.begin(), tmp.begin() + 25);
+	tmp[0].x -= 10;
+	tmp.rbegin()->x += 10;
+	TrimEnd(tmp3, tmp);
+	Finalize(tmp3, 0);
+	Append(result, tmp3);
 
-	//tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 75);
-	//tmp = ic.GetTorsoLegBack8();
-	//tmp[0].x -= 10;
-	//tmp.rbegin()->x += 10;
-	//TrimEnd(tmp3, tmp);
-	//Finalize(tmp3, 30);
-	//Append(result, tmp3);
+	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 75);
+	tmp = ic.GetTorsoLegBack8();
+	tmp[0].x -= 10;
+	tmp.rbegin()->x += 10;
+	TrimEnd(tmp3, tmp);
+	Finalize(tmp3, 0);
+	Append(result, tmp3);
 
-	////tail
-	//tmp3 = AddParametrizationLine(model.GetTail(), true, false, 100);
-	//tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
-	//tmp[0].x += 10;
-	//tmp.rbegin()->x -= 2;
-	//DuplicateLast(tmp);
-	//tmp.rbegin()->y += 10;
-	//TrimEnd(tmp3, tmp);
-	//tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
-	//TrimEnd(tmp3, tmp);
-	//Finalize(tmp3, 30);
-	//Append(result, tmp3);
+	//tail
+	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 100);
+	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
+	tmp[0].x += 10;
+	tmp.rbegin()->x -= 2;
+	DuplicateLast(tmp);
+	tmp.rbegin()->y += 10;
+	TrimEnd(tmp3, tmp);
+	tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
+	TrimEnd(tmp3, tmp);
+	Finalize(tmp3, 0);
+	Append(result, tmp3);
 
-	////box
-	//tmp3 = AddParametrizationLine(model.GetBox(), true, false, 100);
-	//tmp = ic.GetTorsoBoxRight8();
-	//tmp[0].x += 10;
-	//tmp.rbegin()->x -= 10;
-	//TrimEnd(tmp3, tmp);
-	//tmp = ic.GetTorsoBoxLeft8();
-	//tmp[0].x += 10;
-	//tmp.rbegin()->x -= 10;
-	//TrimStart(tmp3, tmp);
-	//Finalize(tmp3, 40);
-	//Append(result, tmp3);
+	//box
+	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 100);
+	tmp = ic.GetTorsoBoxRight8();
+	tmp[0].x += 10;
+	tmp.rbegin()->x -= 10;
+	TrimEnd(tmp3, tmp);
+	tmp = ic.GetTorsoBoxLeft8();
+	tmp[0].x += 10;
+	tmp.rbegin()->x -= 10;
+	TrimStart(tmp3, tmp);
+	Finalize(tmp3, 0);
+	Append(result, tmp3);
 
 	//head
 	tmp3 = AddParametrizationLine(model.GetHead(), true, false, 75);
@@ -761,53 +763,59 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 		p = path;
 	}
 
-	Finalize(tmp3, 50);
+	Finalize(tmp3, 0);
 	Append(result, tmp3);
 
-	////torso
-	//tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 100);
-	//tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
-	//tmp.erase(tmp.begin(), tmp.begin() + 30);
-	//Reverse(tmp);
-	//tmp2 = ic.GetTorsoHead8();
-	//Append(tmp, tmp2);
-	//TrimStart(tmp3, tmp);
+	//torso
+	tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 100);
+	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
+	tmp.erase(tmp.begin(), tmp.begin() + 30);
+	Reverse(tmp);
+	tmp2 = ic.GetTorsoHead8();
+	Append(tmp, tmp2);
+	TrimStart(tmp3, tmp);
 
 
-	//tmp = ic.GetTorsoLegBack8();
-	//tmp[0].y -= 10;
-	//tmp.rbegin()->y -= 10;
-	//TrimCenter(tmp3, tmp, tmp);
+	tmp = ic.GetTorsoLegBack8();
+	tmp[0].y -= 10;
+	tmp.rbegin()->y -= 10;
+	TrimCenter(tmp3, tmp, tmp);
 
-	//tmp = ic.GetTorsoLegFront8();
-	//tmp[0].y -= 10;
-	//tmp.rbegin()->y -= 10;
-	//TrimCenter(tmp3, tmp, tmp);
+	tmp = ic.GetTorsoLegFront8();
+	tmp[0].y -= 10;
+	tmp.rbegin()->y -= 10;
+	TrimCenter(tmp3, tmp, tmp);
 
-	//tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, -10, minZ + 10));
-	//tmp[0].y -= 10;
-	//tmp[0].x += 10;
-	//tmp.erase(tmp.end() - 1);
-	//tmp.rbegin()->y += 10;
-	//tmp.rbegin()->x -= 10;
-	//TrimEnd(tmp3, tmp);
+	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, -10, minZ + 10));
+	tmp[0].y -= 10;
+	tmp[0].x += 10;
+	tmp.erase(tmp.end() - 1);
+	tmp.rbegin()->y += 10;
+	tmp.rbegin()->x -= 10;
+	TrimEnd(tmp3, tmp);
 
-	//tmp = ic.GetTorsoBoxRight8();
-	//tmp[0].x += 5;
-	//DuplicateFirst(tmp);
-	//tmp[0].y += 10;
-	//tmp.rbegin()->y += 10;
-	//TrimCenter(tmp3, tmp, tmp);
+	tmp = ic.GetTorsoBoxRight8();
+	tmp[0].x += 5;
+	DuplicateFirst(tmp);
+	tmp[0].y += 10;
+	DuplicateFirst(tmp);
+	tmp[0].y -= 10.5;
+	tmp[0].x -= 1;
+	tmp.rbegin()->y += 10;
+	TrimCenter(tmp3, tmp, tmp);
+	TrimEndLast(tmp3, tmp);
 
-	//tmp = ic.GetTorsoBoxLeft8();
-	//tmp[0].y += 10;
-	//tmp.rbegin()->x -= 5;
-	//DuplicateLast(tmp);
-	//tmp.rbegin()->y += 10;
-	//TrimCenter(tmp3, tmp, tmp);
+	tmp = ic.GetTorsoBoxLeft8();
+	tmp[0].y += 10;
+	tmp.rbegin()->x -= 5;
+	tmp.rbegin()->y -= 1;
+	DuplicateLast(tmp);
+	tmp.rbegin()->y += 10;
+	TrimCenter(tmp3, tmp, tmp);
+	TrimEnd(tmp3, tmp);
 
-	//Finalize(tmp3, 60);
-	//Append(result, tmp3);
+	Finalize(tmp3, 60);
+	Append(result, tmp3);
 
 	return result;
 }
@@ -845,6 +853,10 @@ vector<Vector3> PathGenerator::GenerateTailRosoIntersection()
 	result.rbegin()->y -= 10;
 	Vector3 offset = { 0,0,-2.5 };
 	Translate(result, offset);
+
+	vector<Vector3> tmp = ic.GetTorsoTail();
+	Reverse(tmp);
+	Append(result, tmp);
 
 	AddSafe(result);
 
@@ -954,10 +966,18 @@ void PathGenerator::Append(vector<Vector3>& path, vector<Vector3>& toAppend)
 {
 	path.insert(path.end(), toAppend.begin(), toAppend.end());
 }
-void PathGenerator::Finalize(vector<vector<Vector3>>& path, float interHeight)
+void PathGenerator::Finalize(vector<vector<Vector3>>& path, float innerHeight)
 {
 	RemoveEmpty(path);
-	AddInnerSafe(path, interHeight);
+	if (innerHeight == 0)
+	{
+		for (int i = 0; i < path.size(); i += 2)
+			Reverse(path[i]);
+	}
+	else
+	{
+	AddInnerSafe(path, innerHeight);
+	}
 	AddOuterSafe(path);
 }
 
@@ -1061,6 +1081,7 @@ void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& 
 			result.push_back(out);
 	}
 	paths = result;
+
 }
 void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
 {

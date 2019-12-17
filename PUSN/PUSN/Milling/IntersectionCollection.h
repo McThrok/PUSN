@@ -70,6 +70,11 @@ public:
 		static auto result = GenerateUnrestrictedPath(model8->GetHead(), model8->GetRightEar(), Vector3(50, 20, minZ + 10));
 		return result;
 	}
+	vector<Vector3> GetTorsoTail()
+	{
+		static auto result = GenerateUnrestrictedPath(model8->GetTorso(), model8->GetTail(), Vector3(50, -20, minZ - 10));
+		return result;
+	}
 
 private:
 	vector<Vector3> GenerateUnrestrictedPath(BezierSurfaceC0* surface1, BezierSurfaceC0* surface2, Vector3 startingPoint)
