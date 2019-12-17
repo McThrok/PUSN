@@ -30,18 +30,33 @@ void MillingMachine::LoadDataFromFile(string filePath)
 	ifstream file(filePath);
 	string str;
 	while (getline(file, str)) {
-		if (str[0] != 'N')
-			continue;
+		//if (str[0] != 'N')
+		//	continue;
 
-		int pos = str.find("G");
+		//int pos = str.find("G");
+		//if (pos == -1)
+		//	continue;
+
+		//if (str.substr(pos + 1, 2) != "01")
+		//	continue;
+
+		//Vector3 position;
+		//str = str.substr(pos + 3);
+
+		int pos = str.find("X");
 		if (pos == -1)
-			continue;
-
-		if (str.substr(pos + 1, 2) != "01")
-			continue;
+		{
+			pos = str.find("Y");
+			if (pos == -1)
+			{
+				pos = str.find("Z");
+				if (pos == -1)
+					continue;
+			}
+		}
 
 		Vector3 position;
-		str = str.substr(pos + 3);
+		str = str.substr(pos);
 
 		if (str[0] == 'X') {
 			pos = str.find(".");

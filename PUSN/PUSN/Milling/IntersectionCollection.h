@@ -37,7 +37,12 @@ public:
 
 	vector<Vector3> GetTorsoLegFront8()
 	{
-		static auto result =  GenerateUnrestrictedPath(model8->GetLegFront(), model8->GetTorso(), Vector3(20, -20, minZ - 20));
+		static auto result = GenerateUnrestrictedPath(model8->GetLegFront(), model8->GetTorso(), Vector3(20, -20, minZ - 20));
+		static bool done = false;
+		if (!done) {
+			result.erase(result.begin(), result.begin() + 25);
+			done = true;
+		}
 		return result;
 	}
 	vector<Vector3> GetTorsoBoxRight8()

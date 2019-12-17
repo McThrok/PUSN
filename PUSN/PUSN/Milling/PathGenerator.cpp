@@ -29,7 +29,9 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 		if (!x && !y && !z)
 			continue;
 
-		ss << "N9G01";
+		ss << "N";
+		ss << i+3;
+		//ss << "G01";
 		if (x) ss << "X" << fixed << std::setprecision(3) << point.x;
 		if (y) ss << "Y" << fixed << std::setprecision(3) << point.y;
 		if (z) ss << "Z" << fixed << std::setprecision(3) << point.z;
@@ -623,11 +625,8 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	ModelVersion& model = elephant.model8;
 
 	tmp = ic.GetTorsoBoxRight8();
-	AddSafe(tmp);
-	tmp = ic.GetTorsoBoxRight8();
-	Append(result, tmp);
-
-	tmp = ic.GetTorsoBoxLeft8();
+	tmp2 = ic.GetTorsoBoxLeft8();
+	Append(tmp, tmp2);
 	AddSafe(tmp);
 	Append(result, tmp);
 
@@ -640,6 +639,8 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	Append(result, tmp);
 
 	tmp = ic.GetTorsoHead8();
+	tmp[0].x -= 1;
+	tmp[0].y += 2;
 	AddSafe(tmp);
 	Append(result, tmp);
 
@@ -684,11 +685,10 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	//legs
 	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 75);
 	tmp = ic.GetTorsoLegFront8();
-	tmp.erase(tmp.begin(), tmp.begin() + 25);
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
 	TrimEnd(tmp3, tmp);
-	Finalize(tmp3, 0);
+	Finalize(tmp3, 27);
 	Append(result, tmp3);
 
 	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 75);
@@ -696,7 +696,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
 	TrimEnd(tmp3, tmp);
-	Finalize(tmp3, 0);
+	Finalize(tmp3, 27);
 	Append(result, tmp3);
 
 	//tail
@@ -709,7 +709,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	TrimEnd(tmp3, tmp);
 	tmp = GenerateUnrestrictedCylinderPath(model.GetTorso(), true, 0);
 	TrimEnd(tmp3, tmp);
-	Finalize(tmp3, 0);
+	Finalize(tmp3, 22);
 	Append(result, tmp3);
 
 	//box
@@ -722,7 +722,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
 	TrimStart(tmp3, tmp);
-	Finalize(tmp3, 0);
+	Finalize(tmp3, 40);
 	Append(result, tmp3);
 
 	//head
@@ -976,7 +976,7 @@ void PathGenerator::Finalize(vector<vector<Vector3>>& path, float innerHeight)
 	}
 	else
 	{
-	AddInnerSafe(path, innerHeight);
+		AddInnerSafe(path, innerHeight);
 	}
 	AddOuterSafe(path);
 }
