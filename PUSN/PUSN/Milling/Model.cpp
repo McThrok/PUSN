@@ -77,15 +77,6 @@ void Model::AddRescaledModelVersion()
 {
 	model8 = ModelVersion(model0);
 	ChangeSizeAlongNormals(model8, 4);
-
-	model10 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model10, 5);
-
-	model12 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model12, 6);
-
-	model16 = ModelVersion(model0);
-	ChangeSizeAlongNormals(model16, 8);
 }
 
 void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
@@ -95,7 +86,7 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 	for (int i = 0; i < surfaces.size(); i++)
 	{
 		BezierSurfaceC0& bs = *surfaces[i];
-		int wc = bs.GetWidthVertexCount();	
+		int wc = bs.GetWidthVertexCount();
 		int hc = bs.GetHeightVertexCount();
 		vector<Vector3> tmp(wc * hc);
 
@@ -104,8 +95,8 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 			{
 				Vector2 hw = bs.GetVertParametrization(w, h);
 				Vector3 change = bs.EvaluateNormal(hw);
-				float dist = length/0.85;
-				if (w % 3 != 0 )
+				float dist = length / 0.85;
+				if (w % 3 != 0)
 					dist *= 1.3;
 
 				tmp[w * hc + h] = bs.GetVert(w, h) + dist * change;
@@ -114,8 +105,6 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 		for (int w = 0; w < wc; w++)
 			for (int h = 0; h < hc; h++)
 				bs.GetVert(w, h) = tmp[w * hc + h];
-
-
 
 		if (bs.isCylinder && &bs != model.GetTail())
 		{
@@ -127,6 +116,10 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 			}
 		}
 	}
+
+	for (int w = 0; w < 7; w++)
+		for (int h = 2; h < 4; h++)
+			model.GetHead()->GetVert(w, h) += {-1.2, -1.2, 0};
 
 	//{
 	//	BezierSurfaceC0* surf = model.GetTail();

@@ -40,10 +40,6 @@ class Model
 public:
 	ModelVersion model0;
 	ModelVersion model8;
-	ModelVersion model10;
-	ModelVersion model12;
-	ModelVersion model16;
-
 
 	void LoadElephant(float minZ);
 	void Rescale(float minZ);

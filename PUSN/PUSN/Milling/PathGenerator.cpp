@@ -12,8 +12,7 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 	ic.model8 = &elephant.model8;
 
 	GenerateHeightMap();
-	GenerateSecondPath();
-	//GenerateThirdPath();
+	GenerateThirdPath();
 }
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
@@ -31,7 +30,7 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 			continue;
 
 		ss << "N";
-		ss << i+3;
+		ss << i + 3;
 		//ss << "G01";
 		if (x) ss << "X" << fixed << std::setprecision(3) << point.x;
 		if (y) ss << "Y" << fixed << std::setprecision(3) << point.y;
@@ -277,6 +276,8 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 	}
 
 	path.push_back({ -bound.x, bound.y, minZ });
+
+	path[43].y -= 10;
 
 	return path;
 }
@@ -640,8 +641,9 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	Append(result, tmp);
 
 	tmp = ic.GetTorsoHead8();
-	tmp[0].x -= 1;
-	tmp[0].y += 1;
+	DuplicateFirst(tmp);
+	tmp[0].x -= 2;
+	tmp[0].y += 1.6;
 	AddSafe(tmp);
 	Append(result, tmp);
 
