@@ -12,7 +12,8 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 	ic.model8 = &elephant.model8;
 
 	GenerateHeightMap();
-	GenerateThirdPath();
+	GenerateSecondPath();
+	//GenerateThirdPath();
 }
 
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
@@ -151,6 +152,7 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 
 			if (prevZ == z)
 				continue;
+			z += 2;
 
 			if (z < prevZ) {
 				subPath.push_back({ x, y , prevZ });
@@ -182,6 +184,7 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 
 void PathGenerator::GenerateSecondPath()
 {
+	GenerateHeightMap();
 	vector<Vector3> moves = GenerateFlatLayer();
 	vector<Vector3> moves2 = GenerateFlatEnvelope();
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
@@ -236,7 +239,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 
 	}
 
-	path.push_back({ x, y, safeZ });
+	path.push_back({ x,-bound.y, safeZ });
 	path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
 	path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
 
@@ -273,7 +276,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 		reversed = !reversed;
 	}
 
-	path.push_back({ x, y, safeZ });
+	path.push_back({ -bound.x, bound.y, minZ });
 
 	return path;
 }
@@ -421,8 +424,6 @@ vector<Vector3> PathGenerator::GenerateFlatEnvelope()
 	Vector3 start2 = start1;
 	start2.z = safeZ;
 
-	result.insert(result.begin(), start1);
-	result.insert(result.begin(), start2);
 	result.push_back(start1);
 	result.push_back(start2);
 
@@ -640,7 +641,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 
 	tmp = ic.GetTorsoHead8();
 	tmp[0].x -= 1;
-	tmp[0].y += 2;
+	tmp[0].y += 1;
 	AddSafe(tmp);
 	Append(result, tmp);
 
