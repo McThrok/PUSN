@@ -121,25 +121,6 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 		for (int h = 2; h < 4; h++)
 			model.GetHead()->GetVert(w, h) += {-1.2, -1.2, 0};
 
-	//{
-	//	BezierSurfaceC0* surf = model.GetTail();
-	//	int wc = surf->GetWidthVertexCount();
-	//	int hc = surf->GetHeightVertexCount();
-
-	//	for (int h = 0; h < hc; h++)
-	//	{
-	//		vector<Vector3> tmp(wc);
-	//		for (int w = 0; w < wc; w++)
-	//			tmp[w] = surf->GetVert(w, h);
-
-	//		for (int w = 0; w < wc; w++)
-	//			surf->GetVert(w, h) = tmp[(w + 3) % 6];
-
-	//		surf->GetVert(3, h).z -= 1;
-	//	}
-	//}
-
-
 	BezierSurfaceC0* surf = model.GetTorso();
 	for (int w = 0; w < surf->GetHeightVertexCount(); w++)
 	{
@@ -147,10 +128,10 @@ void Model::ChangeSizeAlongNormals(ModelVersion& model, float length)
 		surf->GetVert(w, surf->GetHeightVertexCount() - 1).x -= length;
 	}
 
-	BezierSurfaceC0* ears[2] = { model.GetLeftEar(),model.GetRightEar() };
+	BezierSurfaceC0* legs[2] = { model.GetLeftEar(),model.GetRightEar() };
 	for (int k = 0; k < 2; k++)
 	{
-		BezierSurfaceC0* surf = ears[k];
+		BezierSurfaceC0* surf = legs[k];
 		int wc = surf->GetWidthVertexCount();
 		int hc = surf->GetHeightVertexCount();
 
