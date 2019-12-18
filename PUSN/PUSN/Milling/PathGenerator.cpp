@@ -629,6 +629,7 @@ vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
 	tmp = ic.GetTorsoBoxRight8();
 	tmp2 = ic.GetTorsoBoxLeft8();
 	Append(tmp, tmp2);
+	tmp.rbegin()->x -= 2;
 	AddSafe(tmp);
 	Append(result, tmp);
 
@@ -686,7 +687,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	ModelVersion& model = elephant.model8;
 
 	//legs
-	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 150);
+	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 75);
 	tmp = ic.GetTorsoLegFront8();
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
@@ -694,7 +695,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 27);
 	Append(result, tmp3);
 
-	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 150);
+	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 75);
 	tmp = ic.GetTorsoLegBack8();
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
@@ -703,7 +704,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//tail
-	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 200);
+	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 125);
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 2;
@@ -716,7 +717,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//box
-	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 200);
+	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 125);
 	tmp = ic.GetTorsoBoxRight8();
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
@@ -744,7 +745,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//ear
-	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 100);
+	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 75);
 	tmp = ic.GetHeadEarRight8();
 	tmp2 = ic.GetHeadEarLeft8();
 	tmp2.insert(tmp2.begin(), *tmp.rbegin());
