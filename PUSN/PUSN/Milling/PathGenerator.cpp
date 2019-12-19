@@ -90,7 +90,7 @@ void PathGenerator::GenerateFirstPath()
 {
 	GenerateHeightMap();
 	vector<Vector3> moves = GenerateFirstPathLayer((material->size.z + minZ) / 2);
-	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ + 0.1);
+	vector<Vector3> moves2 = GenerateFirstPathLayer(minZ + 1);
 	moves.insert(moves.end(), moves2.begin(), moves2.end());
 	SavePath(moves, "Paths\\elephant\\1.k16");
 
@@ -129,8 +129,8 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 	vector<Vector3> path;
 
 	//k16
-	float xoff = 4;
-	float yoff = 8;
+	float xoff = 3;
+	float yoff = 3;
 
 	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
 
@@ -194,7 +194,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 	vector<Vector3> path;
 
 	//f10
-	float xoff = 8;
+	float xoff = 1;
 	float yoff = 1;
 	float safeY = 8;
 
@@ -607,18 +607,15 @@ void PathGenerator::RemoveSelfIntersections(vector<Vector3>& path)
 
 void PathGenerator::GenerateThirdPath()
 {
-	//vector<Vector3> moves = GenerateSurfaceIntersectionPaths();
-	//vector<Vector3> moves2 = GenerateSurfacePaths();
-	//Append(moves, moves2);
-	//SavePath(moves, "Paths\\elephant\\3.k08");
-
-	vector<Vector3> moves = GenerateSurfaceIntersectionPaths();
-	vector<Vector3> moves2 = GenerateSurfacePaths();
-	vector<Vector3> moves3 = GenerateClosedSpacePaths();
-	vector<Vector3> moves4 = GenerateTailRosoIntersection();
+	vector<Vector3> moves;
+	vector<Vector3> moves2 = GenerateSurfaceIntersectionPaths();
 	Append(moves, moves2);
+	vector<Vector3> moves3 = GenerateSurfacePaths();
 	Append(moves, moves3);
+	vector<Vector3> moves4 = GenerateClosedSpacePaths();
 	Append(moves, moves4);
+	vector<Vector3> moves5 = GenerateTailRosoIntersection();
+	Append(moves, moves5);
 	SavePath(moves, "Paths\\elephant\\3.k08");
 }
 vector<Vector3> PathGenerator::GenerateSurfaceIntersectionPaths()
@@ -687,7 +684,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	ModelVersion& model = elephant.model8;
 
 	//legs
-	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 75);
+	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 50);
 	tmp = ic.GetTorsoLegFront8();
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
@@ -695,7 +692,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 27);
 	Append(result, tmp3);
 
-	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 75);
+	tmp3 = AddParametrizationLine(model.GetLegBack(), true, false, 50);
 	tmp = ic.GetTorsoLegBack8();
 	tmp[0].x -= 10;
 	tmp.rbegin()->x += 10;
@@ -704,7 +701,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//tail
-	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 125);
+	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 100);
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 2;
@@ -717,7 +714,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//box
-	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 125);
+	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 100);
 	tmp = ic.GetTorsoBoxRight8();
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
@@ -730,7 +727,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//head
-	tmp3 = AddParametrizationLine(model.GetHead(), true, false, 150);
+	tmp3 = AddParametrizationLine(model.GetHead(), true, false, 125);
 	tmp2 = GenerateUnrestrictedCylinderPath(model.GetTorso(), false, 0);
 	tmp2.erase(tmp2.begin(), tmp2.begin() + tmp2.size() / 2);
 	tmp = GenerateUnrestrictedPath(model.GetHead(), model.GetTorso(), Vector3(70, 0, minZ + 10));
@@ -745,7 +742,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//ear
-	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 75);
+	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 50);
 	tmp = ic.GetHeadEarRight8();
 	tmp2 = ic.GetHeadEarLeft8();
 	tmp2.insert(tmp2.begin(), *tmp.rbegin());
@@ -771,7 +768,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Append(result, tmp3);
 
 	//torso
-	tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 200);
+	tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 175);
 	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
 	tmp.erase(tmp.begin(), tmp.begin() + 30);
 	Reverse(tmp);
@@ -799,11 +796,11 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	TrimEnd(tmp3, tmp);
 
 	tmp = ic.GetTorsoBoxRight8();
-	tmp[0].x += 5;
+	tmp[0].x += 6;
 	DuplicateFirst(tmp);
 	tmp[0].y += 10;
 	DuplicateFirst(tmp);
-	tmp[0].y -= 10.5;
+	tmp[0].y -= 11;
 	tmp[0].x -= 1;
 	tmp.rbegin()->y += 10;
 	TrimCenter(tmp3, tmp, tmp);
