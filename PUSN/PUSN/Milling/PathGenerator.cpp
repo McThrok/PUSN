@@ -11,7 +11,7 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 	ic.model0 = &elephant.model0;
 	ic.model8 = &elephant.model8;
 
-	//GenerateHeightMap();
+	GenerateHeightMap();
 	//GenerateThirdPath();
 }
 
@@ -67,6 +67,8 @@ void PathGenerator::GenerateHeightMap()
 				float u = 1.0f * i / material->gridX;
 				float v = 1.0f * j / material->gridY;
 				Vector3 point = surf->Evaluate(Vector2(u, v));
+				if (surfaces[k] == elephant.model0.GetTail())
+					point.z += 1;
 
 				point = Vector3::Transform(point, highMapTransform);
 
@@ -151,7 +153,6 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 
 			if (prevZ == z)
 				continue;
-			z += 2;
 
 			if (z < prevZ) {
 				subPath.push_back({ x, y , prevZ });
@@ -194,7 +195,7 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 	vector<Vector3> path;
 
 	//f10
-	float xoff = 1;
+	float xoff = 8;
 	float yoff = 1;
 	float safeY = 8;
 
@@ -238,7 +239,8 @@ vector<Vector3> PathGenerator::GenerateFlatLayer()
 
 	}
 
-	path.push_back({ x,-bound.y, safeZ });
+
+	AddSafeEnd(path);
 	path.push_back(Vector3(-bound.x, bound.y + safeY, safeZ));
 	path.push_back(Vector3(-bound.x, bound.y + safeY, minZ));
 
@@ -726,7 +728,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 40);
 	Append(result, tmp3);
 
-	//head
+	/*head*/
 	tmp3 = AddParametrizationLine(model.GetHead(), true, false, 125);
 	tmp2 = GenerateUnrestrictedCylinderPath(model.GetTorso(), false, 0);
 	tmp2.erase(tmp2.begin(), tmp2.begin() + tmp2.size() / 2);
@@ -741,7 +743,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 50);
 	Append(result, tmp3);
 
-	//ear
+	/*ear*/
 	tmp3 = AddParametrizationLine(model.GetRightEar(), false, false, 50);
 	tmp = ic.GetHeadEarRight8();
 	tmp2 = ic.GetHeadEarLeft8();
@@ -767,13 +769,15 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 0);
 	Append(result, tmp3);
 
-	//torso
+	/*torso*/
 	tmp3 = AddParametrizationLine(model.GetTorso(), true, false, 175);
 	tmp = GenerateUnrestrictedCylinderPath(model.GetHead(), true, 4);
 	tmp.erase(tmp.begin(), tmp.begin() + 30);
 	Reverse(tmp);
 	tmp2 = ic.GetTorsoHead8();
 	Append(tmp, tmp2);
+	tmp.rbegin()->y -= 2;
+	tmp.rbegin()->x += 1;
 	TrimStart(tmp3, tmp);
 
 
