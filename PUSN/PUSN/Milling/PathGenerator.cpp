@@ -131,7 +131,7 @@ vector<Vector3> PathGenerator::GenerateFirstPathLayer(float layerZ)
 	vector<Vector3> path;
 
 	//k16
-	float xoff = 3;
+	float xoff = 10;
 	float yoff = 3;
 
 	Vector2 bound = { material->size.x / 2, material->size.y / 2 };
@@ -685,7 +685,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	vector<vector<Vector3>> tmp3;
 	ModelVersion& model = elephant.model8;
 
-	//legs
+	///*legs*/
 	tmp3 = AddParametrizationLine(model.GetLegFront(), true, false, 50);
 	tmp = ic.GetTorsoLegFront8();
 	tmp[0].x -= 10;
@@ -702,7 +702,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 27);
 	Append(result, tmp3);
 
-	//tail
+	/*tail*/
 	tmp3 = AddParametrizationLine(model.GetTail(), true, false, 100);
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), { 50,-25,minZ });
 	tmp[0].x += 10;
@@ -715,7 +715,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	Finalize(tmp3, 22);
 	Append(result, tmp3);
 
-	//box
+	/*box*/
 	tmp3 = AddParametrizationLine(model.GetBox(), true, false, 100);
 	tmp = ic.GetTorsoBoxRight8();
 	tmp[0].x += 10;
@@ -725,7 +725,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp[0].x += 10;
 	tmp.rbegin()->x -= 10;
 	TrimStart(tmp3, tmp);
-	Finalize(tmp3, 40);
+	Finalize(tmp3, 33);
 	Append(result, tmp3);
 
 	/*head*/
@@ -739,8 +739,8 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp2 = GenerateUnrestrictedPath(model.GetHead(), model.GetRightEar(), Vector3(20, 20, minZ + 10));
 	Append(tmp, tmp2);
 	tmp.push_back(tmp[0]);
-	TrimCenter(tmp3, tmp, tmp);
-	Finalize(tmp3, 50);
+	TrimCenter(tmp3, tmp, tmp, 50);
+	Finalize(tmp3, 35);
 	Append(result, tmp3);
 
 	/*ear*/
@@ -766,7 +766,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 		p = path;
 	}
 
-	Finalize(tmp3, 0);
+	Finalize(tmp3, 40);
 	Append(result, tmp3);
 
 	/*torso*/
@@ -784,12 +784,12 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp = ic.GetTorsoLegBack8();
 	tmp[0].y -= 10;
 	tmp.rbegin()->y -= 10;
-	TrimCenter(tmp3, tmp, tmp);
+	TrimCenter(tmp3, tmp, tmp, 30);
 
 	tmp = ic.GetTorsoLegFront8();
 	tmp[0].y -= 10;
 	tmp.rbegin()->y -= 10;
-	TrimCenter(tmp3, tmp, tmp);
+	TrimCenter(tmp3, tmp, tmp, 30);
 
 	tmp = GenerateUnrestrictedPath(model.GetTail(), model.GetTorso(), Vector3(-50, -10, minZ + 10));
 	tmp[0].y -= 10;
@@ -807,8 +807,7 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp[0].y -= 11;
 	tmp[0].x -= 1;
 	tmp.rbegin()->y += 10;
-	TrimCenter(tmp3, tmp, tmp);
-	TrimEndLast(tmp3, tmp);
+	TrimCenter(tmp3, tmp, tmp, 35);
 
 	tmp = ic.GetTorsoBoxLeft8();
 	tmp[0].y += 10;
@@ -816,10 +815,9 @@ vector<Vector3> PathGenerator::GenerateSurfacePaths()
 	tmp.rbegin()->y -= 1;
 	DuplicateLast(tmp);
 	tmp.rbegin()->y += 10;
-	TrimCenter(tmp3, tmp, tmp);
-	TrimEnd(tmp3, tmp);
+	TrimCenter(tmp3, tmp, tmp, 35);
 
-	Finalize(tmp3, 50);
+	Finalize(tmp3, 40);
 	Append(result, tmp3);
 
 	return result;
@@ -974,15 +972,9 @@ void PathGenerator::Append(vector<Vector3>& path, vector<Vector3>& toAppend)
 void PathGenerator::Finalize(vector<vector<Vector3>>& path, float innerHeight)
 {
 	RemoveEmpty(path);
-	if (innerHeight == 0)
-	{
-		for (int i = 0; i < path.size(); i += 2)
-			Reverse(path[i]);
-	}
-	else
-	{
-		AddInnerSafe(path, innerHeight);
-	}
+	for (int i = 0; i < path.size(); i += 2)
+		Reverse(path[i]);
+	AddInnerSafe(path, innerHeight);
 	AddOuterSafe(path);
 }
 
@@ -1070,22 +1062,22 @@ void PathGenerator::TrimStart(vector<vector<Vector3>>& paths, vector<Vector3>& t
 	for (auto& p : paths)
 		TrimStart(p, trimmer);
 }
-void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo)
+void PathGenerator::TrimCenter(vector<vector<Vector3>>& paths, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo, float innerHeight)
 {
-	vector<vector<Vector3>> result;
+	//vector<vector<Vector3>> result;
 
 	for (int i = 0; i < paths.size(); i++)
 	{
-		vector<Vector3> out;
-		TrimCenter(paths[i], out, trimmerFrom, trimmerTo);
+		//vector<Vector3> out;
+		TrimCenter(paths[i],  trimmerFrom, trimmerTo,innerHeight);
 
-		if (!paths[i].empty())
-			result.push_back(paths[i]);
+		//if (!paths[i].empty())
+		//	result.push_back(paths[i]);
 
-		if (!out.empty())
-			result.push_back(out);
+		//if (!out.empty())
+		//	result.push_back(out);
 	}
-	paths = result;
+	//paths = result;
 
 }
 void PathGenerator::TrimEnd(vector<Vector3>& path, vector<Vector3>& trimmer)
@@ -1100,7 +1092,7 @@ void PathGenerator::TrimStart(vector<Vector3>& path, vector<Vector3>& trimmer)
 	if (to >= 0)
 		path.erase(path.begin(), path.begin() + to + 1);
 }
-void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& pathOut, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo)
+void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& trimmerFrom, vector<Vector3>& trimmerTo, float innerHeight)
 {
 	int from = FindIntersection(path, trimmerFrom);
 	int to = FindIntersectionLast(path, trimmerTo);
@@ -1112,13 +1104,15 @@ void PathGenerator::TrimCenter(vector<Vector3>& path, vector<Vector3>& pathOut, 
 	}
 	else if (from == -1 && to >= 0)
 	{
-		pathOut = vector<Vector3>(path.begin() + to + 1, path.end());
-		path.clear();
+		path = vector<Vector3>(path.begin() + to + 1, path.end());
 	}
 	else if (from >= 0 && to >= 0)
 	{
-		pathOut = vector<Vector3>(path.begin() + to + 1, path.end());
+		vector<Vector3> pathOut = vector<Vector3>(path.begin() + to + 1, path.end());
+		AddSafeStart(pathOut, innerHeight);
 		path.erase(path.begin() + from + 1, path.end());
+		AddSafeEnd(path, innerHeight);
+		Append(path, pathOut);
 	}
 }
 
