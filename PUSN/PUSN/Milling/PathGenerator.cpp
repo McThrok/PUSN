@@ -18,7 +18,7 @@ PathGenerator::PathGenerator(MillingMaterial* _material)
 void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 {
 	stringstream ss;
-
+	int number = 3;
 	for (int i = 0; i < moves.size(); i++)
 	{
 		Vector3& point = moves[i];
@@ -30,12 +30,13 @@ void PathGenerator::SavePath(vector<Vector3> moves, string filePath)
 			continue;
 
 		ss << "N";
-		ss << i + 3;
+		ss << number;
 		ss << "G01";
 		if (x) ss << "X" << fixed << std::setprecision(3) << point.x;
 		if (y) ss << "Y" << fixed << std::setprecision(3) << point.y;
 		if (z) ss << "Z" << fixed << std::setprecision(3) << point.z;
 		ss << endl;
+		number++;
 	}
 
 	ofstream file(filePath);

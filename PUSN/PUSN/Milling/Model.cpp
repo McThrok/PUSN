@@ -73,14 +73,14 @@ void Model::AdjustEar()
 	}
 
 	BezierSurfaceC0* surf = model0.GetTail();
-	for (int w = 0; w < surf->GetHeightVertexCount(); w++)
+	for (int w = 0; w < surf->GetWidthVertexCount(); w++)
 	{
 		surf->GetVert(w, 0).x += 0.5;
 		//surf->GetVert(w, surf->GetHeightVertexCount() - 1).x -= length;
 	}
 
 	 surf = model0.GetHead();
-	for (int w = 0; w < surf->GetHeightVertexCount(); w++)
+	for (int w = 0; w < surf->GetWidthVertexCount(); w++)
 	{
 		surf->GetVert(w, 0).x -= 0.5;
 		//surf->GetVert(w, surf->GetHeightVertexCount() - 1).x -= length;
